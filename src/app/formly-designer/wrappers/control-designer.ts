@@ -12,12 +12,14 @@ import { cloneDeep, set } from 'lodash';
             <i class="fa fa-cogs" aria-hidden="true"></i>
         </button>
         <div>
-            <field-editor #editor [hidden]="!editing" [formControl]="fieldEdit" [field]="fieldSource">
-                <div class="footer">
-                    <button (click)="cancel()" class="btn btn-secondary btn-sm mr-1">Cancel</button>
-                    <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary btn-sm">Apply</button>
-                </div>
-            </field-editor>
+            <div [hidden]="!editing" class="mb-3">
+                <field-editor #editor [formControl]="fieldEdit" [field]="fieldSource">
+                    <div class="footer">
+                        <button (click)="cancel()" class="btn btn-secondary btn-sm mr-1">Cancel</button>
+                        <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary btn-sm">Apply</button>
+                    </div>
+                </field-editor>
+            </div>
             <div [hidden]="editing">
                 <ng-container #fieldComponent></ng-container>
             </div>

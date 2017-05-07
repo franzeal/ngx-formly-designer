@@ -2,7 +2,6 @@ import { Component, forwardRef, Input, OnChanges, OnDestroy, OnInit, Output, Sim
 import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from '../formly-designer-config';
-import { cloneDeep } from 'lodash';
 import { Observable, Subscription } from 'rxjs/Rx';
 
 
@@ -16,16 +15,23 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'field-editor',
     template: `
         <form [formGroup]="form" novalidate>
-            <div class="form-group">
-                <label>key</label>
-                <input formControlName="key" class="form-control">
+            <div class="card">
+                <div class="card-header">
+                    <div class="form-group">
+                        <label>key</label>
+                        <input formControlName="key" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>type</label>
+                        <type-select formControlName="type"></type-select>
+                    </div>
+                </div>
+                <div class="card-block">
+                    <formly-form [form]="fieldForm" [fields]="type.value | typeFields" [model]="field">
+                    </formly-form>
+                    <ng-content></ng-content>
+                </div>
             </div>
-            <div class="form-group">
-                <label>type</label>
-                <type-select formControlName="type"></type-select>
-            </div>
-            <formly-form [form]="fieldForm" [fields]="type.value | typeFields" [model]="field">
-            </formly-form>
         </form>
     `,
     providers: [
@@ -47,11 +53,6 @@ export class FieldEditorComponent implements ControlValueAccessor, OnChanges, On
             key: ["", Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])],
             type: ["", Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
         });
-
-        this.form.statusChanges
-            .switchMap(() => Observable.timer())
-            .subscribe(() => this.invalid = this.form.invalid);
-
         this.fieldForm = formBuilder.group({});
     }
 
@@ -68,30 +69,27 @@ export class FieldEditorComponent implements ControlValueAccessor, OnChanges, On
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
-    private fieldFormValueChangesSubscription: Subscription;
-    private formValueChangesSubscription: Subscription;
+    private formStatusChangesSubscription: Subscription;
     private typeChangesSubscription: Subscription;
+    private valueChangesSubscription: Subscription;
 
     ngOnInit(): void {
-        this.typeChangesSubscription = this.type.valueChanges.subscribe(this.onTypeChange.bind(this));
+        this.typeChangesSubscription = this.type.valueChanges
+            .subscribe(() => this.onTypeChange());
 
-        this.formValueChangesSubscription = this.form.valueChanges.subscribe(() => {
-            Observable.timer().subscribe(() => {
-                this.updateValue();
-            });
-        });
+        this.formStatusChangesSubscription = this.form.statusChanges
+            .switchMap(() => Observable.timer())
+            .subscribe(() => this.invalid = this.form.invalid);
 
-        this.fieldFormValueChangesSubscription = this.fieldForm.valueChanges.subscribe(() => {
-            Observable.timer().subscribe(() => {
-                this.updateValue();
-            });
-        });
+        this.valueChangesSubscription = Observable.merge(this.fieldForm.valueChanges, this.form.valueChanges)
+            .switchMap(() => Observable.timer())
+            .subscribe(() => this.updateValue());
     }
 
     ngOnDestroy(): void {
-        this.fieldFormValueChangesSubscription.unsubscribe();
+        this.formStatusChangesSubscription.unsubscribe();
         this.typeChangesSubscription.unsubscribe();
-        this.formValueChangesSubscription.unsubscribe();
+        this.valueChangesSubscription.unsubscribe();
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -101,7 +99,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnChanges, On
                 this.typeChangesSubscription.unsubscribe();
             }
 
-            let field = this.field ? cloneDeep(this.field) : { };
+            let field = this.field ? this.field : { };
             let key = field.key || "";
             let type = field.type || "";
             this.key.setValue(key);
@@ -153,19 +151,6 @@ export class FieldEditorComponent implements ControlValueAccessor, OnChanges, On
         else {
             this.form.enable();
         }
-    }
-
-    private getFields(type: string): FormlyFieldConfig[] {
-        if (!type) {
-            return [];
-        }
-
-        let designerOption = this.formlyDesignerConfig.types[type];
-        if (!designerOption) {
-            return [];
-        }
-
-        return designerOption.fields || [];
     }
 
     private updateValue(): void {

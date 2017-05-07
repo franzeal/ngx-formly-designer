@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
-import { get, isArray, isNil, set } from 'lodash';
+import { cloneDeep, get, isArray, isNil, set } from 'lodash';
 
 @Injectable()
 export class FormlyDesignerService {
@@ -57,6 +57,19 @@ export class FormlyDesignerService {
             this.model = {};
             this.fields = this.fields.slice();
         }
+    }
+
+    private createDesignedField(originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): void {
+        let designerType = this.designerConfig.types[modifiedField.type];
+
+        // prune the field of paths not identified in the designer config
+        let prunedField = { key: modifiedField.key, type: modifiedField.type };
+        designerType.fields.forEach(designerField => {
+            set(prunedField, designerField.key, get(modifiedField, designerField.key));
+        });
+    }
+
+    private pruneField(field: FormlyFieldConfig): void {
     }
 
     private findAndReplace(fields: FormlyFieldConfig[], originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): boolean {

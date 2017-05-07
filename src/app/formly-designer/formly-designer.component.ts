@@ -8,7 +8,7 @@ import { FormlyDesignerService } from './formly-designer.service';
 @Component({
     selector: 'formly-designer',
     template: `
-        <form class="form-inline" novalidate [formGroup]="designer">
+        <form novalidate [formGroup]="designer">
             <div class="form-group">
                 <label class="form-control-label mr-sm-2">Field</label>
                 <div class="input-group">
@@ -29,8 +29,8 @@ import { FormlyDesignerService } from './formly-designer.service';
             </formly-form>
         </form>
 
-        Designer:
-        <pre>{{ designer.value | json }}</pre>
+        Fields:
+        <pre>{{ designedFields | json }}</pre>
 
         Model:
         <pre>{{ model | json }}</pre>
@@ -52,7 +52,8 @@ export class FormlyDesignerComponent implements OnInit {
     properties = new Array<string>();
 
     form: FormGroup;
-    options: any = { };
+    options: any = {};
+    designedFields: FormlyFieldConfig = [];
 
     constructor(
         private formBuilder: FormBuilder,
@@ -96,7 +97,7 @@ export class FormlyDesignerComponent implements OnInit {
             type: ["", Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
         });
 
-        this.form = this.formBuilder.group({ });
+        this.form = this.formBuilder.group({});
 
         console.log("formly-designer initialized");
     }

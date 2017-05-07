@@ -13,11 +13,11 @@ import { cloneDeep, set } from 'lodash';
         </button>
         <div>
             <field-editor #editor [hidden]="!editing" [formControl]="fieldEdit" [field]="fieldSource">
+                <div class="footer">
+                    <button (click)="cancel()" class="btn btn-secondary btn-sm mr-1">Cancel</button>
+                    <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary btn-sm">Apply</button>
+                </div>
             </field-editor>
-            <div *ngIf="editing">
-                <button (click)="cancel()" class="btn btn-secondary btn-sm">Cancel</button>
-                <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary btn-sm">Apply</button>
-            </div>
             <div [hidden]="editing">
                 <ng-container #fieldComponent></ng-container>
             </div>
@@ -29,6 +29,10 @@ import { cloneDeep, set } from 'lodash';
             justify-content: flex-start;
             align-content: flex-start;
             align-items: flex-start;
+        }
+        field-editor .footer {
+            display: flex;
+            justify-content: flex-end;
         }
     `]
 })

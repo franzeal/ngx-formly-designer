@@ -3,6 +3,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { FieldWrapper, FormlyConfig, FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerService } from '../formly-designer.service';
 import { cloneDeep, set } from 'lodash';
+import { Observable } from 'rxjs/Rx';
 
 
 @Component({
@@ -67,11 +68,9 @@ export class FormlyWrapperControlDesigner extends FieldWrapper implements OnInit
     }
 
     accept(): void {
-        this.editing = false;
-
-        // Apply the fieldEditor changes over top of the designer's existing fields; use a service?  search by object reference
-        // for this field's config, replace, reload?
-        this.formlyDesignerService.updateField(this.field, this.fieldEdit.value);
+        Observable.timer()
+            .do(() => this.formlyDesignerService.updateField(this.field, this.fieldEdit.value))
+            .subscribe(() => this.editing = false);
     }
 
     cancel(): void {

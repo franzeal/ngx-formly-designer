@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ConfigOption } from 'ng-formly';
+import { ConfigOption, FormlyFieldSelect } from 'ng-formly';
 import { FormlyFieldCustomInput } from './custom-input';
 
 export const fieldComponents: Component[] = [
@@ -8,7 +8,14 @@ export const fieldComponents: Component[] = [
 
 export const config: ConfigOption = {
     types: [
-        { name: "custom-input", component: FormlyFieldCustomInput }
+        { name: "customInput", component: FormlyFieldCustomInput },
+        { name: "select", component: FormlyFieldSelect,
+            defaultOptions: {
+                templateOptions: {
+                    options: []
+                }
+            }
+        }
     ],
     wrappers: [
     ]

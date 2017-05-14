@@ -97,10 +97,68 @@ import { AppComponent } from './app.component';
                     ]
                 },
                 {
-                    name: "select"
+                    name: "select",
+                    fields: [
+                        {
+                            key: "templateOptions.label",
+                            type: "input",
+                            templateOptions: {
+                                label: "label"
+                            }
+                        },
+                        {
+                            template: '<div class="mb-3">options</div>'
+                        },
+                        {
+                            key: "templateOptions.options",
+                            type: "repeatSection",
+                            templateOptions: {
+                                canAdd: true,
+                                canRemove: true
+                            },
+                            fieldArray: {
+                                className: "ml-3",
+                                fieldGroup: [
+                                    {
+                                        key: "label",
+                                        type: "input",
+                                        templateOptions: {
+                                            label: "label"
+                                        }
+                                    },
+                                    {
+                                        key: "value",
+                                        type: "input",
+                                        templateOptions: {
+                                            label: "value"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            template: '<div class="mb-3"></div>'
+                        },
+                        {
+                            key: "templateOptions.required",
+                            type: "checkbox",
+                            templateOptions: {
+                                label: "required"
+                            }
+                        }
+                    ]
                 },
                 {
-                    name: "multicheckbox"
+                    name: "multicheckbox",
+                    fields: [
+                        {
+                            key: "templateOptions.label",
+                            type: "input",
+                            templateOptions: {
+                                label: "label"
+                            }
+                        }
+                    ]
                 }
             ]
         })

@@ -30,7 +30,7 @@ import { FormlyDesignerService } from './formly-designer.service';
         </form>
 
         Fields:
-        <pre>{{ designedFields | json }}</pre>
+        <pre>{{ designerFields | json }}</pre>
 
         Model:
         <pre>{{ model | json }}</pre>
@@ -53,7 +53,7 @@ export class FormlyDesignerComponent implements OnInit {
 
     form: FormGroup;
     options: any = {};
-    designedFields: FormlyFieldConfig = [];
+    designerFields: FormlyFieldConfig = [];
 
     constructor(
         private formBuilder: FormBuilder,
@@ -98,6 +98,8 @@ export class FormlyDesignerComponent implements OnInit {
         });
 
         this.form = this.formBuilder.group({});
+
+        this.formlyDesignerService.fields$.subscribe(() => this.designerFields = this.formlyDesignerService.createDesignerFields());
 
         console.log("formly-designer initialized");
     }

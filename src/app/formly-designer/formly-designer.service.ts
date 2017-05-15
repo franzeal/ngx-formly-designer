@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
-import { cloneDeep, get, isArray, isNil, set } from 'lodash';
+import { get, isArray, isNil, set } from 'lodash';
 
 @Injectable()
 export class FormlyDesignerService {
@@ -52,32 +52,48 @@ export class FormlyDesignerService {
     }
 
     updateField(originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): void {
-        let designerType = this.designerConfig.types[modifiedField.type];
-
-        // prune the field of paths not identified in the designer config
-        let prunedField = { key: modifiedField.key, type: modifiedField.type };
-        designerType.fields.forEach(designerField => {
-            set(prunedField, designerField.key, get(modifiedField, designerField.key));
-        });
+        let designerField = this.createPrunedField(modifiedField);
 
         // Needs to do a deep find and replace
-        if (this.findAndReplace(this.fields, originalField, prunedField)) {
+        if (this.findAndReplace(this.fields, originalField, designerField)) {
             this.model = {};
             this.fields = this.fields.slice();
         }
     }
 
-    private createDesignedField(originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): void {
-        let designerType = this.designerConfig.types[modifiedField.type];
-
-        // prune the field of paths not identified in the designer config
-        let prunedField = { key: modifiedField.key, type: modifiedField.type };
-        designerType.fields.forEach(designerField => {
-            set(prunedField, designerField.key, get(modifiedField, designerField.key));
-        });
+    createDesignerFields(): FormlyFieldConfig[] {
+        return this.createPrunedFields(this.fields);
     }
 
-    private pruneField(field: FormlyFieldConfig): void {
+    private createPrunedFields(fields: FormlyFieldConfig[]): FormlyFieldConfig[] {
+        let designedFields = new Array<FormlyFieldConfig>();
+        if (isArray(fields)) {
+            fields.forEach(field => {
+                let designedField = this.createPrunedField(field);
+                if (field.fieldArray) {
+                    designedField.fieldArray = this.createPrunedField(field.fieldArray);
+                }
+                if (field.fieldGroup) {
+                    designedField.fieldGroup = this.createPrunedFields(field.fieldGroup);
+                }
+                designedFields.push(designedField);
+            });
+        }
+        return designedFields;
+    }
+
+    private createPrunedField(field: FormlyFieldConfig): FormlyFieldConfig {
+        let designerType = this.designerConfig.types[field.type];
+        if (!designerType) {
+            return undefined;
+        }
+
+        // Prune the field of paths not identified in the designer config
+        let designedField = { key: field.key, type: field.type };
+        designerType.fields.forEach(designerField => {
+            set(designedField, designerField.key, get(field, designerField.key));
+        });
+        return designedField;
     }
 
     private findAndReplace(fields: FormlyFieldConfig[], originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): boolean {

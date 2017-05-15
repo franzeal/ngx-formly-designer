@@ -9,9 +9,15 @@ import { Observable } from 'rxjs/Rx';
 @Component({
     selector: 'formly-wrapper-control-designer',
     template: `
-        <button *ngIf="!editing" (click)="edit()" class="btn btn-info btn-sm mr-2">
-            <i class="fa fa-cogs" aria-hidden="true"></i>
-        </button>
+        <div *ngIf="!editing" class="dropdown">
+            <button class="btn btn-sm btn-info mr-3" type="button" id="editorMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-cogs" aria-hidden="true"></i>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="editorMenuButton">
+                <div class="dropdown-item" (click)="edit()">Edit</div>
+                <a class="dropdown-item" (click)="remove()">Remove</a>
+            </div>
+        </div>
         <div>
             <div [hidden]="!editing" class="mb-3">
                 <field-editor #editor [formControl]="fieldEdit" [field]="fieldSource">
@@ -65,6 +71,9 @@ export class FormlyWrapperControlDesigner extends FieldWrapper implements OnInit
             templateOptions: cloneDeep(this.field.templateOptions)
         };
         this.fieldSource = field;
+    }
+
+    remove(): void {
     }
 
     accept(): void {

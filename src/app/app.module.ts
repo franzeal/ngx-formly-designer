@@ -62,6 +62,13 @@ import { AppComponent } from './app.component';
                             }
                         },
                         {
+                            key: "templateOptions.defaultValue",
+                            type: "input",
+                            templateOptions: {
+                                label: "default value"
+                            }
+                        },
+                        {
                             key: "templateOptions.description",
                             type: "input",
                             templateOptions: {
@@ -92,6 +99,13 @@ import { AppComponent } from './app.component';
                             type: "input",
                             templateOptions: {
                                 label: "label"
+                            }
+                        },
+                        {
+                            key: "templateOptions.defaultValue",
+                            type: "checkbox",
+                            templateOptions: {
+                                label: "default value"
                             }
                         }
                     ]
@@ -156,6 +170,33 @@ import { AppComponent } from './app.component';
                             type: "input",
                             templateOptions: {
                                 label: "label"
+                            }
+                        },
+                        {
+                            key: "templateOptions.options",
+                            type: "repeatSection",
+                            templateOptions: {
+                                canAdd: true,
+                                canRemove: true
+                            },
+                            fieldArray: {
+                                className: "ml-3",
+                                fieldGroup: [
+                                    {
+                                        key: "value",
+                                        type: "input",
+                                        templateOptions: {
+                                            label: "label"
+                                        }
+                                    },
+                                    {
+                                        key: "key",
+                                        type: "input",
+                                        templateOptions: {
+                                            label: "value"
+                                        }
+                                    }
+                                ]
                             }
                         }
                     ]

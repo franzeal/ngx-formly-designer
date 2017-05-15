@@ -74,6 +74,8 @@ export class FormlyWrapperControlDesigner extends FieldWrapper implements OnInit
     }
 
     remove(): void {
+        Observable.timer()
+            .subscribe(() => this.formlyDesignerService.removeField(this.field));
     }
 
     accept(): void {

@@ -43,6 +43,14 @@ export class FormlyDesignerService {
         this.fields = fields;
     }
 
+    removeField(originalField: FormlyFieldConfig): void {
+        // Needs to do a deep find and replace
+        if (this.findAndReplace(this.fields, originalField, undefined)) {
+            this.model = {};
+            this.fields = this.fields.slice();
+        }
+    }
+
     updateField(originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): void {
         let designerType = this.designerConfig.types[modifiedField.type];
 
@@ -77,7 +85,12 @@ export class FormlyDesignerService {
             for (let i = 0, l = fields.length; i < l; i++) {
                 let field = fields[i];
                 if (field === originalField) {
-                    fields[i] = modifiedField;
+                    if (isNil(modifiedField)) {
+                        fields.splice(i, 1);
+                    }
+                    else {
+                        fields[i] = modifiedField;
+                    }
                     return true;
                 }
                 if (field.fieldGroup && this.findAndReplace(field.fieldGroup, originalField, modifiedField)) {

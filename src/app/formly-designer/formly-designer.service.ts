@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
-import { get, isArray, isNil, set } from 'lodash';
+import { get, isArray, isEmpty, isNil, set } from 'lodash';
 
 @Injectable()
 export class FormlyDesignerService {
@@ -76,7 +76,9 @@ export class FormlyDesignerService {
                 if (field.fieldGroup) {
                     designedField.fieldGroup = this.createPrunedFields(field.fieldGroup);
                 }
-                designedFields.push(designedField);
+                if (Object.keys(designedField).length > 0) {
+                    designedFields.push(designedField);
+                }
             });
         }
         return designedFields;
@@ -85,7 +87,7 @@ export class FormlyDesignerService {
     private createPrunedField(field: FormlyFieldConfig): FormlyFieldConfig {
         let designerType = this.designerConfig.types[field.type];
         if (!designerType) {
-            return undefined;
+            return isEmpty(field.key) ? {} : { key: field.key };
         }
 
         // Prune the field of paths not identified in the designer config

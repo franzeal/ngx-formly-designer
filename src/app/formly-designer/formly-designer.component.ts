@@ -3,7 +3,23 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { FormlyConfig, FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { FormlyDesignerService } from './formly-designer.service';
+import { isString } from 'lodash';
 
+
+export function keyRequired(key: string, type: string): any {
+    return (group: FormGroup): { [key: string]: any } => {
+        if (group.get(type).value === "fieldGroup") {
+            return;
+        }
+
+        let keyValue = group.get(key).value;
+        if (!isString(keyValue) || keyValue.trim().length === 0) {
+            return {
+                keyRequired: true
+            };
+        }
+    }
+}
 
 @Component({
     selector: 'formly-designer',
@@ -93,9 +109,9 @@ export class FormlyDesignerComponent implements OnInit {
         // manipulation of the field - swapping between preview / designer.
 
         this.designer = this.formBuilder.group({
-            key: ["", Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])],
+            key: [""],
             type: ["", Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
-        });
+        }, { validator: keyRequired('key', 'type') });
 
         this.form = this.formBuilder.group({});
 
@@ -105,9 +121,18 @@ export class FormlyDesignerComponent implements OnInit {
     }
 
     add(): void {
-        this.formlyDesignerService.addField({
-            key: this.designer.get("key").value,
-            type: this.designer.get("type").value
-        });
+        let type = this.designer.get("type").value;
+        if (type === "fieldGroup") {
+            this.formlyDesignerService.addField({
+                key: this.designer.get("key").value,
+                fieldGroup: []
+            });
+        }
+        else {
+            this.formlyDesignerService.addField({
+                key: this.designer.get("key").value,
+                type: this.designer.get("type").value
+            });
+        }
     }
 }

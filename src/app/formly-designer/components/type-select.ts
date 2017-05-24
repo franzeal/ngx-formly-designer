@@ -37,6 +37,7 @@ export class TypeSelectComponent implements ControlValueAccessor, OnDestroy, OnI
             if (this.types.length > 0) {
                 this.formControl.setValue(this.types[0]);
             }
+            this.types.push("fieldGroup");
         });
     }
 

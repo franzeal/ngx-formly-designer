@@ -69,44 +69,36 @@ export class FieldEditorComponent implements ControlValueAccessor, OnChanges, On
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
-    private formStatusChangesSubscription: Subscription;
-    private typeChangesSubscription: Subscription;
-    private valueChangesSubscription: Subscription;
+    private subscriptions = new Array<Subscription>();
+    private typeChangeOverride = false;
 
     ngOnInit(): void {
-        this.typeChangesSubscription = this.type.valueChanges
-            .subscribe(() => this.onTypeChange());
+        this.subscriptions.push(this.type.valueChanges
+            .filter(() => this.typeChangeOverride === false)
+            .subscribe(() => this.onTypeChange()));
 
-        this.formStatusChangesSubscription = this.form.statusChanges
+        this.subscriptions.push(this.form.statusChanges
             .switchMap(() => Observable.timer())
-            .subscribe(() => this.invalid = this.form.invalid);
+            .subscribe(() => this.invalid = this.form.invalid));
 
-        this.valueChangesSubscription = Observable.merge(this.fieldForm.valueChanges, this.form.valueChanges)
+        this.subscriptions.push(Observable.merge(this.fieldForm.valueChanges, this.form.valueChanges)
             .switchMap(() => Observable.timer())
-            .subscribe(() => this.updateValue());
+            .subscribe(() => this.updateValue()));
     }
 
     ngOnDestroy(): void {
-        this.formStatusChangesSubscription.unsubscribe();
-        this.typeChangesSubscription.unsubscribe();
-        this.valueChangesSubscription.unsubscribe();
+        this.subscriptions.splice(0).forEach(subscription => subscription.unsubscribe());
     }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes["field"]) {
-            let subscription = this.typeChangesSubscription;
-            if (subscription) {
-                this.typeChangesSubscription.unsubscribe();
-            }
-
+            this.typeChangeOverride = true;
             let field = this.field ? this.field : { };
             let key = field.key || "";
             let type = field.type || "";
             this.key.setValue(key);
             this.type.setValue(type);
-            if (subscription) {
-                this.typeChangesSubscription = this.type.valueChanges.subscribe(this.onTypeChange.bind(this));
-            }
+            this.typeChangeOverride = false;
         }
     }
 

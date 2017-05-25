@@ -62,7 +62,7 @@ import { AppComponent } from './app.component';
                             }
                         },
                         {
-                            key: "templateOptions.defaultValue",
+                            key: "defaultValue",
                             type: "input",
                             templateOptions: {
                                 label: "default value"
@@ -102,7 +102,7 @@ import { AppComponent } from './app.component';
                             }
                         },
                         {
-                            key: "templateOptions.defaultValue",
+                            key: "defaultValue",
                             type: "checkbox",
                             templateOptions: {
                                 label: "default value"

@@ -18,7 +18,7 @@ import { Observable } from 'rxjs/Rx';
                 <a class="dropdown-item" (click)="remove()">Remove</a>
             </div>
         </div>
-        <div>
+        <div class="content">
             <div [hidden]="!editing" class="mb-3">
                 <field-editor #editor [formControl]="fieldEdit" [field]="fieldSource">
                     <div class="footer">
@@ -43,6 +43,9 @@ import { Observable } from 'rxjs/Rx';
             display: flex;
             justify-content: flex-end;
         }
+        .content {
+            width: 100%;
+        }
     `]
 })
 export class FormlyWrapperControlDesigner extends FieldWrapper implements OnInit {
@@ -65,12 +68,7 @@ export class FormlyWrapperControlDesigner extends FieldWrapper implements OnInit
 
     edit(): void {
         this.editing = true;
-        let field = {
-            key: this.field.key,
-            type: this.field.type,
-            templateOptions: cloneDeep(this.field.templateOptions)
-        };
-        this.fieldSource = field;
+        this.fieldSource = this.formlyDesignerService.convertField(cloneDeep(this.field));
     }
 
     remove(): void {

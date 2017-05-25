@@ -61,6 +61,10 @@ export class FormlyDesignerService {
         }
     }
 
+    convertField(field: FormlyFieldConfig): FormlyFieldConfig {
+        return this.createPrunedField(field);
+    }
+
     createDesignerFields(): FormlyFieldConfig[] {
         return this.createPrunedFields(this.fields);
     }

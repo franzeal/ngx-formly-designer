@@ -24,7 +24,7 @@ export function keyRequired(key: string, type: string): any {
 @Component({
     selector: 'formly-designer',
     template: `
-        <form novalidate [formGroup]="designer">
+        <form class="container-fluid" novalidate [formGroup]="designer">
             <div class="form-group">
                 <label class="form-control-label mr-sm-2">Field</label>
                 <div class="input-group">
@@ -40,7 +40,7 @@ export function keyRequired(key: string, type: string): any {
             </div>
         </form>
 
-        <form novalidate [formGroup]="form">
+        <form class="container-fluid" novalidate [formGroup]="form">
             <formly-form [options]="options" [model]="model" [form]="form" [fields]="fields">
             </formly-form>
         </form>

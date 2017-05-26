@@ -6,6 +6,9 @@ export class TemplateDesigner {
             if (field && field.type && field.templateOptions && field.templateOptions['designer'] !== true && !field.fieldGroup && !field.fieldArray) {
                 return 'controlDesigner';
             }
+            if (field && field.type && field.fieldGroup) {
+                return 'fieldGroupDesigner';
+            }
         });
     }
 }

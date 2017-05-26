@@ -4,6 +4,7 @@ import { FormlyDesignerConfig } from './formly-designer-config';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
 import { get, isArray, isEmpty, isNil, set } from 'lodash';
 
+
 @Injectable()
 export class FormlyDesignerService {
     constructor(
@@ -88,17 +89,25 @@ export class FormlyDesignerService {
         return designedFields;
     }
 
+    /** Prunes the field of paths not identified in the designer config */
     private createPrunedField(field: FormlyFieldConfig): FormlyFieldConfig {
+        let designedField: FormlyFieldConfig;
         let designerType = this.designerConfig.types[field.type];
         if (!designerType) {
-            return isEmpty(field.key) ? {} : { key: field.key };
+            designedField = isEmpty(field.key) ? {} : { key: field.key };
+            if (isArray(field.fieldGroup)) {
+                designedField.fieldGroup = this.createPrunedFields(field.fieldGroup);
+            }
         }
-
-        // Prune the field of paths not identified in the designer config
-        let designedField = { key: field.key, type: field.type };
-        designerType.fields.forEach(designerField => {
-            set(designedField, designerField.key, get(field, designerField.key));
-        });
+        else {
+            designedField = { key: field.key, type: field.type };
+            designerType.fields.forEach(designerField => {
+                let value = get(field, designerField.key);
+                if (!isEmpty(value)) {
+                    set(designedField, designerField.key, value);
+                }
+            });
+        }
         return designedField;
     }
 

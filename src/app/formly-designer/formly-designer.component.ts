@@ -1,46 +1,17 @@
-import { AfterViewInit, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { FormlyConfig, FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { FormlyDesignerService } from './formly-designer.service';
-import { isString } from 'lodash';
 
-
-export function keyRequired(key: string, type: string): any {
-    return (group: FormGroup): { [key: string]: any } => {
-        if (group.get(type).value === "fieldGroup") {
-            return;
-        }
-
-        let keyValue = group.get(key).value;
-        if (!isString(keyValue) || keyValue.trim().length === 0) {
-            return {
-                keyRequired: true
-            };
-        }
-    }
-}
 
 @Component({
     selector: 'formly-designer',
     template: `
-        <form class="container-fluid" novalidate [formGroup]="designer">
-            <div class="form-group">
-                <label class="form-control-label mr-sm-2">Field</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Key" formControlName="key">
-                    <div class="btn-group">
-                        <type-select formControlName="type">
-                        </type-select>
-                        <button type="button" class="btn btn-secondary" [disabled]="designer.invalid" (click)="add()">
-                            Add
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </form>
+        <field-picker (selected)="onfieldSelected($event)">
+        </field-picker>
 
-        <form class="container-fluid" novalidate [formGroup]="form">
+        <form novalidate [formGroup]="form">
             <formly-form [options]="options" [model]="model" [form]="form" [fields]="fields">
             </formly-form>
         </form>
@@ -51,18 +22,9 @@ export function keyRequired(key: string, type: string): any {
         Model:
         <pre>{{ model | json }}</pre>
     `,
-    styles: [`
-        .btn-group > type-select > select {
-            border-radius: 0;
-            border-left: 0;
-            border-right: 0;
-        }
-    `],
-    encapsulation: ViewEncapsulation.None,
     providers: [FormlyDesignerService]
 })
 export class FormlyDesignerComponent implements OnInit {
-    designer: FormGroup;
     types = new Array<string>();
     wrappers = new Array<string>();
     properties = new Array<string>();
@@ -108,11 +70,6 @@ export class FormlyDesignerComponent implements OnInit {
         // from the designer's use.  The "designerType" and "designerWrapper" should be exposed by a "fieldEditor" wrapper that allows
         // manipulation of the field - swapping between preview / designer.
 
-        this.designer = this.formBuilder.group({
-            key: [""],
-            type: ["", Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
-        }, { validator: keyRequired('key', 'type') });
-
         this.form = this.formBuilder.group({});
 
         this.formlyDesignerService.fields$.subscribe(() => this.designerFields = this.formlyDesignerService.createDesignerFields());
@@ -120,19 +77,7 @@ export class FormlyDesignerComponent implements OnInit {
         console.log("formly-designer initialized");
     }
 
-    add(): void {
-        let type = this.designer.get("type").value;
-        if (type === "fieldGroup") {
-            this.formlyDesignerService.addField({
-                key: this.designer.get("key").value,
-                fieldGroup: []
-            });
-        }
-        else {
-            this.formlyDesignerService.addField({
-                key: this.designer.get("key").value,
-                type: this.designer.get("type").value
-            });
-        }
+    onfieldSelected(field: FormlyFieldConfig): void {
+        this.formlyDesignerService.addField(field);
     }
 }

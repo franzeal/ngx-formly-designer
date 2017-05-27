@@ -1,6 +1,14 @@
 <div class="row" style="margin:2em">
     <div class="col-xs-4">
-        <formly-designer class="container-fluid">
+        <formly-designer [model]="model" [fields]="fields" class="container-fluid"
+            (modelChanged)="onModelChanged($event)" (fieldsChanged)="onFieldsChanged($event)">
         </formly-designer>
+        <div>
+            Fields:
+            <pre>{{ designerFields | json }}</pre>
+
+            Model:
+            <pre>{{ designerModel | json }}</pre>
+        </div>
     </div>
 </div>

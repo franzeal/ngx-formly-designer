@@ -23,7 +23,7 @@ export class FormlyDesignerService {
     }
 
     get fields$(): Observable<FormlyFieldConfig[]> {
-        return this._fields.asObservable();
+        return this._fields.asObservable().debounceTime(0);
     }
 
     get model(): any {
@@ -35,12 +35,13 @@ export class FormlyDesignerService {
     }
 
     get model$(): Observable<any> {
-        return this._model.asObservable();
+        return this._model.asObservable().debounceTime(0);
     }
 
     addField(field: FormlyFieldConfig): void {
         let fields = this.fields.slice();
         fields.push(field);
+        this.model = {};
         this.fields = fields;
     }
 

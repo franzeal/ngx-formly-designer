@@ -72,14 +72,12 @@ export class FormlyWrapperControlDesigner extends FieldWrapper implements OnInit
     }
 
     remove(): void {
-        Observable.timer()
-            .subscribe(() => this.formlyDesignerService.removeField(this.field));
+        this.formlyDesignerService.removeField(this.field);
     }
 
     accept(): void {
-        Observable.timer()
-            .do(() => this.formlyDesignerService.updateField(this.field, this.fieldEdit.value))
-            .subscribe(() => this.editing = false);
+        this.formlyDesignerService.updateField(this.field, this.fieldEdit.value);
+        this.editing = false;
     }
 
     cancel(): void {

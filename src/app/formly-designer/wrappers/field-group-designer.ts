@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild, ViewContainerRef } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { FieldWrapper, FormlyConfig, FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerService } from '../formly-designer.service';
 import { cloneDeep, set } from 'lodash';
-import { Observable } from 'rxjs/Rx';
+import { Observable, Subscription } from 'rxjs/Rx';
 
 
 @Component({
@@ -44,11 +44,11 @@ import { Observable } from 'rxjs/Rx';
             justify-content: flex-end;
         }
         .content {
-            width: 100%;
+            width: inherit;
         }
     `]
 })
-export class FormlyWrapperFieldGroupDesigner extends FieldWrapper implements OnInit {
+export class FormlyWrapperFieldGroupDesigner extends FieldWrapper {
     @ViewChild('fieldComponent', { read: ViewContainerRef }) fieldComponent: ViewContainerRef;
 
     editing = false;
@@ -63,27 +63,24 @@ export class FormlyWrapperFieldGroupDesigner extends FieldWrapper implements OnI
         super();
     }
 
-    ngOnInit(): void {
-        this.fieldEdit.valueChanges.subscribe(value => console.log(value));
-    }
-
     edit(): void {
         this.editing = true;
         this.fieldSource = this.formlyDesignerService.convertField(cloneDeep(this.field));
     }
 
     remove(): void {
-        Observable.timer()
-            .subscribe(() => this.formlyDesignerService.removeField(this.field));
+        this.formlyDesignerService.removeField(this.field);
     }
 
     accept(): void {
-        Observable.timer()
-            .do(() => this.formlyDesignerService.updateField(this.field, this.fieldEdit.value))
-            .subscribe(() => this.editing = false);
+        this.formlyDesignerService.updateField(this.field, this.fieldEdit.value);
+        this.editing = false;
     }
 
     cancel(): void {
+        let fieldEdit = cloneDeep(this.fieldEdit.value);
+        fieldEdit.key = this.field.key;
+        this.formlyDesignerService.updateField(this.field, fieldEdit);
         this.editing = false;
     }
 }

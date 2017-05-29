@@ -7,17 +7,17 @@ import { isString } from 'lodash';
 
 export function keyRequired(key: string, type: string): any {
     return (group: FormGroup): { [key: string]: any } => {
-        if (group.get(type).value === "fieldGroup") {
+        if (group.get(type).value === 'fieldGroup') {
             return;
         }
 
-        let keyValue = group.get(key).value;
+        const keyValue = group.get(key).value;
         if (!isString(keyValue) || keyValue.trim().length === 0) {
             return {
                 keyRequired: true
             };
         }
-    }
+    };
 }
 
 @Component({
@@ -58,23 +58,23 @@ export class FieldPickerComponent implements OnInit {
 
     ngOnInit(): void {
         this.designer = this.formBuilder.group({
-            key: [""],
-            type: ["", Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
+            key: [''],
+            type: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
         }, { validator: keyRequired('key', 'type') });
     }
 
     add(): void {
-        let type = this.designer.get("type").value;
-        if (type === "fieldGroup") {
+        const type = this.designer.get('type').value;
+        if (type === 'fieldGroup') {
             this.selected.emit({
-                key: this.designer.get("key").value,
+                key: this.designer.get('key').value,
                 fieldGroup: []
             });
         }
         else {
             this.selected.emit({
-                key: this.designer.get("key").value,
-                type: this.designer.get("type").value
+                key: this.designer.get('key').value,
+                type: this.designer.get('type').value
             });
         }
     }

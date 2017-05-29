@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FieldEditorComponent } from './components/field-editor';
 import { FieldGroupEditorComponent } from './components/field-group-editor';
 import { FieldPickerComponent } from './components/field-picker';
-import { FormlyConfig, FormlyModule, FormlyBootstrapModule } from 'ng-formly';
+import { FormlyConfig, FormlyModule } from 'ng-formly';
 import { FormlyDesignerComponent } from './formly-designer.component';
 import { DesignerConfigOption, FormlyDesignerConfig, FORMLY_DESIGNER_CONFIG_TOKEN } from './formly-designer-config';
 import { config, fieldComponents, wrapperComponents } from './config';

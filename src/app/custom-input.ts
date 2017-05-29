@@ -9,7 +9,7 @@ import { FieldType } from 'ng-formly';
             [formlyAttributes]="field" [ngClass]="{'form-control-danger': valid}">
     `,
 })
-export class FormlyFieldCustomInput extends FieldType {
+export class FormlyFieldCustomInputComponent extends FieldType {
     get type() {
         return this.to.type || 'text';
     }

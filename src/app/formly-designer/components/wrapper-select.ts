@@ -27,8 +27,9 @@ export class WrapperSelectComponent implements ControlValueAccessor, OnDestroy, 
         this.wrappers = Object.keys(this.formlyDesignerConfig.wrappers);
     }
 
+    formControl = new FormControl();
+
     protected wrappers: string[];
-    protected formControl = new FormControl();
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
@@ -58,7 +59,7 @@ export class WrapperSelectComponent implements ControlValueAccessor, OnDestroy, 
         this.onTouched = fn;
     }
 
-    setDisabledState(isDisabled: boolean) : void {
+    setDisabledState(isDisabled: boolean): void {
         if (isDisabled) {
             this.formControl.disable();
         }

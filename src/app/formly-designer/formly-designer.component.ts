@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { FormlyConfig, FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { FormlyDesignerService } from './formly-designer.service';
@@ -23,7 +23,7 @@ import { Subscription } from 'rxjs/Rx';
     `],
     providers: [FormlyDesignerService]
 })
-export class FormlyDesignerComponent implements OnInit, OnDestroy {
+export class FormlyDesignerComponent implements OnChanges, OnDestroy, OnInit {
     @Output() fieldsChanged = new EventEmitter<FormlyFieldConfig[]>();
     @Output() modelChanged = new EventEmitter<any>();
 
@@ -41,7 +41,18 @@ export class FormlyDesignerComponent implements OnInit, OnDestroy {
         private formlyConfig: FormlyConfig,
         private formlyDesignerConfig: FormlyDesignerConfig,
         private formlyDesignerService: FormlyDesignerService
-    ) { }
+    ) {
+        this.active = true;
+    }
+
+    @Input()
+    get active(): boolean {
+        return this.formlyDesignerService.active;
+    }
+
+    set active(value: boolean) {
+        this.formlyDesignerService.active = value;
+    }
 
     @Input()
     get fields(): FormlyFieldConfig[] {
@@ -62,7 +73,8 @@ export class FormlyDesignerComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        // Designer forms will be restricted to a single field depth; all designer keys should be complex (e.g. "templateOptions.some.property")
+        // Designer forms will be restricted to a single field depth; all designer keys should be
+        // complex (e.g. "templateOptions.some.property")
 
         // Wrappers for each type of field (group, array, control); depending on the field type, would apply one or more wrappers;
         // e.g. group then control, array then control, or just control; the control wrapper will expose the field editor.  The group
@@ -76,6 +88,12 @@ export class FormlyDesignerComponent implements OnInit, OnDestroy {
                 .subscribe(() => this.fieldsChanged.emit(this.formlyDesignerService.createDesignerFields())));
 
         this.subscriptions.push(this.formlyDesignerService.model$.subscribe(value => this.modelChanged.emit(value)));
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['active']) {
+            this.formlyDesignerService.active = this.active;
+        }
     }
 
     ngOnDestroy(): void {

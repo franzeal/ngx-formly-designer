@@ -11,8 +11,8 @@ export class TypeFieldsPipe implements PipeTransform {
     ) { }
 
     transform(type: string): FormlyFieldConfig[] {
-        let designerOption = (type ? this.formlyDesignerConfig.types[type] || {} : {}) as DesignerOption;
-        let fields = cloneDeep(designerOption.fields || []);
+        const designerOption = (type ? this.formlyDesignerConfig.types[type] || {} : {}) as DesignerOption;
+        const fields = cloneDeep(designerOption.fields || []);
         this.markDesigner(fields);
         return fields;
     }
@@ -20,7 +20,7 @@ export class TypeFieldsPipe implements PipeTransform {
     markDesigner(fields: FormlyFieldConfig[]): void {
         fields.forEach(field => {
             if (isObject(field.templateOptions)) {
-                field.templateOptions["designer"] = true;
+                field.templateOptions['designer'] = true;
             }
             else {
                 field.templateOptions = { designer: true };

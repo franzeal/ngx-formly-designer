@@ -1,9 +1,9 @@
-import { Component, EventEmitter, forwardRef, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, forwardRef, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ControlValueAccessor, FormArray, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { Observable, Subscription } from 'rxjs/Rx';
-import { cloneDeep, isArray, isString } from 'lodash';
+import { cloneDeep, isArray, isEmpty, isObject, isString } from 'lodash';
 
 
 const FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -36,8 +36,9 @@ const FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                 </div>
             </div>
         </form>
-        <formly-designer class="container mt-2" [fields]="childFields" (fieldsChanged)="onChildFieldsChanged($event)">
-        </formly-designer>
+        <div *ngFor="let description of childDescriptions">{{ description }}</div>
+        <!--<formly-designer *ngIf="childFields.length > 0" class="container mt-2" [active]="false" [fields]="childFields">
+        </formly-designer>-->
     `,
     providers: [
         FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR
@@ -52,21 +53,22 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
         private formlyDesignerConfig: FormlyDesignerConfig
     ) {
         this.form = formBuilder.group({
-            key: ["", Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])],
+            key: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])],
             fieldGroup: formBuilder.array([])
         });
     }
 
     get key(): FormControl {
-        return this.form.get("key") as FormControl;
+        return this.form.get('key') as FormControl;
     }
 
     get fieldGroup(): FormArray {
-        return this.form.get("fieldGroup") as FormArray;
+        return this.form.get('fieldGroup') as FormArray;
     }
 
     form: FormGroup;
-    childFields: FormlyFieldConfig[];
+    childFields = new Array<FormlyFieldConfig>();
+    childDescriptions = new Array<string>();
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
@@ -90,15 +92,15 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes["field"]) {
-            let field = this.field ? this.field : {};
-            this.key.setValue(isString(field.key) ? field.key : "");
+        if (changes['field']) {
+            const field = this.field ? this.field : {};
+            this.key.setValue(isString(field.key) ? field.key : '');
             while (this.fieldGroup.length > 0) {
                 this.fieldGroup.removeAt(0);
             }
             if (isArray(field.fieldGroup)) {
-                field.fieldGroup.forEach((field, index) => {
-                    this.fieldGroup.insert(index, new FormControl(field));
+                field.fieldGroup.forEach((childField, index) => {
+                    this.fieldGroup.insert(index, new FormControl(childField));
                 });
             }
             this.updateChildFields(this.fieldGroup.value);
@@ -107,15 +109,15 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
 
     writeValue(obj: any) {
         let changed = false;
-        let onChange = this.onChange;
+        const onChange = this.onChange;
         this.onChange = undefined;
 
         if (!obj) {
-            obj = { key: "", fieldGroup: [] };
+            obj = { key: '', fieldGroup: [] };
             changed = true;
         }
-        else if (!("key" in obj) || !("fieldGroup" in obj)) {
-            obj = { key: "key" in obj ? obj.key : "", fieldGroup: "fieldGroup" in obj ? obj.fieldGroup : [] };
+        else if (!('key' in obj) || !('fieldGroup' in obj)) {
+            obj = { key: 'key' in obj ? obj.key : '', fieldGroup: 'fieldGroup' in obj ? obj.fieldGroup : [] };
             changed = true;
         }
 
@@ -152,22 +154,21 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
         this.fieldGroup.push(new FormControl(field));
     }
 
-    onChildFieldsChanged(fields: FormlyFieldConfig[]): void {
-        this.changeOverride = true;
-        while (this.fieldGroup.length > 0) {
-            this.fieldGroup.removeAt(0);
-        }
-        if (isArray(fields)) {
-            fields.forEach((field, index) => {
-                this.fieldGroup.insert(index, new FormControl(field));
-            });
-        }
-        this.updateValue();
-        this.changeOverride = false;
-    }
-
-    private updateChildFields(fields: FormlyFieldConfig[]): void {
-        this.childFields = cloneDeep(fields);
+    private updateChildFields(fields: FormlyFieldConfig[]) {
+        this.childFields = isArray(fields) ? cloneDeep(fields) : [];
+        this.childDescriptions = this.childFields.map(childField => {
+            let type = '';
+            if (isString(childField.type)) {
+                type = childField.type;
+            }
+            else if (isArray(childField.fieldGroup)) {
+                type = 'fieldGroup';
+            }
+            else if (isObject(childField.fieldArray)) {
+                type = 'fieldArray';
+            }
+            return isEmpty(childField.key) ? type : `'${childField.key}': ${type}`;
+        });
     }
 
     private updateValue(): void {
@@ -175,12 +176,9 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
             return;
         }
 
-        if (this.changeOverride === false) {
-            this.updateChildFields(this.fieldGroup.value);
-        }
-
         this.field.key = this.key.value;
         this.field.fieldGroup = this.fieldGroup.value;
+        this.updateChildFields(this.field.fieldGroup);
         this.onChange(this.field);
     }
 }

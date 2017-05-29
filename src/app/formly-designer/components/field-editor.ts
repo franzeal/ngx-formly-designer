@@ -51,18 +51,18 @@ export class FieldEditorComponent implements ControlValueAccessor, OnChanges, On
         private formlyDesignerConfig: FormlyDesignerConfig
     ) {
         this.form = formBuilder.group({
-            key: ["", Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])],
-            type: ["", Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
+            key: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])],
+            type: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
         });
         this.fieldForm = formBuilder.group({});
     }
 
     get key(): FormControl {
-        return this.form.get("key") as FormControl;
+        return this.form.get('key') as FormControl;
     }
 
     get type(): FormControl {
-        return this.form.get("type") as FormControl;
+        return this.form.get('type') as FormControl;
     }
 
     form: FormGroup;
@@ -92,26 +92,26 @@ export class FieldEditorComponent implements ControlValueAccessor, OnChanges, On
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes["field"]) {
+        if (changes['field']) {
             this.typeChangeOverride = true;
-            let field = this.field ? this.field : { };
-            this.key.setValue(isString(field.key) ? field.key : "");
-            this.type.setValue(isString(field.type) ? field.type : "");
+            const field = this.field ? this.field : { };
+            this.key.setValue(isString(field.key) ? field.key : '');
+            this.type.setValue(isString(field.type) ? field.type : '');
             this.typeChangeOverride = false;
         }
     }
 
     writeValue(obj: any) {
         let changed = false;
-        let onChange = this.onChange;
+        const onChange = this.onChange;
         this.onChange = undefined;
 
         if (!obj) {
-            obj = { key: "", type: "" };
+            obj = { key: '', type: '' };
             changed = true;
         }
-        else if (!("key" in obj) || !("type" in obj)) {
-            obj = { key: "key" in obj ? obj.key : "", type: "type" in obj ? obj.type : "" };
+        else if (!('key' in obj) || !('type' in obj)) {
+            obj = { key: 'key' in obj ? obj.key : '', type: 'type' in obj ? obj.type : '' };
             changed = true;
         }
 

@@ -11,8 +11,21 @@ export class FormlyDesignerService {
         private designerConfig: FormlyDesignerConfig
     ) { }
 
+    private readonly _active = new BehaviorSubject<boolean>(false);
     private readonly _fields = new BehaviorSubject<FormlyFieldConfig[]>([]);
     private readonly _model = new BehaviorSubject<any>({});
+
+    get active(): boolean {
+        return this._active.value;
+    }
+
+    set active(value: boolean) {
+        this._active.next(!!value);
+    }
+
+    get active$(): Observable<boolean> {
+        return this._active.asObservable().debounceTime(0);
+    }
 
     get fields(): FormlyFieldConfig[] {
         return this._fields.value;
@@ -39,7 +52,7 @@ export class FormlyDesignerService {
     }
 
     addField(field: FormlyFieldConfig): void {
-        let fields = this.fields.slice();
+        const fields = this.fields.slice();
         fields.push(field);
         this.model = {};
         this.fields = fields;
@@ -54,7 +67,7 @@ export class FormlyDesignerService {
     }
 
     updateField(originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): void {
-        let designerField = this.createPrunedField(modifiedField);
+        const designerField = this.createPrunedField(modifiedField);
 
         // Needs to do a deep find and replace
         if (this.findAndReplace(this.fields, originalField, designerField)) {
@@ -72,10 +85,10 @@ export class FormlyDesignerService {
     }
 
     private createPrunedFields(fields: FormlyFieldConfig[]): FormlyFieldConfig[] {
-        let designedFields = new Array<FormlyFieldConfig>();
+        const designedFields = new Array<FormlyFieldConfig>();
         if (isArray(fields)) {
             fields.forEach(field => {
-                let designedField = this.createPrunedField(field);
+                const designedField = this.createPrunedField(field);
                 if (field.fieldArray) {
                     designedField.fieldArray = this.createPrunedField(field.fieldArray);
                 }
@@ -93,7 +106,7 @@ export class FormlyDesignerService {
     /** Prunes the field of paths not identified in the designer config */
     private createPrunedField(field: FormlyFieldConfig): FormlyFieldConfig {
         let designedField: FormlyFieldConfig;
-        let designerType = this.designerConfig.types[field.type];
+        const designerType = this.designerConfig.types[field.type];
         if (!designerType) {
             designedField = isEmpty(field.key) ? {} : { key: field.key };
             if (isArray(field.fieldGroup)) {
@@ -103,7 +116,7 @@ export class FormlyDesignerService {
         else {
             designedField = { key: field.key, type: field.type };
             designerType.fields.forEach(designerField => {
-                let value = get(field, designerField.key);
+                const value = get(field, designerField.key);
                 if (!isEmpty(value)) {
                     set(designedField, designerField.key, value);
                 }
@@ -114,8 +127,9 @@ export class FormlyDesignerService {
 
     private findAndReplace(fields: FormlyFieldConfig[], originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): boolean {
         if (isArray(fields)) {
-            for (let i = 0, l = fields.length; i < l; i++) {
-                let field = fields[i];
+            const l = fields.length;
+            for (let i = 0; i < l; i++) {
+                const field = fields[i];
                 if (field === originalField) {
                     if (isNil(modifiedField)) {
                         fields.splice(i, 1);
@@ -137,7 +151,7 @@ export class FormlyDesignerService {
     }
 
     private findAndReplaceFieldArray(parentField: FormlyFieldConfig, prevField, newField): boolean {
-        let fieldArray = parentField.fieldArray;
+        const fieldArray = parentField.fieldArray;
         if (fieldArray === prevField) {
             parentField.fieldArray = newField;
             return true;

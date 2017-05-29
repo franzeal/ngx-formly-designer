@@ -14,7 +14,8 @@ import { clone, cloneDeep, isArray, isFunction } from 'lodash';
             </button>
         </div>
         <div class="body" [ngClass]="{interactive: canAdd()}">
-            <div class="section flex-container" *ngFor="let control of formControlAsFormGroupOrArray.controls; let i=index" [ngClass]="{interactive: canRemove(i)}">
+            <div class="section flex-container" *ngFor="let control of formControlAsFormGroupOrArray.controls; let i=index"
+                [ngClass]="{interactive: canRemove(i)}">
                 <button type="button" class="remove-btn btn btn-sm btn-danger" (click)="remove(i)" [hidden]="!canRemove(i)">
                     <i class="fa fa-times" aria-hidden="true"></i>
                 </button>
@@ -40,7 +41,7 @@ import { clone, cloneDeep, isArray, isFunction } from 'lodash';
         }
     `]
 })
-export class FormlyFieldRepeatSection extends FieldType implements OnInit {
+export class FormlyFieldRepeatSectionComponent extends FieldType implements OnInit {
     private _fields: FormlyFieldConfig[][] = [];
 
     static createControl(model: any, field: FormlyFieldConfig): AbstractControl {
@@ -51,11 +52,11 @@ export class FormlyFieldRepeatSection extends FieldType implements OnInit {
         );
     }
 
-    get formControlAsFormGroupOrArray(): FormGroup | FormArray{
-        if(this.formControl instanceof FormGroup){
+    get formControlAsFormGroupOrArray(): FormGroup | FormArray {
+        if (this.formControl instanceof FormGroup) {
             return this.formControl as FormGroup;
         }
-        else if(this.formControl instanceof FormArray){
+        else if (this.formControl instanceof FormArray) {
             return this.formControl as FormArray;
         }
         return undefined;
@@ -88,17 +89,17 @@ export class FormlyFieldRepeatSection extends FieldType implements OnInit {
     }
 
     canAdd(): boolean {
-        let canAdd = this.to["canAdd"] as Function | boolean;
+        const canAdd = this.to['canAdd'] as Function | boolean;
         return (isFunction(canAdd) ? canAdd.apply(this) : canAdd) === true;
     }
 
     canRemove(index: number): boolean {
-        let canRemove = this.to["canRemove"] as Function | boolean;
+        const canRemove = this.to['canRemove'] as Function | boolean;
         if (canRemove === false) {
             return false;
         }
 
-        let value = this.model[index];
+        const value = this.model[index];
         if (value && value.canRemove === false) {
             return false;
         }
@@ -107,9 +108,9 @@ export class FormlyFieldRepeatSection extends FieldType implements OnInit {
     }
 
     add(): void {
-        let formGroup = new FormGroup({});
-        let added = {};
-        let onSectionAdded = this.to["onSectionAdded"] as Function;
+        const formGroup = new FormGroup({});
+        const added = {};
+        const onSectionAdded = this.to['onSectionAdded'] as Function;
         if (isFunction(onSectionAdded)) {
             onSectionAdded.apply(this, [added]);
         }
@@ -120,8 +121,8 @@ export class FormlyFieldRepeatSection extends FieldType implements OnInit {
 
     remove(index: number): void {
         (<FormArray>this.formControl).removeAt(index);
-        let removed = this.model.splice(index, 1);
-        let onSectionRemoved = this.to["onSectionRemoved"];
+        const removed = this.model.splice(index, 1);
+        const onSectionRemoved = this.to['onSectionRemoved'];
         if (isFunction(onSectionRemoved)) {
             onSectionRemoved.apply(this, [removed, index]);
         }

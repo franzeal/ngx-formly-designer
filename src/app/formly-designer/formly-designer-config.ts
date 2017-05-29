@@ -1,6 +1,7 @@
 import { Injectable, Inject, OpaqueToken } from '@angular/core';
 import { FormlyConfig, FormlyFieldConfig } from 'ng-formly';
 
+
 export const FORMLY_DESIGNER_CONFIG_TOKEN = new OpaqueToken('FORMLY_DESIGNER_CONFIG_TOKEN');
 
 @Injectable()
@@ -63,7 +64,7 @@ export class FormlyDesignerConfig {
 
 export interface DesignerOption {
     name: string;
-    fields?: FormlyFieldConfig[]
+    fields?: FormlyFieldConfig[];
 }
 
 export interface DesignerConfigOption {

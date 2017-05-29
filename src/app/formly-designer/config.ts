@@ -2,35 +2,35 @@ import { Component } from '@angular/core';
 
 import { ConfigOption } from 'ng-formly';
 
-import { FormlyFieldRepeatSection } from './types/repeat-section';
-import { FormlyFieldTypeSelect } from './types/type-select';
-import { FormlyFieldWrapperSelect } from './types/wrapper-select';
-import { FormlyWrapperControlDesigner } from './wrappers/control-designer';
-import { FormlyWrapperFieldGroupDesigner } from './wrappers/field-group-designer';
+import { FormlyFieldRepeatSectionComponent } from './types/repeat-section';
+import { FormlyFieldTypeSelectComponent } from './types/type-select';
+import { FormlyFieldWrapperSelectComponent } from './types/wrapper-select';
+import { FormlyWrapperControlDesignerComponent } from './wrappers/control-designer';
+import { FormlyWrapperFieldGroupDesignerComponent } from './wrappers/field-group-designer';
 
 import { TemplateDesigner } from './run/designer';
 
 
 export const fieldComponents: Component[] = [
-    FormlyFieldRepeatSection,
-    FormlyFieldTypeSelect,
-    FormlyFieldWrapperSelect
+    FormlyFieldRepeatSectionComponent,
+    FormlyFieldTypeSelectComponent,
+    FormlyFieldWrapperSelectComponent
 ];
 
 export const wrapperComponents: Component[] = [
-    FormlyWrapperControlDesigner,
-    FormlyWrapperFieldGroupDesigner
+    FormlyWrapperControlDesignerComponent,
+    FormlyWrapperFieldGroupDesignerComponent
 ];
 
 export const config: ConfigOption = {
     types: [
-        { name: 'repeatSection', component: FormlyFieldRepeatSection },
-        { name: 'typeSelect', component: FormlyFieldTypeSelect },
-        { name: 'wrapperSelect', component: FormlyFieldTypeSelect }
+        { name: 'repeatSection', component: FormlyFieldRepeatSectionComponent },
+        { name: 'typeSelect', component: FormlyFieldTypeSelectComponent },
+        { name: 'wrapperSelect', component: FormlyFieldTypeSelectComponent }
     ],
     wrappers: [
-        { name: 'controlDesigner', component: FormlyWrapperControlDesigner },
-        { name: 'fieldGroupDesigner', component: FormlyWrapperFieldGroupDesigner }
+        { name: 'controlDesigner', component: FormlyWrapperControlDesignerComponent },
+        { name: 'fieldGroupDesigner', component: FormlyWrapperFieldGroupDesignerComponent }
     ],
     manipulators: [
         { class: TemplateDesigner, method: 'run' }

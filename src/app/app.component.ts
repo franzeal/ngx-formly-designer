@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 import { FormlyFieldConfig } from 'ng-formly';
-import { Observable } from 'rxjs/Rx';
-import { cloneDeep } from 'lodash';
 
 
 @Component({

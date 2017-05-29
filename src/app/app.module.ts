@@ -27,124 +27,124 @@ import { AppComponent } from './app.component';
         FormlyDesignerModule.forRoot({
             types: [
                 {
-                    name: "input",
+                    name: 'input',
                     fields: [
                         {
-                            key: "templateOptions.label",
-                            type: "input",
+                            key: 'templateOptions.label',
+                            type: 'input',
                             templateOptions: {
-                                label: "label"
+                                label: 'label'
                             }
                         },
                         {
-                            key: "templateOptions.type",
-                            type: "select",
+                            key: 'templateOptions.type',
+                            type: 'select',
                             templateOptions: {
-                                label: "type",
+                                label: 'type',
                                 options: [
                                     {
-                                        label: "text",
-                                        value: "text"
+                                        label: 'text',
+                                        value: 'text'
                                     },
                                     {
-                                        label: "number",
-                                        value: "number"
+                                        label: 'number',
+                                        value: 'number'
                                     }
                                 ]
                             },
-                            defaultValue: "text"
+                            defaultValue: 'text'
                         },
                         {
-                            key: "templateOptions.placeholder",
-                            type: "input",
+                            key: 'templateOptions.placeholder',
+                            type: 'input',
                             templateOptions: {
-                                label: "placeholder"
+                                label: 'placeholder'
                             }
                         },
                         {
-                            key: "defaultValue",
-                            type: "input",
+                            key: 'defaultValue',
+                            type: 'input',
                             templateOptions: {
-                                label: "default value"
+                                label: 'default value'
                             }
                         },
                         {
-                            key: "templateOptions.description",
-                            type: "input",
+                            key: 'templateOptions.description',
+                            type: 'input',
                             templateOptions: {
-                                label: "description"
+                                label: 'description'
                             }
                         },
                         {
-                            key: "templateOptions.pattern",
-                            type: "input",
+                            key: 'templateOptions.pattern',
+                            type: 'input',
                             templateOptions: {
-                                label: "pattern"
+                                label: 'pattern'
                             }
                         },
                         {
-                            key: "templateOptions.required",
-                            type: "checkbox",
+                            key: 'templateOptions.required',
+                            type: 'checkbox',
                             templateOptions: {
-                                label: "required"
+                                label: 'required'
                             }
                         }
                     ]
                 },
                 {
-                    name: "checkbox",
+                    name: 'checkbox',
                     fields: [
                         {
-                            key: "templateOptions.label",
-                            type: "input",
+                            key: 'templateOptions.label',
+                            type: 'input',
                             templateOptions: {
-                                label: "label"
+                                label: 'label'
                             }
                         },
                         {
-                            key: "defaultValue",
-                            type: "checkbox",
+                            key: 'defaultValue',
+                            type: 'checkbox',
                             templateOptions: {
-                                label: "default value"
+                                label: 'default value'
                             }
                         }
                     ]
                 },
                 {
-                    name: "select",
+                    name: 'select',
                     fields: [
                         {
-                            key: "templateOptions.label",
-                            type: "input",
+                            key: 'templateOptions.label',
+                            type: 'input',
                             templateOptions: {
-                                label: "label"
+                                label: 'label'
                             }
                         },
                         {
                             template: '<div class="mb-3">options</div>'
                         },
                         {
-                            key: "templateOptions.options",
-                            type: "repeatSection",
+                            key: 'templateOptions.options',
+                            type: 'repeatSection',
                             templateOptions: {
                                 canAdd: true,
                                 canRemove: true
                             },
                             fieldArray: {
-                                className: "ml-3",
+                                className: 'ml-3',
                                 fieldGroup: [
                                     {
-                                        key: "label",
-                                        type: "input",
+                                        key: 'label',
+                                        type: 'input',
                                         templateOptions: {
-                                            label: "label"
+                                            label: 'label'
                                         }
                                     },
                                     {
-                                        key: "value",
-                                        type: "input",
+                                        key: 'value',
+                                        type: 'input',
                                         templateOptions: {
-                                            label: "value"
+                                            label: 'value'
                                         }
                                     }
                                 ]
@@ -154,46 +154,46 @@ import { AppComponent } from './app.component';
                             template: '<div class="mb-3"></div>'
                         },
                         {
-                            key: "templateOptions.required",
-                            type: "checkbox",
+                            key: 'templateOptions.required',
+                            type: 'checkbox',
                             templateOptions: {
-                                label: "required"
+                                label: 'required'
                             }
                         }
                     ]
                 },
                 {
-                    name: "multicheckbox",
+                    name: 'multicheckbox',
                     fields: [
                         {
-                            key: "templateOptions.label",
-                            type: "input",
+                            key: 'templateOptions.label',
+                            type: 'input',
                             templateOptions: {
-                                label: "label"
+                                label: 'label'
                             }
                         },
                         {
-                            key: "templateOptions.options",
-                            type: "repeatSection",
+                            key: 'templateOptions.options',
+                            type: 'repeatSection',
                             templateOptions: {
                                 canAdd: true,
                                 canRemove: true
                             },
                             fieldArray: {
-                                className: "ml-3",
+                                className: 'ml-3',
                                 fieldGroup: [
                                     {
-                                        key: "value",
-                                        type: "input",
+                                        key: 'value',
+                                        type: 'input',
                                         templateOptions: {
-                                            label: "label"
+                                            label: 'label'
                                         }
                                     },
                                     {
-                                        key: "key",
-                                        type: "input",
+                                        key: 'key',
+                                        type: 'input',
                                         templateOptions: {
-                                            label: "value"
+                                            label: 'value'
                                         }
                                     }
                                 ]

@@ -1,16 +1,17 @@
 import { ChangeDetectorRef, Component, ViewChild, ViewContainerRef } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { FieldWrapper, FormlyConfig, FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerService } from '../formly-designer.service';
-import { cloneDeep, set } from 'lodash';
-import { Observable, Subscription } from 'rxjs/Rx';
+import { cloneDeep } from 'lodash';
+import { Observable } from 'rxjs/Rx';
 
 
 @Component({
     selector: 'formly-wrapper-field-group-designer',
     template: `
-        <div *ngIf="!editing" class="dropdown">
-            <button class="btn btn-sm btn-info mr-3" type="button" id="editorMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <div *ngIf="!editing && active" class="dropdown">
+            <button class="btn btn-sm btn-info mr-3" type="button" id="editorMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fa fa-cogs" aria-hidden="true"></i>
             </button>
             <div class="dropdown-menu" aria-labelledby="editorMenuButton">
@@ -19,7 +20,7 @@ import { Observable, Subscription } from 'rxjs/Rx';
             </div>
         </div>
         <div class="content">
-            <div [hidden]="!editing" class="mb-3">
+            <div [hidden]="!editing">
                 <field-group-editor #editor [formControl]="fieldEdit" [field]="fieldSource">
                     <div class="footer">
                         <button (click)="cancel()" class="btn btn-secondary btn-sm mr-1">Cancel</button>
@@ -38,22 +39,30 @@ import { Observable, Subscription } from 'rxjs/Rx';
             justify-content: flex-start;
             align-content: flex-start;
             align-items: flex-start;
+            margin: .25em;
         }
         field-group-editor .footer {
             display: flex;
             justify-content: flex-end;
         }
         .content {
-            width: inherit;
+            border: 1px dashed #000;
+            border-radius: 5px;
+            padding: 1em;
+            width: 100%;
         }
     `]
 })
-export class FormlyWrapperFieldGroupDesigner extends FieldWrapper {
+export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper {
     @ViewChild('fieldComponent', { read: ViewContainerRef }) fieldComponent: ViewContainerRef;
 
     editing = false;
     fieldEdit = new FormControl({});
     fieldSource: FormlyFieldConfig;
+
+    get active(): boolean {
+        return this.formlyDesignerService.active;
+    }
 
     constructor(
         private changeDetector: ChangeDetectorRef,
@@ -65,6 +74,7 @@ export class FormlyWrapperFieldGroupDesigner extends FieldWrapper {
 
     edit(): void {
         this.editing = true;
+        this.formlyDesignerService.active = false;
         this.fieldSource = this.formlyDesignerService.convertField(cloneDeep(this.field));
     }
 
@@ -73,14 +83,20 @@ export class FormlyWrapperFieldGroupDesigner extends FieldWrapper {
     }
 
     accept(): void {
-        this.formlyDesignerService.updateField(this.field, this.fieldEdit.value);
-        this.editing = false;
+        Observable.timer().subscribe(() => {
+            this.formlyDesignerService.updateField(this.field, this.fieldEdit.value);
+            this.formlyDesignerService.active = true;
+            this.editing = false;
+        });
     }
 
     cancel(): void {
-        let fieldEdit = cloneDeep(this.fieldEdit.value);
+        const fieldEdit = cloneDeep(this.fieldEdit.value);
         fieldEdit.key = this.field.key;
-        this.formlyDesignerService.updateField(this.field, fieldEdit);
-        this.editing = false;
+        Observable.timer().subscribe(() => {
+            this.formlyDesignerService.updateField(this.field, fieldEdit);
+            this.formlyDesignerService.active = true;
+            this.editing = false;
+        });
     }
 }

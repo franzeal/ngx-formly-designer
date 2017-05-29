@@ -19,13 +19,14 @@ const TYPE_SELECT_CONTROL_VALUE_ACCESSOR: any = {
     `,
     providers: [TYPE_SELECT_CONTROL_VALUE_ACCESSOR]
 })
-export class TypeSelectComponent implements ControlValueAccessor, OnDestroy, OnInit {
+export class TypeSelectComponent implements AfterViewInit, ControlValueAccessor, OnDestroy, OnInit {
     constructor(
         private formlyDesignerConfig: FormlyDesignerConfig
     ) { }
 
+    formControl = new FormControl();
+
     protected types: string[];
-    protected formControl = new FormControl();
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
@@ -37,7 +38,7 @@ export class TypeSelectComponent implements ControlValueAccessor, OnDestroy, OnI
             if (this.types.length > 0) {
                 this.formControl.setValue(this.types[0]);
             }
-            this.types.push("fieldGroup");
+            this.types.push('fieldGroup');
         });
     }
 
@@ -65,7 +66,7 @@ export class TypeSelectComponent implements ControlValueAccessor, OnDestroy, OnI
         this.onTouched = fn;
     }
 
-    setDisabledState(isDisabled: boolean) : void {
+    setDisabledState(isDisabled: boolean): void {
         if (isDisabled) {
             this.formControl.disable();
         }

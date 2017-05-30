@@ -22,7 +22,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                         <label>key</label>
                         <input formControlName="key" class="form-control">
                     </div>
-                    <div class="form-group">
+                    <div *ngIf="showType" class="form-group">
                         <label>type</label>
                         <type-select formControlName="type"></type-select>
                     </div>
@@ -40,11 +40,9 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     ]
 })
 export class FieldEditorComponent implements ControlValueAccessor, OnChanges, OnDestroy, OnInit {
-    @Input()
-    field: FormlyFieldConfig = {};
-
-    @Output()
-    invalid: boolean;
+    @Input() field: FormlyFieldConfig = {};
+    @Input() showType: boolean;
+    @Output() invalid: boolean;
 
     constructor(
         private formBuilder: FormBuilder,

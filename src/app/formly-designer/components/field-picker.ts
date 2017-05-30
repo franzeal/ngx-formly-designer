@@ -1,24 +1,10 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from '../formly-designer-config';
-import { isString } from 'lodash';
 
 
-export function keyRequired(key: string, type: string): any {
-    return (group: FormGroup): { [key: string]: any } => {
-        if (group.get(type).value === 'fieldGroup') {
-            return;
-        }
-
-        const keyValue = group.get(key).value;
-        if (!isString(keyValue) || keyValue.trim().length === 0) {
-            return {
-                keyRequired: true
-            };
-        }
-    };
-}
+declare var $: any;
 
 @Component({
     selector: 'field-picker',
@@ -26,7 +12,6 @@ export function keyRequired(key: string, type: string): any {
         <form novalidate [formGroup]="designer">
             <div class="form-group">
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="key" formControlName="key">
                     <div class="btn-group">
                         <type-select formControlName="type">
                         </type-select>
@@ -36,17 +21,48 @@ export function keyRequired(key: string, type: string): any {
                     </div>
                 </div>
             </div>
+            <div #modal class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add {{ type }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Cancel">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <field-editor #editor [formControl]="fieldEdit" [field]="fieldSource">
+                            </field-editor>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" (click)="onApply()"
+                                [disabled]="editor.invalid">Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </form>
     `,
     styles: [`
+        .input-group .btn-group, .modal-header {
+            display: flex;
+        }
+        .modal-header {
+            justify-content: space-between;
+        }
         :host /deep/ type-select > select {
-            border-radius: 0;
-            border-left: 0;
+            border-radius: .25rem 0 0 .25rem;
             border-right: 0;
+        }
+        ::after {
+            display: none !important;
         }
     `]
 })
 export class FieldPickerComponent implements OnInit {
+    @ViewChild('modal') modalRef: ElementRef;
+    @ViewChild('modal2') modal2Ref: ElementRef;
     @Output() selected = new EventEmitter<FormlyFieldConfig>();
 
     constructor(
@@ -55,27 +71,46 @@ export class FieldPickerComponent implements OnInit {
     ) { }
 
     designer: FormGroup;
+    fieldSource: FormlyFieldConfig;
+    fieldEdit = new FormControl({});
+
+    get type(): string {
+        return this.designer.get('type').value;
+    }
+
+    private get modal(): any {
+        return $(this.modalRef.nativeElement);
+    }
+
+    private get modal2(): any {
+        return $(this.modal2Ref.nativeElement);
+    }
 
     ngOnInit(): void {
         this.designer = this.formBuilder.group({
-            key: [''],
             type: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
-        }, { validator: keyRequired('key', 'type') });
+        });
     }
 
     add(): void {
-        const type = this.designer.get('type').value;
+        this.fieldEdit.setValue({});
+        const type = this.type;
         if (type === 'fieldGroup') {
-            this.selected.emit({
-                key: this.designer.get('key').value,
+            this.fieldSource = {
                 fieldGroup: []
-            });
+            };
+            this.selected.emit(this.fieldSource);
         }
         else {
-            this.selected.emit({
-                key: this.designer.get('key').value,
-                type: this.designer.get('type').value
-            });
+            this.modal.modal('show');
+            this.fieldSource = {
+                type: type
+            };
         }
+    }
+
+    onApply(): void {
+        this.selected.emit(this.fieldEdit.value);
+        this.modal.modal('hide');
     }
 }

@@ -3,7 +3,7 @@ import { ControlValueAccessor, FormArray, FormBuilder, FormControl, FormGroup, N
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { Observable, Subscription } from 'rxjs/Rx';
-import { cloneDeep, isArray, isEmpty, isObject, isString } from 'lodash';
+import { cloneDeep, isArray, isString } from 'lodash';
 
 
 const FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -22,23 +22,18 @@ const FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                         <label>key</label>
                         <input formControlName="key" class="form-control">
                     </div>
-                </div>
-                <div class="card-block">
-                    <ng-content></ng-content>
-                </div>
-            </div>
-            <div class="card mt-2">
-                <div class="card-block">
                     <div class="form-group">
                         <label>child</label>
                         <field-picker (selected)="onfieldSelected($event)"></field-picker>
                     </div>
                 </div>
+                <div class="card-block">
+                    <ng-content></ng-content>
+                </div>
             </div>
         </form>
-        <div *ngFor="let description of childDescriptions">{{ description }}</div>
-        <!--<formly-designer *ngIf="childFields.length > 0" class="container mt-2" [active]="false" [fields]="childFields">
-        </formly-designer>-->
+        <formly-designer *ngIf="childFields.length > 0" class="container mt-2" [active]="false" [fields]="childFields">
+        </formly-designer>
     `,
     providers: [
         FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR
@@ -53,7 +48,7 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
         private formlyDesignerConfig: FormlyDesignerConfig
     ) {
         this.form = formBuilder.group({
-            key: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])],
+            key: [''],
             fieldGroup: formBuilder.array([])
         });
     }
@@ -68,7 +63,6 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
 
     form: FormGroup;
     childFields = new Array<FormlyFieldConfig>();
-    childDescriptions = new Array<string>();
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
@@ -156,19 +150,6 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
 
     private updateChildFields(fields: FormlyFieldConfig[]) {
         this.childFields = isArray(fields) ? cloneDeep(fields) : [];
-        this.childDescriptions = this.childFields.map(childField => {
-            let type = '';
-            if (isString(childField.type)) {
-                type = childField.type;
-            }
-            else if (isArray(childField.fieldGroup)) {
-                type = 'fieldGroup';
-            }
-            else if (isObject(childField.fieldArray)) {
-                type = 'fieldArray';
-            }
-            return isEmpty(childField.key) ? type : `'${childField.key}': ${type}`;
-        });
     }
 
     private updateValue(): void {

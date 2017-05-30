@@ -20,9 +20,10 @@
     "@angular/platform-browser": "^2.4.0",
     "@angular/platform-browser-dynamic": "^2.4.0",
     "@angular/router": "^3.4.0",
-    "bootstrap": "^4.0.0-alpha.6",
+    "bootstrap": "4.0.0-alpha.6",
     "core-js": "^2.4.1",
     "font-awesome": "^4.7.0",
+    "jquery": "^3.2.1",
     "lodash-es": "^4.17.4",
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.11",
@@ -31,9 +32,10 @@
     "zone.js": "^0.7.6"
   },
   "devDependencies": {
-    "@angular/cli": "1.0.0-rc.4",
+    "@angular/cli": "1.0.0",
     "@angular/compiler-cli": "^2.4.0",
     "@types/jasmine": "2.5.38",
+    "@types/jquery": "^2.0.45",
     "@types/lodash": "ts2.0",
     "@types/moment": "^2.13.0",
     "@types/moment-timezone": "^0.2.34",

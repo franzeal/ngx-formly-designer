@@ -91,12 +91,7 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper {
     }
 
     cancel(): void {
-        const fieldEdit = cloneDeep(this.fieldEdit.value);
-        fieldEdit.key = this.field.key;
-        Observable.timer().subscribe(() => {
-            this.formlyDesignerService.updateField(this.field, fieldEdit);
-            this.formlyDesignerService.active = true;
-            this.editing = false;
-        });
+        this.formlyDesignerService.active = true;
+        this.editing = false;
     }
 }

@@ -11,20 +11,33 @@ export class FormlyDesignerService {
         private designerConfig: FormlyDesignerConfig
     ) { }
 
-    private readonly _active = new BehaviorSubject<boolean>(false);
+    private readonly _disabled = new BehaviorSubject<boolean>(false);
+    private readonly _preview = new BehaviorSubject<boolean>(false);
     private readonly _fields = new BehaviorSubject<FormlyFieldConfig[]>([]);
     private readonly _model = new BehaviorSubject<any>({});
 
-    get active(): boolean {
-        return this._active.value;
+    get disabled(): boolean {
+        return this._disabled.value;
     }
 
-    set active(value: boolean) {
-        this._active.next(!!value);
+    set disabled(value: boolean) {
+        this._disabled.next(!!value);
     }
 
-    get active$(): Observable<boolean> {
-        return this._active.asObservable().debounceTime(0);
+    get disabled$(): Observable<boolean> {
+        return this._disabled.asObservable().debounceTime(0);
+    }
+
+    get preview(): boolean {
+        return this._preview.value;
+    }
+
+    set preview(value: boolean) {
+        this._preview.next(!!value);
+    }
+
+    get preview$(): Observable<boolean> {
+        return this._preview.asObservable().debounceTime(0);
     }
 
     get fields(): FormlyFieldConfig[] {

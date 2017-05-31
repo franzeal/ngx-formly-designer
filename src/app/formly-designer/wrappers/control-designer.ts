@@ -9,8 +9,8 @@ import { Observable } from 'rxjs/Rx';
 @Component({
     selector: 'formly-wrapper-control-designer',
     template: `
-        <div *ngIf="!editing && active" class="dropdown">
-            <button class="btn btn-sm btn-info mr-3" type="button" id="editorMenuButton"
+        <div *ngIf="!editing && !preview" class="dropdown">
+            <button [disabled]="disabled" class="btn btn-sm btn-info mr-2" type="button" id="editorMenuButton"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fa fa-cogs" aria-hidden="true"></i>
             </button>
@@ -19,7 +19,7 @@ import { Observable } from 'rxjs/Rx';
                 <a class="dropdown-item" (click)="remove()">Remove</a>
             </div>
         </div>
-        <div class="content">
+        <div class="content" [ngClass]="{'preview': preview}">
             <div class="editor" [hidden]="!editing">
                 <field-editor #editor [showType]="true" [formControl]="fieldEdit" [field]="fieldSource">
                     <div class="footer">
@@ -41,12 +41,8 @@ import { Observable } from 'rxjs/Rx';
             align-items: flex-start;
             margin: .25em;
         }
-        .editor {
-            margin: 1em 0;
-        }
-        field-editor .footer {
-            display: flex;
-            justify-content: flex-end;
+        .btn:not(:disabled), .dropdown-item:not(:disabled) {
+            cursor: pointer;
         }
         .content {
             border: 1px dashed #000;
@@ -54,6 +50,17 @@ import { Observable } from 'rxjs/Rx';
             min-height: 2em;
             padding: 0 1em;
             width: 100%;
+        }
+        .content.preview {
+            border: 0;
+            padding: 0;
+        }
+        .editor {
+            margin: 1em 0;
+        }
+        field-editor .footer {
+            display: flex;
+            justify-content: flex-end;
         }
     `]
 })
@@ -72,13 +79,17 @@ export class FormlyWrapperControlDesignerComponent extends FieldWrapper {
         super();
     }
 
-    get active(): boolean {
-        return this.formlyDesignerService.active;
+    get disabled(): boolean {
+        return this.formlyDesignerService.disabled;
+    }
+
+    get preview(): boolean {
+        return this.formlyDesignerService.preview;
     }
 
     edit(): void {
         this.editing = true;
-        this.formlyDesignerService.active = false;
+        this.formlyDesignerService.disabled = true;
         this.fieldSource = this.formlyDesignerService.convertField(cloneDeep(this.field));
     }
 
@@ -89,13 +100,13 @@ export class FormlyWrapperControlDesignerComponent extends FieldWrapper {
     accept(): void {
         Observable.timer().subscribe(() => {
             this.formlyDesignerService.updateField(this.field, this.fieldEdit.value);
-            this.formlyDesignerService.active = true;
+            this.formlyDesignerService.disabled = false;
             this.editing = false;
         });
     }
 
     cancel(): void {
-        this.formlyDesignerService.active = true;
+        this.formlyDesignerService.disabled = false;
         this.editing = false;
     }
 }

@@ -1,5 +1,5 @@
 import { Component, forwardRef, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
-import { ControlValueAccessor, FormArray, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
+import { ControlValueAccessor, FormArray, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { Observable, Subscription } from 'rxjs/Rx';
@@ -22,18 +22,21 @@ const FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                         <label>key</label>
                         <input formControlName="key" class="form-control">
                     </div>
-                    <div class="form-group">
-                        <label>child</label>
-                        <field-picker (selected)="onfieldSelected($event)"></field-picker>
-                    </div>
                 </div>
                 <div class="card-block">
+                    <div class="form-group">
+                        <label>child</label>
+                        <field-picker (selected)="onFieldSelected($event)"></field-picker>
+                    </div>
                     <ng-content></ng-content>
                 </div>
             </div>
         </form>
-        <formly-designer *ngIf="childFields.length > 0" class="container mt-2" [active]="false" [fields]="childFields">
-        </formly-designer>
+        <div *ngIf="childFields.length > 0">
+            <h4 class="mt-2">Children Preview</h4>
+            <formly-designer class="mt-1" [disabled]="true" [preview]="true" [fields]="childFields">
+            </formly-designer>
+        </div>
     `,
     providers: [
         FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR
@@ -144,7 +147,7 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
         }
     }
 
-    onfieldSelected(field: FormlyFieldConfig): void {
+    onFieldSelected(field: FormlyFieldConfig): void {
         this.fieldGroup.push(new FormControl(field));
     }
 

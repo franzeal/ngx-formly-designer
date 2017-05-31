@@ -13,10 +13,15 @@ const TYPE_SELECT_CONTROL_VALUE_ACCESSOR: any = {
 @Component({
     selector: 'type-select',
     template: `
-        <select [formControl]="formControl" style="width:100%" class="custom-select">
+        <select [formControl]="formControl" class="custom-select">
             <option *ngFor="let type of types; let i = index" [ngValue]="type">{{ type }}</option>
         </select>
     `,
+    styles: [`
+        select {
+            width: 100%;
+        }
+    `],
     providers: [TYPE_SELECT_CONTROL_VALUE_ACCESSOR]
 })
 export class TypeSelectComponent implements AfterViewInit, ControlValueAccessor, OnDestroy, OnInit {

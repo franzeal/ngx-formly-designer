@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { FormlyConfig, FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from './formly-designer-config';
@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs/Rx';
 @Component({
     selector: 'formly-designer',
     template: `
-        <field-picker (selected)="onfieldSelected($event)">
+        <field-picker (selected)="onFieldSelected($event)">
         </field-picker>
         <form novalidate [formGroup]="form">
             <formly-form [options]="options" [model]="model" [form]="form" [fields]="fields">
@@ -23,7 +23,7 @@ import { Subscription } from 'rxjs/Rx';
     `],
     providers: [FormlyDesignerService]
 })
-export class FormlyDesignerComponent implements OnChanges, OnDestroy, OnInit {
+export class FormlyDesignerComponent implements OnDestroy, OnInit {
     @Output() fieldsChanged = new EventEmitter<FormlyFieldConfig[]>();
     @Output() modelChanged = new EventEmitter<any>();
 
@@ -41,17 +41,24 @@ export class FormlyDesignerComponent implements OnChanges, OnDestroy, OnInit {
         private formlyConfig: FormlyConfig,
         private formlyDesignerConfig: FormlyDesignerConfig,
         private formlyDesignerService: FormlyDesignerService
-    ) {
-        this.active = true;
+    ) { }
+
+    @Input()
+    get disabled(): boolean {
+        return this.formlyDesignerService.disabled;
+    }
+
+    set disabled(value: boolean) {
+        this.formlyDesignerService.disabled = value;
     }
 
     @Input()
-    get active(): boolean {
-        return this.formlyDesignerService.active;
+    get preview(): boolean {
+        return this.formlyDesignerService.preview;
     }
 
-    set active(value: boolean) {
-        this.formlyDesignerService.active = value;
+    set preview(value: boolean) {
+        this.formlyDesignerService.preview = value;
     }
 
     @Input()
@@ -90,17 +97,11 @@ export class FormlyDesignerComponent implements OnChanges, OnDestroy, OnInit {
         this.subscriptions.push(this.formlyDesignerService.model$.subscribe(value => this.modelChanged.emit(value)));
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes['active']) {
-            this.formlyDesignerService.active = this.active;
-        }
-    }
-
     ngOnDestroy(): void {
         this.subscriptions.splice(0).forEach(subscription => subscription.unsubscribe());
     }
 
-    onfieldSelected(field: FormlyFieldConfig): void {
+    onFieldSelected(field: FormlyFieldConfig): void {
         this.formlyDesignerService.addField(field);
     }
 }

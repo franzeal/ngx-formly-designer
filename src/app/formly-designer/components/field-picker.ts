@@ -12,13 +12,11 @@ declare var $: any;
         <form novalidate [formGroup]="designer">
             <div class="form-group">
                 <div class="input-group">
-                    <div class="btn-group">
-                        <type-select formControlName="type">
-                        </type-select>
-                        <button type="button" class="btn btn-secondary" [disabled]="designer.invalid" (click)="add()">
-                            Add
-                        </button>
-                    </div>
+                    <type-select formControlName="type">
+                    </type-select>
+                    <button type="button" class="btn btn-secondary" [disabled]="designer.invalid" (click)="add()">
+                        Add
+                    </button>
                 </div>
             </div>
             <div #modal class="modal fade" tabindex="-1" role="dialog">
@@ -45,11 +43,20 @@ declare var $: any;
         </form>
     `,
     styles: [`
-        .input-group .btn-group, .modal-header {
+        .btn:not(:disabled), .dropdown-item:not(:disabled) {
+            cursor: pointer;
+        }
+        .input-group > .btn {
+            border-radius: 0 .25rem .25rem 0;
+        }
+        .input-group, .modal-header {
             display: flex;
         }
         .modal-header {
             justify-content: space-between;
+        }
+        type-select {
+            flex-grow: 2;
         }
         :host /deep/ type-select > select {
             border-radius: .25rem 0 0 .25rem;
@@ -62,7 +69,6 @@ declare var $: any;
 })
 export class FieldPickerComponent implements OnInit {
     @ViewChild('modal') modalRef: ElementRef;
-    @ViewChild('modal2') modal2Ref: ElementRef;
     @Output() selected = new EventEmitter<FormlyFieldConfig>();
 
     constructor(
@@ -80,10 +86,6 @@ export class FieldPickerComponent implements OnInit {
 
     private get modal(): any {
         return $(this.modalRef.nativeElement);
-    }
-
-    private get modal2(): any {
-        return $(this.modal2Ref.nativeElement);
     }
 
     ngOnInit(): void {

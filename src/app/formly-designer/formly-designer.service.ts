@@ -138,6 +138,13 @@ export class FormlyDesignerService {
         return designedField;
     }
 
+    private checkPathConflict(fields: FormlyFieldConfig[], originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): void {
+        // Determine what the full path of the modified field is
+
+        // Find the first field in fields (exluding the original field) that has the
+        // same path and a conflicting type (field / fieldGroup / fieldArray), if any
+    }
+
     private findAndReplace(fields: FormlyFieldConfig[], originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): boolean {
         if (isArray(fields)) {
             const l = fields.length;
@@ -163,7 +170,7 @@ export class FormlyDesignerService {
         return false;
     }
 
-    private findAndReplaceFieldArray(parentField: FormlyFieldConfig, prevField, newField): boolean {
+    private findAndReplaceFieldArray(parentField: FormlyFieldConfig, prevField: FormlyFieldConfig, newField: FormlyFieldConfig): boolean {
         const fieldArray = parentField.fieldArray;
         if (fieldArray === prevField) {
             parentField.fieldArray = newField;

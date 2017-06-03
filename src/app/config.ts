@@ -1,13 +1,16 @@
 import { Component } from '@angular/core';
 import { ConfigOption, FormlyFieldMultiCheckbox, FormlyFieldSelect } from 'ng-formly';
-import { FormlyFieldCustomInputComponent } from './custom-input';
+import { FormlyFieldCustomInputComponent } from './types/custom-input';
+import { FormlyWrapperExpanderComponent } from './wrappers/expander';
 
 export const fieldComponents: Component[] = [
-    FormlyFieldCustomInputComponent
+    FormlyFieldCustomInputComponent,
+    FormlyWrapperExpanderComponent
 ];
 
 export const config: ConfigOption = {
     types: [
+        { name: 'extended-input', extends: 'input' },
         { name: 'customInput', component: FormlyFieldCustomInputComponent },
         { name: 'multicheckbox', component: FormlyFieldMultiCheckbox,
             defaultOptions: {
@@ -25,5 +28,6 @@ export const config: ConfigOption = {
         }
     ],
     wrappers: [
+        { name: 'expander', component: FormlyWrapperExpanderComponent }
     ]
 };

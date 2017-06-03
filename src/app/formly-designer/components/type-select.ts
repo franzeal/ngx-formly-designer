@@ -14,7 +14,7 @@ const TYPE_SELECT_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'type-select',
     template: `
         <select [formControl]="formControl" class="custom-select">
-            <option *ngFor="let type of types; let i = index" [ngValue]="type">{{ type }}</option>
+            <option *ngFor="let type of types" [ngValue]="type">{{ type }}</option>
         </select>
     `,
     styles: [`

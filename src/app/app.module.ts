@@ -9,11 +9,13 @@ import { FormlyDesignerModule } from './formly-designer/formly-designer.module';
 import { config, fieldComponents } from './config';
 
 import { AppComponent } from './app.component';
+import { ExpanderComponent } from './components/expander.component';
 
 
 @NgModule({
     declarations: [
         AppComponent,
+        ExpanderComponent,
 
         fieldComponents
     ],
@@ -197,6 +199,27 @@ import { AppComponent } from './app.component';
                                         }
                                     }
                                 ]
+                            }
+                        }
+                    ]
+                }
+            ],
+            wrappers: [
+                {
+                    name: 'expander',
+                    fields: [
+                        {
+                            key: 'templateOptions.label',
+                            type: 'input',
+                            templateOptions: {
+                                label: 'label'
+                            }
+                        },
+                        {
+                            key: 'templateOptions.expanded',
+                            type: 'checkbox',
+                            templateOptions: {
+                                label: 'expanded'
                             }
                         }
                     ]

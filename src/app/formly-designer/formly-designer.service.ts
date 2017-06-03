@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FormlyFieldConfig } from 'ng-formly';
+import { FormlyFieldConfig, FormlyConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
 import { get, isArray, isEmpty, isNil, set } from 'lodash';
@@ -8,7 +8,8 @@ import { get, isArray, isEmpty, isNil, set } from 'lodash';
 @Injectable()
 export class FormlyDesignerService {
     constructor(
-        private designerConfig: FormlyDesignerConfig
+        private designerConfig: FormlyDesignerConfig,
+        private formlyConfig: FormlyConfig
     ) { }
 
     private readonly _disabled = new BehaviorSubject<boolean>(false);
@@ -134,6 +135,27 @@ export class FormlyDesignerService {
                     set(designedField, designerField.key, value);
                 }
             });
+        }
+
+        if (isArray(field.wrappers)) {
+            const wrappers = field.wrappers.slice();
+            if (field.type) {
+                const typeWrappers = (this.formlyConfig.getType(field.type).wrappers || []).slice();
+                if (typeWrappers.length > 0) {
+                    for (let i = wrappers.length - 1; i >= 0; i--) {
+                        for (let j = typeWrappers.length - 1; j >= 0; j--) {
+                            if (wrappers[i] === typeWrappers[j]) {
+                                typeWrappers.splice(j, 1);
+                                wrappers.splice(i, 1);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (wrappers.length > 0) {
+                designedField.wrappers = wrappers;
+            }
         }
         return designedField;
     }

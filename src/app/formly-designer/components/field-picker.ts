@@ -9,12 +9,12 @@ declare var $: any;
 @Component({
     selector: 'field-picker',
     template: `
-        <form novalidate [formGroup]="designer">
+        <form novalidate [formGroup]="form">
             <div class="form-group">
                 <div class="input-group">
                     <type-select formControlName="type">
                     </type-select>
-                    <button type="button" class="btn btn-secondary" [disabled]="designer.invalid" (click)="add()">
+                    <button type="button" class="btn btn-secondary" [disabled]="form.invalid" (click)="add()">
                         Add
                     </button>
                 </div>
@@ -76,12 +76,12 @@ export class FieldPickerComponent implements OnInit {
         private formlyDesignerConfig: FormlyDesignerConfig
     ) { }
 
-    designer: FormGroup;
+    form: FormGroup;
     fieldSource: FormlyFieldConfig;
     fieldEdit = new FormControl({});
 
     get type(): string {
-        return this.designer.get('type').value;
+        return this.form.get('type').value;
     }
 
     private get modal(): any {
@@ -89,7 +89,7 @@ export class FieldPickerComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.designer = this.formBuilder.group({
+        this.form = this.formBuilder.group({
             type: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
         });
     }

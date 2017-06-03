@@ -22,6 +22,10 @@ const FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                         <label>key</label>
                         <input formControlName="key" class="form-control">
                     </div>
+                    <div class="form-group">
+                        <label>wrappers</label>
+                        <wrappers-picker [wrappers]="wrappers.value" (selected)="onWrappersSelected($event)"></wrappers-picker>
+                    </div>
                 </div>
                 <div class="card-block">
                     <div class="form-group">
@@ -52,7 +56,8 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
     ) {
         this.form = formBuilder.group({
             key: [''],
-            fieldGroup: formBuilder.array([])
+            fieldGroup: formBuilder.array([]),
+            wrappers: formBuilder.control([])
         });
     }
 
@@ -62,6 +67,10 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
 
     get fieldGroup(): FormArray {
         return this.form.get('fieldGroup') as FormArray;
+    }
+
+    get wrappers(): FormControl {
+        return this.form.get('wrappers') as FormControl;
     }
 
     form: FormGroup;
@@ -92,6 +101,7 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
         if (changes['field']) {
             const field = this.field ? this.field : {};
             this.key.setValue(isString(field.key) ? field.key : '');
+            this.wrappers.setValue(isArray(field.wrappers) ? field.wrappers : []);
             while (this.fieldGroup.length > 0) {
                 this.fieldGroup.removeAt(0);
             }
@@ -110,11 +120,15 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
         this.onChange = undefined;
 
         if (!obj) {
-            obj = { key: '', fieldGroup: [] };
+            obj = { key: '', fieldGroup: [], wrappers: [] };
             changed = true;
         }
-        else if (!('key' in obj) || !('fieldGroup' in obj)) {
-            obj = { key: 'key' in obj ? obj.key : '', fieldGroup: 'fieldGroup' in obj ? obj.fieldGroup : [] };
+        else if (!('key' in obj) || !('fieldGroup' in obj) || !('wrappers' in obj)) {
+            obj = {
+                key: 'key' in obj ? obj.key : '',
+                fieldGroup: 'fieldGroup' in obj ? obj.fieldGroup : [],
+                wrappers: 'wrappers' in obj ? obj.wrappers : []
+            };
             changed = true;
         }
 
@@ -151,6 +165,10 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
         this.fieldGroup.push(new FormControl(field));
     }
 
+    onWrappersSelected(wrappers: string[]): void {
+        this.wrappers.setValue(wrappers);
+    }
+
     private updateChildFields(fields: FormlyFieldConfig[]) {
         this.childFields = isArray(fields) ? cloneDeep(fields) : [];
     }
@@ -162,6 +180,7 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnChange
 
         this.field.key = this.key.value;
         this.field.fieldGroup = this.fieldGroup.value;
+        this.field.wrappers = this.wrappers.value as string[];
         this.updateChildFields(this.field.fieldGroup);
         this.onChange(this.field);
     }

@@ -1,7 +1,7 @@
-import { Component, forwardRef, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, forwardRef, OnDestroy, OnInit } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyDesignerConfig } from '../formly-designer-config';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable, Subscription } from 'rxjs/Rx';
 
 
 const WRAPPER_SELECT_CONTROL_VALUE_ACCESSOR: any = {
@@ -14,18 +14,20 @@ const WRAPPER_SELECT_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'wrapper-select',
     template: `
         <select [formControl]="formControl" class="custom-select">
-            <option selected></option>
             <option *ngFor="let wrapper of wrappers" [ngValue]="wrapper">{{ wrapper }}</option>
         </select>
     `,
+    styles: [`
+        select {
+            width: 100%;
+        }
+    `],
     providers: [WRAPPER_SELECT_CONTROL_VALUE_ACCESSOR]
 })
-export class WrapperSelectComponent implements ControlValueAccessor, OnDestroy, OnInit {
+export class WrapperSelectComponent implements AfterViewInit, ControlValueAccessor, OnDestroy, OnInit {
     constructor(
         private formlyDesignerConfig: FormlyDesignerConfig
-    ) {
-        this.wrappers = Object.keys(this.formlyDesignerConfig.wrappers);
-    }
+    ) { }
 
     formControl = new FormControl();
 
@@ -34,6 +36,15 @@ export class WrapperSelectComponent implements ControlValueAccessor, OnDestroy, 
     protected onTouched = () => { };
 
     private valueChangesSubscription: Subscription;
+
+    ngAfterViewInit(): void {
+        Observable.timer().subscribe(() => {
+            this.wrappers = Object.keys(this.formlyDesignerConfig.wrappers);
+            if (this.wrappers.length > 0) {
+                this.formControl.setValue(this.wrappers[0]);
+            }
+        });
+    }
 
     ngOnInit(): void {
         this.valueChangesSubscription = this.formControl.valueChanges.subscribe(value => {

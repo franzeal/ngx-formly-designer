@@ -12,6 +12,7 @@ import { config, fieldComponents, wrapperComponents } from './config';
 import { TypeFieldsPipe } from './type-fields.pipe';
 import { TypeSelectComponent } from './components/type-select';
 import { WrapperSelectComponent } from './components/wrapper-select';
+import { WrappersPickerComponent } from './components/wrappers-picker';
 
 
 @NgModule({
@@ -24,6 +25,7 @@ import { WrapperSelectComponent } from './components/wrapper-select';
         FormlyDesignerComponent,
         TypeSelectComponent,
         WrapperSelectComponent,
+        WrappersPickerComponent,
 
         fieldComponents,
         wrapperComponents

@@ -6,7 +6,7 @@ export class TemplateDesigner {
         formlyConfig.templateManipulators.preWrapper.push((field: FormlyFieldConfig) => {
             if (field && field.type && field.templateOptions && field.templateOptions['designer'] !== true &&
                 !field.fieldGroup && !field.fieldArray) {
-                return 'controlDesigner';
+                return 'fieldDesigner';
             }
             if (field && field.type && field.fieldGroup) {
                 return 'fieldGroupDesigner';

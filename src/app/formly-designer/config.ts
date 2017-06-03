@@ -5,7 +5,7 @@ import { ConfigOption } from 'ng-formly';
 import { FormlyFieldRepeatSectionComponent } from './types/repeat-section';
 import { FormlyFieldTypeSelectComponent } from './types/type-select';
 import { FormlyFieldWrapperSelectComponent } from './types/wrapper-select';
-import { FormlyWrapperControlDesignerComponent } from './wrappers/control-designer';
+import { FormlyWrapperFieldDesignerComponent } from './wrappers/field-designer';
 import { FormlyWrapperFieldGroupDesignerComponent } from './wrappers/field-group-designer';
 
 import { TemplateDesigner } from './run/designer';
@@ -18,7 +18,7 @@ export const fieldComponents: Component[] = [
 ];
 
 export const wrapperComponents: Component[] = [
-    FormlyWrapperControlDesignerComponent,
+    FormlyWrapperFieldDesignerComponent,
     FormlyWrapperFieldGroupDesignerComponent
 ];
 
@@ -29,7 +29,7 @@ export const config: ConfigOption = {
         { name: 'wrapperSelect', component: FormlyFieldTypeSelectComponent }
     ],
     wrappers: [
-        { name: 'controlDesigner', component: FormlyWrapperControlDesignerComponent },
+        { name: 'fieldDesigner', component: FormlyWrapperFieldDesignerComponent },
         { name: 'fieldGroupDesigner', component: FormlyWrapperFieldGroupDesignerComponent }
     ],
     manipulators: [

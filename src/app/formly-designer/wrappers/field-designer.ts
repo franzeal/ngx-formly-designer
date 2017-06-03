@@ -7,7 +7,7 @@ import { Observable } from 'rxjs/Rx';
 
 
 @Component({
-    selector: 'formly-wrapper-control-designer',
+    selector: 'formly-wrapper-field-designer',
     template: `
         <div *ngIf="!editing && !preview" class="dropdown">
             <button [disabled]="disabled" class="btn btn-sm btn-info mr-2" type="button" id="editorMenuButton"
@@ -19,7 +19,7 @@ import { Observable } from 'rxjs/Rx';
                 <a class="dropdown-item" (click)="remove()">Remove</a>
             </div>
         </div>
-        <div class="content" [ngClass]="{'preview': preview}">
+        <div class="content" [ngClass]="{preview: preview}">
             <div class="editor" [hidden]="!editing">
                 <field-editor #editor [showType]="true" [formControl]="fieldEdit" [field]="fieldSource">
                     <div class="footer">
@@ -64,7 +64,7 @@ import { Observable } from 'rxjs/Rx';
         }
     `]
 })
-export class FormlyWrapperControlDesignerComponent extends FieldWrapper {
+export class FormlyWrapperFieldDesignerComponent extends FieldWrapper {
     @ViewChild('fieldComponent', { read: ViewContainerRef }) fieldComponent: ViewContainerRef;
 
     editing = false;

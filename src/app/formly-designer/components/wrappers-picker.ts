@@ -40,7 +40,7 @@ import { FormlyDesignerConfig } from '../formly-designer-config';
         wrapper-select {
             flex-grow: 2;
         }
-        :host /deep/ type-select > select {
+        :host /deep/ wrapper-select > select {
             border-radius: .25rem 0 0 .25rem;
             border-right: 0;
         }

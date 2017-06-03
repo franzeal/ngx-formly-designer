@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FormlyFieldConfig, FormlyConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
-import { get, isArray, isEmpty, isNil, set } from 'lodash';
+import { get, isArray, isEmpty, isNil, isString, set } from 'lodash';
 
 
 @Injectable()
@@ -131,7 +131,7 @@ export class FormlyDesignerService {
             designedField = { key: field.key, type: field.type };
             designerType.fields.forEach(designerField => {
                 const value = get(field, designerField.key);
-                if (!isEmpty(value)) {
+                if (!isNil(value) && (!isString(value) || value.length > 0) && value !== designedField.defaultValue) {
                     set(designedField, designerField.key, value);
                 }
             });

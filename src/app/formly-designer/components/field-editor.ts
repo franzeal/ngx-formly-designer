@@ -4,7 +4,7 @@ import { FormlyFieldConfig } from 'ng-formly';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { Observable, Subscription } from 'rxjs/Rx';
-import { cloneDeep, isString } from 'lodash';
+import { clone, cloneDeep, isObject, isString } from 'lodash';
 
 
 const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -91,6 +91,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     }
 
     writeValue(obj: any) {
+        obj = isObject(obj) ? obj : {};
         this.valueChangesSubscription.unsubscribe();
         this.key.setValue(isString(obj.key) ? obj.key : '');
         this.type.setValue(isString(obj.type) ? obj.type : '');
@@ -138,6 +139,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         this.valueChangesSubscription.unsubscribe();
         this.fields = this.fieldsService.getTypeFields(this.type.value);
         this.fieldForm = this.formBuilder.group({});
+        this.field = clone(this.field);
         this.subscribeValueChanges();
     }
 }

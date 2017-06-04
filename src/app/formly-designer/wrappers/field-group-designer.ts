@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, ViewChild, ViewContainerRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { FieldWrapper, FormlyConfig, FormlyFieldConfig } from 'ng-formly';
+import { FieldWrapper, FormlyConfig } from 'ng-formly';
 import { FormlyDesignerService } from '../formly-designer.service';
 import { cloneDeep } from 'lodash';
 import { Observable } from 'rxjs/Rx';
@@ -19,9 +19,9 @@ import { Observable } from 'rxjs/Rx';
                 <a class="dropdown-item" (click)="remove()">Remove</a>
             </div>
         </div>
-        <div class="content" [ngClass]="{'preview': preview}">
+        <div class="content" [ngClass]="{preview: preview}">
             <div [hidden]="!editing">
-                <field-group-editor #editor [formControl]="fieldEdit" [field]="fieldSource">
+                <field-group-editor #editor [formControl]="fieldEdit">
                     <div class="footer">
                         <button (click)="cancel()" class="btn btn-secondary btn-sm mr-1">Cancel</button>
                         <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary btn-sm">Apply</button>
@@ -65,7 +65,6 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper {
 
     editing = false;
     fieldEdit = new FormControl({});
-    fieldSource: FormlyFieldConfig;
 
     get disabled(): boolean {
         return this.formlyDesignerService.disabled;
@@ -86,7 +85,7 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper {
     edit(): void {
         this.editing = true;
         this.formlyDesignerService.disabled = true;
-        this.fieldSource = this.formlyDesignerService.convertField(cloneDeep(this.field));
+        this.fieldEdit.setValue(this.formlyDesignerService.convertField(cloneDeep(this.field)));
     }
 
     remove(): void {

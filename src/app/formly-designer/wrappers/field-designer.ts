@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, ViewChild, ViewContainerRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { FieldWrapper, FormlyConfig, FormlyFieldConfig } from 'ng-formly';
+import { FieldWrapper, FormlyConfig } from 'ng-formly';
 import { FormlyDesignerService } from '../formly-designer.service';
 import { cloneDeep } from 'lodash';
 import { Observable } from 'rxjs/Rx';

@@ -21,7 +21,7 @@ import { Observable } from 'rxjs/Rx';
         </div>
         <div class="content" [ngClass]="{preview: preview}">
             <div class="editor" [hidden]="!editing">
-                <field-editor #editor [showType]="true" [formControl]="fieldEdit" [field]="fieldSource">
+                <field-editor #editor [showType]="true" [formControl]="fieldEdit">
                     <div class="footer">
                         <button (click)="cancel()" class="btn btn-secondary btn-sm mr-1">Cancel</button>
                         <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary btn-sm">Apply</button>
@@ -69,7 +69,6 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper {
 
     editing = false;
     fieldEdit = new FormControl({});
-    fieldSource: FormlyFieldConfig;
 
     constructor(
         private changeDetector: ChangeDetectorRef,
@@ -90,7 +89,7 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper {
     edit(): void {
         this.editing = true;
         this.formlyDesignerService.disabled = true;
-        this.fieldSource = this.formlyDesignerService.convertField(cloneDeep(this.field));
+        this.fieldEdit.setValue(this.formlyDesignerService.convertField(cloneDeep(this.field)));
     }
 
     remove(): void {

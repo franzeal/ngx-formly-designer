@@ -1,9 +1,10 @@
-import { Component, forwardRef, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, forwardRef, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
+import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { Observable, Subscription } from 'rxjs/Rx';
-import { isString } from 'lodash';
+import { cloneDeep, isString } from 'lodash';
 
 
 const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -28,7 +29,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                     </div>
                 </div>
                 <div class="card-block">
-                    <formly-form [form]="fieldForm" [fields]="type.value | typeFields" [model]="field">
+                    <formly-form [form]="fieldForm" [fields]="fields" [model]="field">
                     </formly-form>
                     <ng-content></ng-content>
                 </div>
@@ -39,12 +40,12 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
         FIELD_EDITOR_CONTROL_VALUE_ACCESSOR
     ]
 })
-export class FieldEditorComponent implements ControlValueAccessor, OnChanges, OnDestroy, OnInit {
-    @Input() field: FormlyFieldConfig = {};
+export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
     @Input() showType: boolean;
     @Output() invalid: boolean;
 
     constructor(
+        private fieldsService: FieldsService,
         private formBuilder: FormBuilder,
         private formlyDesignerConfig: FormlyDesignerConfig
     ) {
@@ -65,64 +66,38 @@ export class FieldEditorComponent implements ControlValueAccessor, OnChanges, On
 
     form: FormGroup;
     fieldForm: FormGroup;
+    field: FormlyFieldConfig = {};
+    fields: FormlyFieldConfig[];
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
     private subscriptions = new Array<Subscription>();
-    private typeChangeOverride = false;
+    private valueChangesSubscription: Subscription;
 
     ngOnInit(): void {
         this.subscriptions.push(this.type.valueChanges
-            .filter(() => this.typeChangeOverride === false)
             .subscribe(() => this.onTypeChange()));
 
         this.subscriptions.push(this.form.statusChanges
             .switchMap(() => Observable.timer())
             .subscribe(() => this.invalid = this.form.invalid));
 
-        this.subscriptions.push(Observable.merge(this.fieldForm.valueChanges, this.form.valueChanges)
-            .switchMap(() => Observable.timer())
-            .subscribe(() => this.updateValue()));
+        this.subscribeValueChanges();
     }
 
     ngOnDestroy(): void {
+        this.valueChangesSubscription.unsubscribe();
         this.subscriptions.splice(0).forEach(subscription => subscription.unsubscribe());
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes['field']) {
-            this.typeChangeOverride = true;
-            const field = this.field ? this.field : { };
-            this.key.setValue(isString(field.key) ? field.key : '');
-            this.type.setValue(isString(field.type) ? field.type : '');
-            this.typeChangeOverride = false;
-        }
-    }
-
     writeValue(obj: any) {
-        let changed = false;
-        const onChange = this.onChange;
-        this.onChange = undefined;
-
-        if (!obj) {
-            obj = { key: '', type: '' };
-            changed = true;
-        }
-        else if (!('key' in obj) || !('type' in obj)) {
-            obj = { key: 'key' in obj ? obj.key : '', type: 'type' in obj ? obj.type : '' };
-            changed = true;
-        }
-
-        this.field = obj;
-        this.form.setValue(obj);
+        this.valueChangesSubscription.unsubscribe();
+        this.key.setValue(isString(obj.key) ? obj.key : '');
+        this.type.setValue(isString(obj.type) ? obj.type : '');
+        this.fields = this.fieldsService.getTypeFields(this.type.value);
         this.fieldForm = this.formBuilder.group({});
-
-        this.onChange = onChange;
-        if (changed && onChange) {
-            Observable.timer().subscribe(() => {
-                onChange(obj);
-            });
-        }
+        this.field = cloneDeep(obj);
+        this.subscribeValueChanges();
     }
 
     registerOnChange(fn: any) {
@@ -142,18 +117,27 @@ export class FieldEditorComponent implements ControlValueAccessor, OnChanges, On
         }
     }
 
+    private subscribeValueChanges(): void {
+        this.valueChangesSubscription = Observable.merge(this.fieldForm.valueChanges, this.form.valueChanges)
+            .switchMap(() => Observable.timer())
+            .subscribe(() => this.updateValue());
+    }
+
     private updateValue(): void {
         if (!this.onChange) {
             return;
         }
 
-        this.field.key = this.key.value;
-        this.field.type = this.type.value;
-        this.onChange(this.field);
+        const field = this.field;
+        field.key = this.key.value;
+        field.type = this.type.value;
+        this.onChange(field);
     }
 
     private onTypeChange(): void {
+        this.valueChangesSubscription.unsubscribe();
+        this.fields = this.fieldsService.getTypeFields(this.type.value);
         this.fieldForm = this.formBuilder.group({});
-        this.field = { key: this.key.value, type: this.type.value } as any;
+        this.subscribeValueChanges();
     }
 }

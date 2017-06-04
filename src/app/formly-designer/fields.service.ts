@@ -1,23 +1,41 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { FormlyFieldConfig } from 'ng-formly';
 import { DesignerOption, FormlyDesignerConfig } from './formly-designer-config';
 import { cloneDeep, isObject } from 'lodash';
 
 
-@Pipe({ name: 'typeFields' })
-export class TypeFieldsPipe implements PipeTransform {
+@Injectable()
+export class FieldsService {
     constructor(
         private formlyDesignerConfig: FormlyDesignerConfig
     ) { }
 
-    transform(type: string): FormlyFieldConfig[] {
-        const designerOption = (type ? this.formlyDesignerConfig.types[type] || {} : {}) as DesignerOption;
+    getTypeFields(type: string): FormlyFieldConfig[] {
+        return this.getFields(type, 'type');
+    }
+
+    getWrapperFields(wrapper: string): FormlyFieldConfig[] {
+        return this.getFields(wrapper, 'wrapper');
+    }
+
+    private getFields(name: string, type: string): FormlyFieldConfig[] {
+        const designerOption = (name ? this.getDesignerOptions(type)[name] || {} : {}) as DesignerOption;
         const fields = cloneDeep(designerOption.fields || []);
         this.markDesigner(fields);
         return fields;
     }
 
-    markDesigner(fields: FormlyFieldConfig[]): void {
+    private getDesignerOptions(type: string): {[name: string]: DesignerOption} {
+        if (type === 'type') {
+            return this.formlyDesignerConfig.types;
+        }
+        if (type === 'wrapper') {
+            return this.formlyDesignerConfig.wrappers;
+        }
+        return { };
+    }
+
+    private markDesigner(fields: FormlyFieldConfig[]): void {
         fields.forEach(field => {
             if (isObject(field.templateOptions)) {
                 field.templateOptions['designer'] = true;

@@ -5,26 +5,28 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FieldEditorComponent } from './components/field-editor';
 import { FieldGroupEditorComponent } from './components/field-group-editor';
 import { FieldPickerComponent } from './components/field-picker';
+import { FieldsService } from './fields.service';
 import { FormlyConfig, FormlyModule } from 'ng-formly';
 import { FormlyDesignerComponent } from './formly-designer.component';
 import { DesignerConfigOption, FormlyDesignerConfig, FORMLY_DESIGNER_CONFIG_TOKEN } from './formly-designer-config';
 import { config, fieldComponents, wrapperComponents } from './config';
-import { TypeFieldsPipe } from './type-fields.pipe';
 import { TypeSelectComponent } from './components/type-select';
+import { WrapperEditorComponent } from './components/wrapper-editor';
 import { WrapperSelectComponent } from './components/wrapper-select';
+import { WrapperPickerComponent } from './components/wrapper-picker';
 import { WrappersPickerComponent } from './components/wrappers-picker';
 
 
 @NgModule({
     declarations: [
-        TypeFieldsPipe,
-
         FieldEditorComponent,
         FieldGroupEditorComponent,
         FieldPickerComponent,
         FormlyDesignerComponent,
         TypeSelectComponent,
+        WrapperEditorComponent,
         WrapperSelectComponent,
+        WrapperPickerComponent,
         WrappersPickerComponent,
 
         fieldComponents,
@@ -41,7 +43,8 @@ import { WrappersPickerComponent } from './components/wrappers-picker';
         FormlyDesignerComponent
     ],
     providers: [
-        FormlyDesignerConfig
+        FormlyDesignerConfig,
+        FieldsService
     ]
 })
 export class FormlyDesignerModule {

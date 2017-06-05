@@ -91,8 +91,10 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     }
 
     writeValue(obj: any) {
-        obj = isObject(obj) ? obj : {};
         this.valueChangesSubscription.unsubscribe();
+        if (!isObject(obj)) {
+            obj = {};
+        }
         this.key.setValue(isString(obj.key) ? obj.key : '');
         this.type.setValue(isString(obj.type) ? obj.type : '');
         this.fields = this.fieldsService.getTypeFields(this.type.value);
@@ -120,7 +122,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
 
     private subscribeValueChanges(): void {
         this.valueChangesSubscription = Observable.merge(this.fieldForm.valueChanges, this.form.valueChanges)
-            .switchMap(() => Observable.timer())
+            .debounceTime(0)
             .subscribe(() => this.updateValue());
     }
 

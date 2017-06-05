@@ -1,90 +1,47 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { FormlyDesignerConfig } from '../formly-designer-config';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormlyFieldConfig } from 'ng-formly';
+import { FormlyDesignerService } from '../formly-designer.service';
+import { cloneDeep } from 'lodash';
 
 
 @Component({
     selector: 'wrappers-picker',
     template: `
-        <form novalidate [formGroup]="form">
-            <div class="form-group">
-                <div class="input-group">
-                    <wrapper-select formControlName="wrapper">
-                    </wrapper-select>
-                    <button type="button" class="btn btn-secondary" [disabled]="form.invalid" (click)="add()">
-                        Add
-                    </button>
-                </div>
-                <div *ngFor="let wrapper of wrappers; let i = index" class="badge badge-default">
-                    {{ wrapper }}&nbsp;&nbsp;<i class="fa fa-times" aria-hidden="true" (click)="remove(i)"></i>
-                </div>
+        <div class="form-group">
+            <div class="input-group">
+                <wrapper-picker [field]="field" (selected)="onWrapperSelected($event)">
+                </wrapper-picker>
             </div>
-        </form>
+            <div *ngFor="let wrapper of field?.wrappers; let i = index" class="badge badge-default">
+                {{ wrapper }}&nbsp;&nbsp;<i class="fa fa-times" aria-hidden="true" (click)="remove(i)"></i>
+            </div>
+        </div>
     `,
     styles: [`
         .badge {
             margin-right: .25em;
         }
-        .btn:not(:disabled), .dropdown-item:not(:disabled), .badge > i {
+        .badge > i {
             cursor: pointer;
-        }
-        .input-group > .btn {
-            border-radius: 0 .25rem .25rem 0;
-        }
-        .input-group, .modal-header {
-            display: flex;
-        }
-        .modal-header {
-            justify-content: space-between;
-        }
-        wrapper-select {
-            flex-grow: 2;
-        }
-        :host /deep/ wrapper-select > select {
-            border-radius: .25rem 0 0 .25rem;
-            border-right: 0;
-        }
-        ::after {
-            display: none !important;
         }
     `]
 })
-export class WrappersPickerComponent implements OnInit {
-    @Input() wrappers: string[];
-    @Output() selected = new EventEmitter<string[]>();
+export class WrappersPickerComponent {
+    @Input() field: FormlyFieldConfig;
+    @Output() selected = new EventEmitter<FormlyFieldConfig>();
 
     constructor(
-        private formBuilder: FormBuilder,
-        private formlyDesignerConfig: FormlyDesignerConfig
-    ) {
-        this.form = formBuilder.group({
-            wrapper: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
-        });
+        private formlyDesignerService: FormlyDesignerService
+    ) { }
+
+    onWrapperSelected(field: FormlyFieldConfig): void {
+        this.selected.emit(field);
     }
 
-    form: FormGroup;
-
-    get wrapper(): string {
-        return this.form.get('wrapper').value;
-    }
-
-    ngOnInit(): void {
-        this.form = this.formBuilder.group({
-            wrapper: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
-        });
-    }
-
-    add(): void {
-        const wrappers = this.wrappers ? this.wrappers.slice() : [];
-        wrappers.push(this.wrapper);
-        this.wrappers = wrappers;
-        this.selected.emit(wrappers);
-    }
-
-    remove(index: number): void {
-        const wrappers = this.wrappers ? this.wrappers.slice() : [];
-        wrappers.splice(index, 1);
-        this.wrappers = wrappers;
-        this.selected.emit(wrappers);
+    remove(index: number) {
+        const field = cloneDeep(this.field);
+        field.wrappers.splice(index, 1);
+        this.field = this.formlyDesignerService.convertField(field);
+        this.selected.emit(this.field);
     }
 }

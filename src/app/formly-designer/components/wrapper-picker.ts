@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild }
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from '../formly-designer-config';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isArray, isObject } from 'lodash';
 
 
 declare var $: any;
@@ -30,7 +30,7 @@ declare var $: any;
                             </button>
                         </div>
                         <div class="modal-body">
-                            <wrapper-editor #editor [formControl]="fieldEdit" [field]="fieldSource" [wrapperIndex]="wrapperIndex">
+                            <wrapper-editor #editor [formControl]="fieldEdit" [wrapper]="wrapper">
                             </wrapper-editor>
                         </div>
                         <div class="modal-footer">
@@ -44,7 +44,7 @@ declare var $: any;
         </form>
     `,
     styles: [`
-        .btn:not(:disabled), .dropdown-item:not(:disabled) {
+        .btn:not(:disabled) {
             cursor: pointer;
         }
         .input-group > .btn {
@@ -71,7 +71,6 @@ declare var $: any;
 export class WrapperPickerComponent implements OnInit {
     @ViewChild('modal') modalRef: ElementRef;
     @Input() field: FormlyFieldConfig;
-    @Input() wrapperIndex: number;
     @Output() selected = new EventEmitter<FormlyFieldConfig>();
 
     constructor(
@@ -80,7 +79,6 @@ export class WrapperPickerComponent implements OnInit {
     ) { }
 
     form: FormGroup;
-    fieldSource: FormlyFieldConfig;
     fieldEdit = new FormControl({});
 
     get wrapper(): string {
@@ -98,11 +96,24 @@ export class WrapperPickerComponent implements OnInit {
     }
 
     add(): void {
-        this.fieldEdit.setValue({});
-        this.modal.modal('show');
-        const fieldSource = cloneDeep(this.field);
-        fieldSource.wrappers.push(this.wrapper);
-        this.fieldSource = fieldSource;
+        if (isObject(this.field)) {
+            const field = cloneDeep(this.field);
+            if (isArray(field.wrappers)) {
+                field.wrappers.push(this.wrapper);
+            }
+            else {
+                field.wrappers = [this.wrapper];
+            }
+            this.fieldEdit.setValue(field);
+
+            const fields = this.formlyDesignerConfig.wrappers[this.wrapper].fields;
+            if (isArray(fields) && fields.length > 0) {
+                this.modal.modal('show');
+            }
+            else {
+                this.selected.emit(this.fieldEdit.value);
+            }
+        }
     }
 
     onApply(): void {

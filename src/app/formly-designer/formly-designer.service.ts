@@ -129,12 +129,7 @@ export class FormlyDesignerService {
         }
         else {
             designedField = { key: field.key, type: field.type };
-            designerType.fields.forEach(designerField => {
-                const value = get(field, designerField.key);
-                if (!isNil(value) && (!isString(value) || value.length > 0) && value !== designedField.defaultValue) {
-                    set(designedField, designerField.key, value);
-                }
-            });
+            this.applyProperties(field, designedField, designerType.fields);
         }
 
         if (isArray(field.wrappers)) {
@@ -155,9 +150,22 @@ export class FormlyDesignerService {
             }
             if (wrappers.length > 0) {
                 designedField.wrappers = wrappers;
+                const designerWrapperFields = wrappers.map(wrapper => this.designerConfig.wrappers[wrapper])
+                    .filter(designerOption => designerOption && isArray(designerOption.fields))
+                    .reduce<FormlyFieldConfig[]>((previous, current) => previous.concat(current.fields), []);
+                this.applyProperties(field, designedField, designerWrapperFields);
             }
         }
         return designedField;
+    }
+
+    private applyProperties(field: FormlyFieldConfig, designedField: FormlyFieldConfig, designerFields: FormlyFieldConfig[]): void {
+        designerFields.forEach(designerField => {
+            const value = get(field, designerField.key);
+            if (!isNil(value) && (!isString(value) || value.length > 0) && value !== designerField.defaultValue) {
+                set(designedField, designerField.key, value);
+            }
+        });
     }
 
     private checkPathConflict(fields: FormlyFieldConfig[], originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): void {

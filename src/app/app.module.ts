@@ -220,7 +220,8 @@ import { ExpanderComponent } from './components/expander.component';
                             type: 'checkbox',
                             templateOptions: {
                                 label: 'expanded'
-                            }
+                            },
+                            defaultValue: true
                         }
                     ]
                 }

@@ -43,7 +43,7 @@ declare var $: any;
         </form>
     `,
     styles: [`
-        .btn:not(:disabled), .dropdown-item:not(:disabled) {
+        .btn:not(:disabled) {
             cursor: pointer;
         }
         .input-group > .btn {

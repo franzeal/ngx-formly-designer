@@ -1,10 +1,10 @@
 import { Component, forwardRef, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
-import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
+import { ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { Observable, Subscription } from 'rxjs/Rx';
-import { clone, isArray, isString } from 'lodash';
+import { clone, cloneDeep, isObject } from 'lodash';
 
 
 const WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -16,14 +16,8 @@ const WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 @Component({
     selector: 'wrapper-editor',
     template: `
-        <form [formGroup]="form" novalidate>
+        <form [formGroup]="fieldForm" novalidate>
             <div class="card">
-                <div *ngIf="showWrapper" class="card-header">
-                    <div class="form-group">
-                        <label>wrapper</label>
-                        <wrapper-select formControlName="wrapper"></wrapper-select>
-                    </div>
-                </div>
                 <div class="card-block">
                     <formly-form [form]="fieldForm" [fields]="fields" [model]="field">
                     </formly-form>
@@ -32,14 +26,17 @@ const WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
             </div>
         </form>
     `,
+    styles: [`
+        :host /deep/ .form-control {
+            width: 100%;
+        }
+    `],
     providers: [
         WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR
     ]
 })
 export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, OnDestroy, OnInit {
-    @Input() field: FormlyFieldConfig = {};
-    @Input() wrapperIndex: number;
-    @Input() showWrapper: boolean;
+    @Input() wrapper: string;
     @Output() invalid: boolean;
 
     constructor(
@@ -47,61 +44,54 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
         private formBuilder: FormBuilder,
         private formlyDesignerConfig: FormlyDesignerConfig
     ) {
-        this.form = formBuilder.group({
-            wrapper: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
-        });
         this.fieldForm = formBuilder.group({});
     }
 
-    get wrapper(): FormControl {
-        return this.form.get('wrapper') as FormControl;
-    }
-
-    form: FormGroup;
     fieldForm: FormGroup;
+    field: FormlyFieldConfig;
     fields: FormlyFieldConfig[];
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
     private subscriptions = new Array<Subscription>();
-    private wrapperChangeOverride = false;
-    private valueChangeOverride = false;
+    private valueChangesSubscription: Subscription;
 
     ngOnInit(): void {
-        this.subscriptions.push(this.wrapper.valueChanges
-            .filter(() => this.wrapperChangeOverride === false)
-            .subscribe(() => this.onWrapperChange()));
-
-        this.subscriptions.push(this.form.statusChanges
+        this.subscriptions.push(this.fieldForm.statusChanges
             .switchMap(() => Observable.timer())
-            .subscribe(() => this.invalid = this.form.invalid));
+            .subscribe(() => this.invalid = this.fieldForm.invalid));
 
-        this.subscriptions.push(Observable.merge(this.fieldForm.valueChanges, this.form.valueChanges)
-            .filter(() => this.valueChangeOverride === false)
-            .switchMap(() => Observable.timer())
-            .subscribe(() => this.updateValue()));
+        this.subscribeValueChanges();
     }
 
     ngOnDestroy(): void {
+        this.valueChangesSubscription.unsubscribe();
         this.subscriptions.splice(0).forEach(subscription => subscription.unsubscribe());
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['field'] || changes['wrapperIndex']) {
-            this.wrapperChangeOverride = true;
-            const field = this.field ? this.field : { };
-            const wrappers = isArray(field.wrappers) ? field.wrappers : [];
-            const wrapper = wrappers[this.wrapperIndex];
-            this.wrapper.setValue(isString(wrapper) ? wrapper : '');
-            this.fields = this.fieldsService.getWrapperFields(this.wrapper.value);
-            this.wrapperChangeOverride = false;
+        if (changes['wrapper']) {
+            if (this.valueChangesSubscription) {
+                this.valueChangesSubscription.unsubscribe();
+            }
+            this.fields = this.fieldsService.getWrapperFields(this.wrapper);
+            this.fieldForm = this.formBuilder.group({});
+            this.field = clone(this.field);
+            if (this.valueChangesSubscription) {
+                this.subscribeValueChanges();
+            }
         }
     }
 
     writeValue(obj: any) {
-        this.valueChangeOverride = true;
-        this.fieldForm.setValue(obj);
-        this.valueChangeOverride = false;
+        this.valueChangesSubscription.unsubscribe();
+        if (!isObject(obj)) {
+            obj = {};
+        }
+        this.fields = this.fieldsService.getWrapperFields(this.wrapper);
+        this.fieldForm = this.formBuilder.group({});
+        this.field = cloneDeep(obj);
+        this.subscribeValueChanges();
     }
 
     registerOnChange(fn: any) {
@@ -114,11 +104,17 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
 
     setDisabledState(isDisabled: boolean): void {
         if (isDisabled) {
-            this.form.disable();
+            this.fieldForm.disable();
         }
         else {
-            this.form.enable();
+            this.fieldForm.enable();
         }
+    }
+
+    private subscribeValueChanges(): void {
+        this.valueChangesSubscription = this.fieldForm.valueChanges
+            .debounceTime(0)
+            .subscribe(() => this.updateValue());
     }
 
     private updateValue(): void {
@@ -126,17 +122,6 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
             return;
         }
 
-        const wrappers = this.field.wrappers.slice();
-        wrappers.splice(this.wrapperIndex, 1, this.wrapper.value);
-        this.field.wrappers = wrappers;
         this.onChange(this.field);
-    }
-
-    private onWrapperChange(): void {
-        this.fields = this.fieldsService.getWrapperFields(this.wrapper.value);
-        this.fieldForm.setValue({});
-        const field = clone(this.field);
-        field.wrappers.splice(this.wrapperIndex, 1, this.wrapper.value);
-        this.field = field;
     }
 }

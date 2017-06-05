@@ -24,7 +24,9 @@ const FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                     </div>
                     <div class="form-group">
                         <label>wrappers</label>
-                        <wrappers-picker [wrappers]="wrappers.value" (selected)="onWrappersSelected($event)"></wrappers-picker>
+                        <wrappers-picker [field]="field"
+                            (selected)="onWrappersSelected($event)">
+                        </wrappers-picker>
                     </div>
                 </div>
                 <div class="card-block">
@@ -68,10 +70,6 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestro
         return this.form.get('fieldGroup') as FormControl;
     }
 
-    get wrappers(): FormControl {
-        return this.form.get('wrappers') as FormControl;
-    }
-
     form: FormGroup;
     field: FormlyFieldConfig = {};
     childFields = new Array<FormlyFieldConfig>();
@@ -100,14 +98,8 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestro
     }
 
     writeValue(obj: any) {
-        obj = isObject(obj) ? obj : {};
         this.valueChangesSubscription.unsubscribe();
-        this.key.setValue(isString(obj.key) ? obj.key : '');
-        this.wrappers.setValue(isArray(obj.wrappers) ? obj.wrappers : []);
-        const fieldGroup = isArray(obj.fieldGroup) ? obj.fieldGroup : [];
-        this.fieldGroup.setValue(fieldGroup);
-        this.childFields = cloneDeep(fieldGroup);
-        this.field = cloneDeep(obj);
+        this.updateField(obj);
         this.subscribeValueChanges();
     }
 
@@ -134,14 +126,25 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestro
         this.fieldGroup.setValue(fieldGroup);
     }
 
-    onWrappersSelected(wrappers: string[]): void {
-        this.wrappers.setValue(wrappers);
+    onWrappersSelected(field: FormlyFieldConfig): void {
+        this.updateField(field);
     }
 
     private subscribeValueChanges(): void {
         this.valueChangesSubscription = this.form.valueChanges
             .switchMap(() => Observable.timer())
             .subscribe(() => this.updateValue());
+    }
+
+    private updateField(field: FormlyFieldConfig): void {
+        if (!isObject(field)) {
+            field = {};
+        }
+        this.key.setValue(isString(field.key) ? field.key : '');
+        const fieldGroup = isArray(field.fieldGroup) ? field.fieldGroup : [];
+        this.fieldGroup.setValue(fieldGroup);
+        this.childFields = cloneDeep(fieldGroup);
+        this.field = cloneDeep(field);
     }
 
     private updateValue(): void {
@@ -152,7 +155,6 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestro
         const field = this.field;
         field.key = this.key.value;
         field.fieldGroup = this.fieldGroup.value;
-        field.wrappers = this.wrappers.value;
         this.onChange(field);
     }
 }

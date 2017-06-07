@@ -27,6 +27,12 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                         <label>type</label>
                         <type-select formControlName="type"></type-select>
                     </div>
+                    <div *ngIf="showWrappers" class="form-group">
+                        <label>wrappers</label>
+                        <wrappers-picker [field]="field"
+                            (selected)="onWrappersSelected($event)">
+                        </wrappers-picker>
+                    </div>
                 </div>
                 <div class="card-block">
                     <formly-form [form]="fieldForm" [fields]="fields" [model]="field">
@@ -42,6 +48,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
     @Input() showType: boolean;
+    @Input() showWrappers: boolean;
     @Output() invalid: boolean;
 
     constructor(
@@ -92,14 +99,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
 
     writeValue(obj: any) {
         this.valueChangesSubscription.unsubscribe();
-        if (!isObject(obj)) {
-            obj = {};
-        }
-        this.key.setValue(isString(obj.key) ? obj.key : '');
-        this.type.setValue(isString(obj.type) ? obj.type : '');
-        this.fields = this.fieldsService.getTypeFields(this.type.value);
-        this.fieldForm = this.formBuilder.group({});
-        this.field = cloneDeep(obj);
+        this.updateField(obj);
         this.subscribeValueChanges();
     }
 
@@ -126,6 +126,17 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
             .subscribe(() => this.updateValue());
     }
 
+    private updateField(field: FormlyFieldConfig): void {
+        if (!isObject(field)) {
+            field = {};
+        }
+        this.key.setValue(isString(field.key) ? field.key : '');
+        this.type.setValue(isString(field.type) ? field.type : '');
+        this.fields = this.fieldsService.getTypeFields(this.type.value);
+        this.fieldForm = this.formBuilder.group({});
+        this.field = cloneDeep(field);
+    }
+
     private updateValue(): void {
         if (!this.onChange) {
             return;
@@ -143,5 +154,9 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         this.fieldForm = this.formBuilder.group({});
         this.field = clone(this.field);
         this.subscribeValueChanges();
+    }
+
+    onWrappersSelected(field: FormlyFieldConfig): void {
+        this.updateField(field);
     }
 }

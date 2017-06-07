@@ -2,6 +2,7 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild }
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from '../formly-designer-config';
+import { FormlyDesignerService } from '../formly-designer.service';
 import { cloneDeep, isArray, isObject } from 'lodash';
 
 
@@ -44,6 +45,9 @@ declare var $: any;
         </form>
     `,
     styles: [`
+        :host {
+            width: inherit;
+        }
         .btn:not(:disabled) {
             cursor: pointer;
         }
@@ -75,7 +79,8 @@ export class WrapperPickerComponent implements OnInit {
 
     constructor(
         private formBuilder: FormBuilder,
-        private formlyDesignerConfig: FormlyDesignerConfig
+        private formlyDesignerConfig: FormlyDesignerConfig,
+        private formlyDesignerService: FormlyDesignerService
     ) { }
 
     form: FormGroup;
@@ -111,12 +116,13 @@ export class WrapperPickerComponent implements OnInit {
                 this.modal.modal('show');
             }
             else {
-                this.selected.emit(this.fieldEdit.value);
+                this.onApply();
             }
         }
     }
 
     onApply(): void {
+        this.field = this.formlyDesignerService.convertField(this.fieldEdit.value);
         this.selected.emit(this.fieldEdit.value);
         this.modal.modal('hide');
     }

@@ -5,7 +5,7 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
     selector: 'expander',
     template: `
         <div class="header">
-            <span class="toggle" (click)="toggle()" [attr.title]="title" (dblclick)="$event.stopPropagation()">
+            <span class="toggle noselect" (click)="toggle()" [attr.title]="title" (dblclick)="$event.stopPropagation()">
                 <i [ngClass]="iconClass"></i>&nbsp;&nbsp;<span class="h4">{{heading}}</span>
             </span>
         </div>
@@ -15,14 +15,18 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
     `,
     styles: [`
         :host {
-            .toggle {
-                cursor: pointer;
-                cursor: hand;
-            }
-            ::after {
-                display: none;
-            }
             margin-top: 1em;
+        }
+        .toggle {
+            cursor: pointer;
+            cursor: hand;
+        }
+        .noselect {
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
     `]
 })

@@ -1,4 +1,4 @@
-import { Component, forwardRef, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, forwardRef, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from '../formly-designer-config';
@@ -22,7 +22,7 @@ const FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                         <label>key</label>
                         <input formControlName="key" class="form-control">
                     </div>
-                    <div class="form-group">
+                    <div *ngIf="showWrappers" class="form-group">
                         <label>wrappers</label>
                         <wrappers-picker [field]="field"
                             (selected)="onWrappersSelected($event)">
@@ -49,6 +49,7 @@ const FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     ]
 })
 export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
+    @Input() showWrappers: boolean;
     @Output() invalid: boolean;
 
     constructor(

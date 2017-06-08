@@ -19,49 +19,28 @@ declare var $: any;
                     </button>
                 </div>
             </div>
+            <div #modal class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add {{ type }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Cancel">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <field-editor #editor [formControl]="fieldEdit">
+                            </field-editor>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" (click)="onApply()"
+                                [disabled]="editor.invalid">Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </form>
-        <div #fieldModal class="modal fade" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Add {{ type }}</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Cancel">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <field-editor #fieldEditor [formControl]="fieldEdit">
-                        </field-editor>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" (click)="onApplyField()"
-                            [disabled]="fieldEditor.invalid">Apply</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div #fieldGroupModal class="modal fade" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Add {{ type }}</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Cancel">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <field-group-editor #fieldGroupEditor [formControl]="fieldGroupEdit">
-                        </field-group-editor>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" (click)="onApplyFieldGroup()"
-                            [disabled]="fieldGroupEditor.invalid">Apply</button>
-                    </div>
-                </div>
-            </div>
-        </div>
     `,
     styles: [`
         .btn:not(:disabled) {
@@ -89,8 +68,7 @@ declare var $: any;
     `]
 })
 export class FieldPickerComponent implements OnInit {
-    @ViewChild('fieldModal') fieldModalRef: ElementRef;
-    @ViewChild('fieldGroupModal') fieldGroupModalRef: ElementRef;
+    @ViewChild('modal') modalRef: ElementRef;
     @Output() selected = new EventEmitter<FormlyFieldConfig>();
 
     constructor(
@@ -100,18 +78,13 @@ export class FieldPickerComponent implements OnInit {
 
     form: FormGroup;
     fieldEdit = new FormControl({});
-    fieldGroupEdit = new FormControl({});
 
     get type(): string {
         return this.form.get('type').value;
     }
 
-    private get fieldModal(): any {
-        return $(this.fieldModalRef.nativeElement);
-    }
-
-    private get fieldGroupModal(): any {
-        return $(this.fieldGroupModalRef.nativeElement);
+    private get modal(): any {
+        return $(this.modalRef.nativeElement);
     }
 
     ngOnInit(): void {
@@ -123,26 +96,21 @@ export class FieldPickerComponent implements OnInit {
     add(): void {
         const type = this.type;
         if (type === 'fieldGroup') {
-            this.fieldGroupEdit.setValue({
+            this.fieldEdit.setValue({
                 fieldGroup: []
             });
-            this.fieldGroupModal.modal('show');
+            this.selected.emit(this.fieldEdit.value);
         }
         else {
             this.fieldEdit.setValue({
                 type: type
             });
-            this.fieldModal.modal('show');
+            this.modal.modal('show');
         }
     }
 
-    onApplyField(): void {
+    onApply(): void {
         this.selected.emit(this.fieldEdit.value);
-        this.fieldModal.modal('hide');
-    }
-
-    onApplyFieldGroup(): void {
-        this.selected.emit(this.fieldGroupEdit.value);
-        this.fieldGroupModal.modal('hide');
+        this.modal.modal('hide');
     }
 }

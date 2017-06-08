@@ -21,10 +21,10 @@ import { Observable } from 'rxjs/Rx';
         </div>
         <div class="content" [ngClass]="{preview: preview}">
             <div [hidden]="!editing">
-                <field-group-editor #editor [showWrappers]="true" [formControl]="fieldEdit">
+                <field-group-editor #editor [showWrappers]="true" [showChildren]="true" [formControl]="fieldEdit">
                     <div class="footer">
-                        <button (click)="cancel()" class="btn btn-secondary btn-sm mr-1">Cancel</button>
-                        <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary btn-sm">Apply</button>
+                        <button (click)="cancel()" class="btn btn-secondary mr-1">Cancel</button>
+                        <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary">Apply</button>
                     </div>
                 </field-group-editor>
             </div>

@@ -132,6 +132,11 @@ export class FormlyDesignerService {
             this.applyProperties(field, designedField, designerType.fields);
         }
 
+        let className: string;
+        if (isString(field.className) && (className = field.className.trim()).length > 0) {
+            designedField.className = className;
+        }
+
         if (isArray(field.wrappers)) {
             const wrappers = field.wrappers.slice();
             if (field.type) {

@@ -23,8 +23,8 @@ import { Observable } from 'rxjs/Rx';
             <div class="editor" [hidden]="!editing">
                 <field-editor #editor [showType]="true" [showWrappers]="true" [formControl]="fieldEdit">
                     <div class="footer">
-                        <button (click)="cancel()" class="btn btn-secondary btn-sm mr-1">Cancel</button>
-                        <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary btn-sm">Apply</button>
+                        <button (click)="cancel()" class="btn btn-secondary mr-1">Cancel</button>
+                        <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary">Apply</button>
                     </div>
                 </field-editor>
             </div>

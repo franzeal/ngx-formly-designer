@@ -23,6 +23,10 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                         <label>key</label>
                         <input formControlName="key" class="form-control">
                     </div>
+                    <div *ngIf="formlyDesignerConfig.settings.showClassName" class="form-group">
+                        <label>className</label>
+                        <input formControlName="className" class="form-control">
+                    </div>
                     <div *ngIf="showType" class="form-group">
                         <label>type</label>
                         <type-select formControlName="type"></type-select>
@@ -54,10 +58,11 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     constructor(
         private fieldsService: FieldsService,
         private formBuilder: FormBuilder,
-        private formlyDesignerConfig: FormlyDesignerConfig
+        public formlyDesignerConfig: FormlyDesignerConfig
     ) {
         this.form = formBuilder.group({
             key: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])],
+            className: [''],
             type: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
         });
         this.fieldForm = formBuilder.group({});
@@ -65,6 +70,10 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
 
     get key(): FormControl {
         return this.form.get('key') as FormControl;
+    }
+
+    get className(): FormControl {
+        return this.form.get('className') as FormControl;
     }
 
     get type(): FormControl {
@@ -86,7 +95,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
             .subscribe(() => this.onTypeChange()));
 
         this.subscriptions.push(this.form.statusChanges
-            .switchMap(() => Observable.timer())
+            .debounceTime(0)
             .subscribe(() => this.invalid = this.form.invalid));
 
         this.subscribeValueChanges();
@@ -131,6 +140,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
             field = {};
         }
         this.key.setValue(isString(field.key) ? field.key : '');
+        this.className.setValue(isString(field.className) ? field.className : '');
         this.type.setValue(isString(field.type) ? field.type : '');
         this.fields = this.fieldsService.getTypeFields(this.type.value);
         this.fieldForm = this.formBuilder.group({});
@@ -144,6 +154,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
 
         const field = this.field;
         field.key = this.key.value;
+        field.className = this.className.value;
         field.type = this.type.value;
         this.onChange(field);
     }

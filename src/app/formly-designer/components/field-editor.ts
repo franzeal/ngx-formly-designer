@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, forwardRef, Input, OnDestroy, OnInit } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FieldsService } from '../fields.service';
@@ -53,7 +53,6 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
     @Input() showType: boolean;
     @Input() showWrappers: boolean;
-    @Output() invalid: boolean;
 
     constructor(
         private fieldsService: FieldsService,
@@ -80,6 +79,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         return this.form.get('type') as FormControl;
     }
 
+    invalid: boolean;
     form: FormGroup;
     fieldForm: FormGroup;
     field: FormlyFieldConfig = {};

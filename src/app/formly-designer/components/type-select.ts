@@ -30,8 +30,8 @@ export class TypeSelectComponent implements AfterViewInit, ControlValueAccessor,
     ) { }
 
     formControl = new FormControl();
+    types: string[];
 
-    protected types: string[];
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 

@@ -30,8 +30,8 @@ export class WrapperSelectComponent implements AfterViewInit, ControlValueAccess
     ) { }
 
     formControl = new FormControl();
+    wrappers: string[];
 
-    protected wrappers: string[];
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 

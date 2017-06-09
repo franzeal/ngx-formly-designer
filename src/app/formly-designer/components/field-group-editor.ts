@@ -1,8 +1,8 @@
-import { Component, forwardRef, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, forwardRef, Input, OnDestroy, OnInit } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from '../formly-designer-config';
-import { Observable, Subscription } from 'rxjs/Rx';
+import { Subscription } from 'rxjs/Rx';
 import { cloneDeep, isArray, isObject, isString } from 'lodash';
 
 
@@ -60,7 +60,6 @@ const FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
     @Input() showWrappers: boolean;
     @Input() showChildren: boolean;
-    @Output() invalid: boolean;
 
     constructor(
         private formBuilder: FormBuilder,
@@ -86,6 +85,7 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestro
         return this.form.get('fieldGroup') as FormControl;
     }
 
+    invalid: boolean;
     form: FormGroup;
     field: FormlyFieldConfig = {};
     childFields = new Array<FormlyFieldConfig>();

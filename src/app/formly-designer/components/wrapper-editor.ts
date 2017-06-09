@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, forwardRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FieldsService } from '../fields.service';
@@ -37,7 +37,6 @@ const WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, OnDestroy, OnInit {
     @Input() wrapper: string;
-    @Output() invalid: boolean;
 
     constructor(
         private fieldsService: FieldsService,
@@ -47,9 +46,11 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
         this.fieldForm = formBuilder.group({});
     }
 
+    invalid: boolean;
     fieldForm: FormGroup;
     field: FormlyFieldConfig;
     fields: FormlyFieldConfig[];
+
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 

@@ -8,20 +8,19 @@ import { clone, cloneDeep, isArray, isFunction } from 'lodash';
 @Component({
     selector: 'formly-field-repeat-section',
     template: `
-        <div class="header">
-            <button type="button" class="add-btn btn btn-sm btn-primary" (click)="add()" [hidden]="!canAdd()">
+        <div class="header" *ngIf="canAdd()">
+            <button type="button" class="add-btn btn btn-sm btn-primary" (click)="add()">
                 <i class="fa fa-plus" aria-hidden="true"></i>
             </button>
         </div>
         <div class="body" [ngClass]="{interactive: canAdd()}">
-            <div class="section flex-container" *ngFor="let control of formControlAsFormGroupOrArray.controls; let i=index"
+            <div class="section flex-container" *ngFor="let control of formControl.controls; let i=index"
                 [ngClass]="{interactive: canRemove(i)}">
-                <button type="button" class="remove-btn btn btn-sm btn-danger" (click)="remove(i)" [hidden]="!canRemove(i)">
+                <button type="button" class="remove-btn btn btn-sm btn-danger" (click)="remove(i)" *ngIf="canRemove(i)">
                     <i class="fa fa-times" aria-hidden="true"></i>
                 </button>
                 <formly-form [model]="model[i]" [fields]="fields(i)" [options]="newOptions"
-                    [form]="formControl.at(i)" class="flex-item-right"
-                    [ngClass]="field.fieldArray.className">
+                    [form]="formControl.at(i)" [ngClass]="field.fieldArray.className">
                 </formly-form>
             </div>
         </div>
@@ -29,14 +28,13 @@ import { clone, cloneDeep, isArray, isFunction } from 'lodash';
     styles: [`
         .flex-container.interactive {
             display: flex;
-            flex-direction: row;
             align-items: flex-start;
             flex-wrap: nowrap;
-            .flex-item-right {
-                flex-grow: 1;
-            }
         }
-        .body.interactive :first-child {
+        formly-form {
+            flex-grow: 1;
+        }
+        .body.interactive {
             margin-top: 0.5em;
         }
     `]
@@ -50,16 +48,6 @@ export class FormlyFieldRepeatSectionComponent extends FieldType implements OnIn
             field.validators ? field.validators.validation : undefined,
             field.asyncValidators ? field.asyncValidators.validation : undefined
         );
-    }
-
-    get formControlAsFormGroupOrArray(): FormGroup | FormArray {
-        if (this.formControl instanceof FormGroup) {
-            return this.formControl as FormGroup;
-        }
-        else if (this.formControl instanceof FormArray) {
-            return this.formControl as FormArray;
-        }
-        return undefined;
     }
 
     get newOptions(): any {

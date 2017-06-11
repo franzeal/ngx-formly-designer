@@ -36,7 +36,7 @@
     "@angular/compiler-cli": "^2.4.0",
     "@types/jasmine": "2.5.38",
     "@types/jquery": "^2.0.45",
-    "@types/lodash": "ts2.0",
+    "@types/lodash": "^4.14.65",
     "@types/moment": "^2.13.0",
     "@types/moment-timezone": "^0.2.34",
     "@types/node": "~6.0.60",
@@ -52,6 +52,6 @@
     "protractor": "~5.1.0",
     "ts-node": "~2.0.0",
     "tslint": "~4.5.0",
-    "typescript": "~2.0.0"
+    "typescript": "~2.2.0"
   }
 }

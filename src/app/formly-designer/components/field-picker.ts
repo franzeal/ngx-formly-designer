@@ -2,6 +2,7 @@ import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from '../formly-designer-config';
+import { isArray } from 'lodash';
 
 
 declare var $: any;
@@ -62,9 +63,6 @@ declare var $: any;
             border-radius: .25rem 0 0 .25rem;
             border-right: 0;
         }
-        ::after {
-            display: none !important;
-        }
     `]
 })
 export class FieldPickerComponent implements OnInit {
@@ -102,9 +100,12 @@ export class FieldPickerComponent implements OnInit {
             this.selected.emit(this.fieldEdit.value);
         }
         else {
-            this.fieldEdit.setValue({
-                type: type
-            });
+            const field = { type: type } as FormlyFieldConfig;
+            if (this.formlyDesignerConfig.types[type].fieldArray) {
+                field.fieldArray = { fieldGroup: new Array<FormlyFieldConfig>() };
+            }
+            this.fieldEdit.setValue(field);
+
             this.modal.modal('show');
         }
     }

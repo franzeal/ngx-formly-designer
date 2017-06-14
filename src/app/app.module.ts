@@ -202,6 +202,10 @@ import { ExpanderComponent } from './components/expander.component';
                             }
                         }
                     ]
+                },
+                {
+                    name: 'repeatSection',
+                    fieldArray: true
                 }
             ],
             wrappers: [

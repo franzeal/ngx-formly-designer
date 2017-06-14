@@ -13,7 +13,7 @@ export class FormlyDesignerConfig {
         configs.forEach(config => this.addConfig(config));
     }
 
-    types: {[name: string]: DesignerOption} = {};
+    types: {[name: string]: DesignerTypeOption} = {};
     wrappers: {[name: string]: DesignerOption} = {};
     settings: DesignerSettings = { showClassName: true };
 
@@ -35,7 +35,7 @@ export class FormlyDesignerConfig {
         }
     }
 
-    setType(options: DesignerOption | DesignerOption[]): void {
+    setType(options: DesignerTypeOption | DesignerTypeOption[]): void {
         if (Array.isArray(options)) {
             options.forEach((option) => {
                 this.setType(option);
@@ -46,9 +46,10 @@ export class FormlyDesignerConfig {
             this.formlyConfig.getType(options.name);
 
             if (!this.types[options.name]) {
-                this.types[options.name] = <DesignerOption>{};
+                this.types[options.name] = <DesignerTypeOption>{};
             }
             this.types[options.name].name = options.name;
+            this.types[options.name].fieldArray = !!options.fieldArray;
             this.types[options.name].fields = options.fields;
         }
     }
@@ -77,12 +78,16 @@ export interface DesignerOption {
     fields?: FormlyFieldConfig[];
 }
 
+export interface DesignerTypeOption extends DesignerOption {
+    fieldArray?: boolean;
+}
+
 export interface DesignerSettings {
     showClassName?: boolean;
 }
 
 export interface DesignerConfigOption {
     settings?: DesignerSettings;
-    types?: DesignerOption[];
+    types?: DesignerTypeOption[];
     wrappers?: DesignerOption[];
 }

@@ -67,9 +67,6 @@ declare var $: any;
             border-radius: .25rem 0 0 .25rem;
             border-right: 0;
         }
-        ::after {
-            display: none !important;
-        }
     `]
 })
 export class WrapperPickerComponent implements OnInit {

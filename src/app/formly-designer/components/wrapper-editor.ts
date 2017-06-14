@@ -49,7 +49,7 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
     invalid: boolean;
     fieldForm: FormGroup;
     field: FormlyFieldConfig;
-    fields: FormlyFieldConfig[];
+    fields = new Array<FormlyFieldConfig>();
 
     protected onChange = (value: any) => { };
     protected onTouched = () => { };

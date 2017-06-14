@@ -121,15 +121,20 @@ export class FormlyDesignerService {
     private createPrunedField(field: FormlyFieldConfig): FormlyFieldConfig {
         let designedField: FormlyFieldConfig;
         const designerType = this.designerConfig.types[field.type];
-        if (!designerType) {
+        if (designerType) {
+            designedField = { key: field.key, type: field.type };
+            this.applyProperties(field, designedField, designerType.fields);
+            if (designerType.fieldArray) {
+                designedField.fieldArray = {
+                    fieldGroup: this.createPrunedFields(field.fieldArray.fieldGroup)
+                };
+            }
+        }
+        else {
             designedField = isEmpty(field.key) ? {} : { key: field.key };
             if (isArray(field.fieldGroup)) {
                 designedField.fieldGroup = this.createPrunedFields(field.fieldGroup);
             }
-        }
-        else {
-            designedField = { key: field.key, type: field.type };
-            this.applyProperties(field, designedField, designerType.fields);
         }
 
         let className: string;
@@ -165,12 +170,14 @@ export class FormlyDesignerService {
     }
 
     private applyProperties(field: FormlyFieldConfig, designedField: FormlyFieldConfig, designerFields: FormlyFieldConfig[]): void {
-        designerFields.forEach(designerField => {
-            const value = get(field, designerField.key);
-            if (!isNil(value) && (!isString(value) || value.length > 0) && value !== designerField.defaultValue) {
-                set(designedField, designerField.key, value);
-            }
-        });
+        if (isArray(designerFields)) {
+            designerFields.forEach(designerField => {
+                const value = get(field, designerField.key);
+                if (!isNil(value) && (!isString(value) || value.length > 0) && value !== designerField.defaultValue) {
+                    set(designedField, designerField.key, value);
+                }
+            });
+        }
     }
 
     private checkPathConflict(fields: FormlyFieldConfig[], originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): void {

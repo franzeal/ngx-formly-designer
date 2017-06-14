@@ -7,11 +7,8 @@ export class TemplateDesigner {
             if (!field || (field.templateOptions && field.templateOptions['designer'] === true)) {
                 return;
             }
-            if (field.type && !field.fieldGroup && !field.fieldArray) {
-                return 'fieldDesigner';
-            }
-            if (field.type && field.fieldGroup) {
-                return 'fieldGroupDesigner';
+            if (field.type) {
+                return field.fieldGroup ? 'fieldGroupDesigner' : 'fieldDesigner';
             }
         });
     }

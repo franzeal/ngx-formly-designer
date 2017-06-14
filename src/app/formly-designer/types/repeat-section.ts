@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { FieldType, FormlyFieldConfig } from 'ng-formly';
 
-import { clone, cloneDeep, isArray, isFunction } from 'lodash';
+import { clone, cloneDeep, isArray, isFunction, isUndefined } from 'lodash';
 
 
 @Component({
@@ -26,6 +26,9 @@ import { clone, cloneDeep, isArray, isFunction } from 'lodash';
         </div>
     `,
     styles: [`
+        .header {
+            margin-top: .5em;
+        }
         .flex-container.interactive {
             display: flex;
             align-items: flex-start;
@@ -36,6 +39,12 @@ import { clone, cloneDeep, isArray, isFunction } from 'lodash';
         }
         .body.interactive {
             margin-top: 0.5em;
+        }
+        .section {
+            margin-bottom: .25em;
+        }
+        .section>button {
+            margin-top: .25em;
         }
     `]
 })
@@ -78,7 +87,7 @@ export class FormlyFieldRepeatSectionComponent extends FieldType implements OnIn
 
     canAdd(): boolean {
         const canAdd = this.to['canAdd'] as Function | boolean;
-        return (isFunction(canAdd) ? canAdd.apply(this) : canAdd) === true;
+        return isUndefined(canAdd) || (isFunction(canAdd) ? canAdd.apply(this) : canAdd) === true;
     }
 
     canRemove(index: number): boolean {

@@ -17,7 +17,7 @@ import { Subscription } from 'rxjs/Rx';
         </form>
     `,
     styles: [`
-        :host-context(field-group-editor) field-picker {
+        :host-context(field-editor) field-picker, :host-context(field-group-editor) field-picker {
             display: none;
         }
     `],

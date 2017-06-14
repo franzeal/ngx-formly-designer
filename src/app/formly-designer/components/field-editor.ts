@@ -4,7 +4,7 @@ import { FormlyFieldConfig } from 'ng-formly';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { Observable, Subscription } from 'rxjs/Rx';
-import { clone, cloneDeep, isObject, isString } from 'lodash';
+import { clone, cloneDeep, isArray, isObject, isString } from 'lodash';
 
 
 const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -38,14 +38,28 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                         </wrappers-picker>
                     </div>
                 </div>
-                <div class="card-block">
-                    <formly-form [form]="fieldForm" [fields]="fields" [model]="field">
+                <div *ngIf="fields.length > 0 || (showChildren && fieldArray)" class="card-block">
+                    <formly-form *ngIf="fields.length > 0" [form]="fieldForm" [fields]="fields" [model]="field">
                     </formly-form>
+                    <div *ngIf="showChildren && fieldArray" class="form-group">
+                        <label>child</label>
+                        <field-picker (selected)="onFieldSelected($event)"></field-picker>
+                    </div>
                     <ng-content></ng-content>
                 </div>
             </div>
         </form>
+        <div *ngIf="showChildren && childFields.length > 0">
+            <h4 class="mt-2">Children Preview</h4>
+            <formly-designer class="mt-1" [disabled]="true" [preview]="true" [fields]="childFields">
+            </formly-designer>
+        </div>
     `,
+    styles: [`
+        .card-header:last-child {
+            border-bottom: 0;
+        }
+    `],
     providers: [
         FIELD_EDITOR_CONTROL_VALUE_ACCESSOR
     ]
@@ -53,6 +67,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
     @Input() showType: boolean;
     @Input() showWrappers: boolean;
+    @Input() showChildren: boolean;
 
     constructor(
         private fieldsService: FieldsService,
@@ -83,7 +98,9 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     form: FormGroup;
     fieldForm: FormGroup;
     field: FormlyFieldConfig = {};
-    fields: FormlyFieldConfig[];
+    fields = new Array<FormlyFieldConfig>();
+    fieldArray: boolean;
+    childFields = new Array<FormlyFieldConfig>();
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
@@ -129,6 +146,19 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         }
     }
 
+    onFieldSelected(field: FormlyFieldConfig): void {
+        if (!isObject(this.field.fieldArray)) {
+            this.field.fieldArray = {};
+        }
+        if (!isArray(this.field.fieldArray.fieldGroup)) {
+            this.field.fieldArray.fieldGroup = [];
+        }
+
+        this.field.fieldArray.fieldGroup.push(field);
+        this.childFields = cloneDeep(this.field.fieldArray.fieldGroup);
+        this.updateField(this.field);
+    }
+
     private subscribeValueChanges(): void {
         this.valueChangesSubscription = Observable.merge(this.fieldForm.valueChanges, this.form.valueChanges)
             .debounceTime(0)
@@ -144,6 +174,8 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         this.type.setValue(isString(field.type) ? field.type : '');
         this.fields = this.fieldsService.getTypeFields(this.type.value);
         this.fieldForm = this.formBuilder.group({});
+        const fieldGroup = field && field.fieldArray && field.fieldArray.fieldGroup;
+        this.childFields = isArray(fieldGroup) ? cloneDeep(fieldGroup) : [];
         this.field = cloneDeep(field);
     }
 
@@ -162,6 +194,8 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     private onTypeChange(): void {
         this.valueChangesSubscription.unsubscribe();
         this.fields = this.fieldsService.getTypeFields(this.type.value);
+        const designerType = this.formlyDesignerConfig.types[this.type.value];
+        this.fieldArray = designerType ? designerType.fieldArray : false;
         this.fieldForm = this.formBuilder.group({});
         this.field = clone(this.field);
         this.subscribeValueChanges();

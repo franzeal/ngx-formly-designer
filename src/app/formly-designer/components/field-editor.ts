@@ -174,8 +174,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         this.type.setValue(isString(field.type) ? field.type : '');
         this.fields = this.fieldsService.getTypeFields(this.type.value);
         this.fieldForm = this.formBuilder.group({});
-        const fieldGroup = field && field.fieldArray && field.fieldArray.fieldGroup;
-        this.childFields = isArray(fieldGroup) ? cloneDeep(fieldGroup) : [];
+        this.childFields = field && field.fieldArray && isArray(field.fieldArray.fieldGroup) ? cloneDeep(field.fieldArray.fieldGroup) : [];
         this.field = cloneDeep(field);
     }
 

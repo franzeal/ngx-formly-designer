@@ -16,8 +16,6 @@ import { WrapperSelectComponent } from './components/wrapper-select';
 import { WrapperPickerComponent } from './components/wrapper-picker';
 import { WrappersPickerComponent } from './components/wrappers-picker';
 
-import { isObject } from 'lodash';
-
 
 @NgModule({
     declarations: [

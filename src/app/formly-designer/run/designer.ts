@@ -8,7 +8,13 @@ export class TemplateDesigner {
                 return;
             }
             if (field.type) {
-                return field.fieldGroup ? 'fieldGroupDesigner' : 'fieldDesigner';
+                if (field.fieldGroup) {
+                    return 'fieldGroupDesigner';
+                }
+                if (field.fieldArray) {
+                    return 'fieldArrayDesigner';
+                }
+                return 'fieldDesigner';
             }
         });
     }

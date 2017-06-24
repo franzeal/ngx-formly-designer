@@ -14,13 +14,13 @@ import { clone, cloneDeep, isArray, isFunction, isUndefined } from 'lodash';
             </button>
         </div>
         <div class="body" [ngClass]="{interactive: canAdd()}">
-            <div class="section flex-container" *ngFor="let control of formControl.controls; let i=index"
+            <div class="section flex-container" *ngFor="let control of formArray.controls; let i=index"
                 [ngClass]="{interactive: canRemove(i)}">
                 <button type="button" class="remove-btn btn btn-sm btn-danger" (click)="remove(i)" *ngIf="canRemove(i)">
                     <i class="fa fa-times" aria-hidden="true"></i>
                 </button>
                 <formly-form [model]="model[i]" [fields]="fields(i)" [options]="newOptions"
-                    [form]="formControl.at(i)" [ngClass]="field.fieldArray.className">
+                    [form]="formArray.at(i)" [ngClass]="field.fieldArray.className">
                 </formly-form>
             </div>
         </div>
@@ -57,6 +57,10 @@ export class FormlyFieldRepeatSectionComponent extends FieldType implements OnIn
             field.validators ? field.validators.validation : undefined,
             field.asyncValidators ? field.asyncValidators.validation : undefined
         );
+    }
+
+    get formArray(): FormArray {
+        return this.formControl as FormArray;
     }
 
     get newOptions(): any {

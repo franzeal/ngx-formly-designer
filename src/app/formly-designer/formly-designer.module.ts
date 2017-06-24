@@ -54,12 +54,12 @@ export class FormlyDesignerModule {
         formlyConfig.addConfig(config);
     }
 
-    static forRoot(config: DesignerConfigOption = {}): ModuleWithProviders {
+    static forRoot(designerConfig: DesignerConfigOption = {}): ModuleWithProviders {
         return {
             ngModule: FormlyDesignerModule,
             providers: [
                 { provide: ANALYZE_FOR_ENTRY_COMPONENTS, useValue: [fieldComponents, wrapperComponents], multi: true },
-                { provide: FORMLY_DESIGNER_CONFIG_TOKEN, useValue: config, multi: true }
+                { provide: FORMLY_DESIGNER_CONFIG_TOKEN, useValue: designerConfig, multi: true }
             ]
         };
     }

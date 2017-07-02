@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
-import { FormlyFieldConfig, FormlyConfig } from 'ng-formly';
+import { FormGroup } from '@angular/forms';
+import { FormlyFieldConfig, FormlyConfig, FormlyFormBuilder } from 'ng-formly';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
-import { get, isArray, isEmpty, isNil, isString, set } from 'lodash';
+import { cloneDeepWith, get, isArray, isEmpty, isNil, isString, set } from 'lodash';
 
 
 @Injectable()
 export class FormlyDesignerService {
     constructor(
         private designerConfig: FormlyDesignerConfig,
-        private formlyConfig: FormlyConfig
+        private formlyConfig: FormlyConfig,
+        private formlyFormBuilder: FormlyFormBuilder
     ) { }
 
     private readonly _disabled = new BehaviorSubject<boolean>(false);
@@ -66,7 +68,12 @@ export class FormlyDesignerService {
     }
 
     addField(field: FormlyFieldConfig): void {
-        const fields = this.fields.slice();
+        // Test build
+        let fields = this.fields.slice();
+        fields.push(field);
+        this.formlyFormBuilder.buildForm(new FormGroup({}), fields, {}, {});
+
+        fields = this.fields.slice();
         fields.push(field);
         this.model = {};
         this.fields = fields;
@@ -82,6 +89,12 @@ export class FormlyDesignerService {
 
     updateField(originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): void {
         const designerField = this.createPrunedField(modifiedField);
+
+        // Test build
+        const fields = cloneDeepWith<any>(this.fields, (value: any, key: number|string, object: any, stack: any) => {
+            return value === originalField ? designerField : undefined;
+        }) as FormlyFieldConfig[];
+        this.formlyFormBuilder.buildForm(new FormGroup({}), fields, {}, {});
 
         // Needs to do a deep find and replace
         if (this.findAndReplace(this.fields, originalField, designerField)) {
@@ -178,13 +191,6 @@ export class FormlyDesignerService {
                 }
             });
         }
-    }
-
-    private checkPathConflict(fields: FormlyFieldConfig[], originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): void {
-        // Determine what the full path of the modified field is
-
-        // Find the first field in fields (exluding the original field) that has the
-        // same path and a conflicting type (field / fieldGroup / fieldArray), if any
     }
 
     private findAndReplace(fields: FormlyFieldConfig[], originalField: FormlyFieldConfig, modifiedField: FormlyFieldConfig): boolean {

@@ -1,8 +1,8 @@
 import { ChangeDetectorRef, Component, ViewChild, ViewContainerRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { FieldWrapper, FormlyConfig } from 'ng-formly';
+import { FieldWrapper, FormlyConfig, FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerService } from '../formly-designer.service';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isArray } from 'lodash';
 import { Observable } from 'rxjs/Rx';
 
 
@@ -21,7 +21,7 @@ import { Observable } from 'rxjs/Rx';
         </div>
         <div class="content" [ngClass]="{preview: preview}">
             <div [hidden]="!editing">
-                <field-group-editor #editor [showWrappers]="true" [showChildren]="true" [formControl]="fieldEdit">
+                <field-group-editor #editor [showWrappers]="true" [formControl]="fieldEdit">
                     <div class="footer">
                         <button (click)="cancel()" class="btn btn-secondary mr-1">Cancel</button>
                         <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary">Apply</button>
@@ -29,6 +29,10 @@ import { Observable } from 'rxjs/Rx';
                 </field-group-editor>
             </div>
             <div [hidden]="editing">
+                <div class="form-group">
+                    <label>child</label>
+                    <field-picker (selected)="onFieldSelected($event)"></field-picker>
+                </div>
                 <ng-container #fieldComponent></ng-container>
             </div>
         </div>
@@ -103,5 +107,15 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper {
     cancel(): void {
         this.formlyDesignerService.disabled = false;
         this.editing = false;
+    }
+
+    onFieldSelected(field: FormlyFieldConfig): void {
+        const updatedField = cloneDeep(this.field);
+        updatedField.fieldGroup = isArray(updatedField.fieldGroup) ? updatedField.fieldGroup.slice() : [];
+        updatedField.fieldGroup.push(field);
+        Observable.timer()
+            .do(() => this.formlyDesignerService.updateField(this.field, updatedField))
+            .catch(err => Observable.never())
+            .subscribe();
     }
 }

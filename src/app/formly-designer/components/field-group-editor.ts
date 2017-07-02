@@ -3,7 +3,7 @@ import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACC
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { Subscription } from 'rxjs/Rx';
-import { cloneDeep, isArray, isObject, isString } from 'lodash';
+import { cloneDeep, isObject, isString } from 'lodash';
 
 
 const FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -33,20 +33,11 @@ const FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                         </wrappers-picker>
                     </div>
                 </div>
-                <div *ngIf="showChildren" class="card-block">
-                    <div class="form-group">
-                        <label>child</label>
-                        <field-picker (selected)="onFieldSelected($event)"></field-picker>
-                    </div>
+                <div class="card-block">
                     <ng-content></ng-content>
                 </div>
             </div>
         </form>
-        <div *ngIf="showChildren && childFields.length > 0">
-            <h4 class="mt-2">Children Preview</h4>
-            <formly-designer class="mt-1" [disabled]="true" [preview]="true" [fields]="childFields">
-            </formly-designer>
-        </div>
     `,
     styles: [`
         .card-header:last-child {
@@ -59,7 +50,6 @@ const FIELD_GROUP_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
     @Input() showWrappers: boolean;
-    @Input() showChildren: boolean;
 
     constructor(
         private formBuilder: FormBuilder,
@@ -68,7 +58,6 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestro
         this.form = formBuilder.group({
             key: [''],
             className: [''],
-            fieldGroup: formBuilder.control([]),
             wrappers: formBuilder.control([])
         });
     }
@@ -81,14 +70,9 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestro
         return this.form.get('className') as FormControl;
     }
 
-    get fieldGroup(): FormControl {
-        return this.form.get('fieldGroup') as FormControl;
-    }
-
     invalid: boolean;
     form: FormGroup;
     field: FormlyFieldConfig = {};
-    childFields = new Array<FormlyFieldConfig>();
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
@@ -99,11 +83,6 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestro
         this.subscriptions.push(this.form.statusChanges
             .debounceTime(0)
             .subscribe(() => this.invalid = this.form.invalid));
-
-        this.subscriptions.push(this.fieldGroup.valueChanges
-            .debounceTime(0)
-            .map(fieldGroup => isArray(fieldGroup) ? fieldGroup : [])
-            .subscribe(fieldGroup => this.childFields = cloneDeep(fieldGroup)));
 
         this.subscribeValueChanges();
     }
@@ -136,12 +115,6 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestro
         }
     }
 
-    onFieldSelected(field: FormlyFieldConfig): void {
-        const fieldGroup = isArray(this.fieldGroup.value) ? this.fieldGroup.value.slice() : [];
-        fieldGroup.push(field);
-        this.fieldGroup.setValue(fieldGroup);
-    }
-
     onWrappersSelected(field: FormlyFieldConfig): void {
         this.updateField(field);
     }
@@ -158,9 +131,6 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestro
         }
         this.key.setValue(isString(field.key) ? field.key : '');
         this.className.setValue(isString(field.className) ? field.className : '');
-        const fieldGroup = isArray(field.fieldGroup) ? field.fieldGroup : [];
-        this.fieldGroup.setValue(fieldGroup);
-        this.childFields = cloneDeep(fieldGroup);
         this.field = cloneDeep(field);
     }
 
@@ -172,7 +142,6 @@ export class FieldGroupEditorComponent implements ControlValueAccessor, OnDestro
         const field = this.field;
         field.key = this.key.value;
         field.className = this.className.value;
-        field.fieldGroup = this.fieldGroup.value;
         this.onChange(field);
     }
 }

@@ -49,11 +49,6 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                 </div>
             </div>
         </form>
-        <div *ngIf="showChildren && childFields.length > 0">
-            <h4 class="mt-2">Children Preview</h4>
-            <formly-designer class="mt-1" [disabled]="true" [preview]="true" [fields]="childFields">
-            </formly-designer>
-        </div>
     `,
     styles: [`
         .card-header:last-child {

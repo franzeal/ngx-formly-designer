@@ -21,34 +21,42 @@ export class FieldsService {
     private getFields(name: string, type: string): FormlyFieldConfig[] {
         const designerOption = (name ? this.getDesignerOptions(type)[name] || {} : {}) as DesignerOption;
         const fields = cloneDeep(designerOption.fields || []);
-        this.markDesigner(fields);
+        this.mutateFields(fields, true);
         return fields;
     }
 
-    private getDesignerOptions(type: string): {[name: string]: DesignerOption} {
+    private getDesignerOptions(type: string): { [name: string]: DesignerOption } {
         if (type === 'type') {
             return this.formlyDesignerConfig.types;
         }
         if (type === 'wrapper') {
             return this.formlyDesignerConfig.wrappers;
         }
-        return { };
+        return {};
     }
 
-    private markDesigner(fields: FormlyFieldConfig[]): void {
-        fields.forEach(field => {
-            if (isObject(field.templateOptions)) {
-                field.templateOptions['designer'] = true;
-            }
-            else {
-                field.templateOptions = { designer: true };
-            }
-            if (field.fieldGroup) {
-                this.markDesigner(field.fieldGroup);
-            }
-            if (field.fieldArray) {
-                this.markDesigner([field.fieldArray]);
-            }
-        });
+    public mutateField(field: FormlyFieldConfig, designerField: boolean): void {
+        if (isObject(field.templateOptions)) {
+            field.templateOptions['$designerField'] = designerField;
+        }
+        else {
+            field.templateOptions = { $designerField: designerField };
+        }
+        if (field.fieldGroup) {
+            this.mutateFields(field.fieldGroup, designerField);
+        }
+        else if (field.fieldArray && field.fieldArray.fieldGroup) {
+            // Treating fieldArrays as fieldGroups
+            field.templateOptions['$sourceType'] = field.type;
+            field.type = 'fieldArray';
+            field.fieldGroup = field.fieldArray.fieldGroup;
+            delete field.fieldArray;
+
+            this.mutateFields(field.fieldGroup, designerField);
+        }
+    }
+
+    public mutateFields(fields: FormlyFieldConfig[], designerFields: boolean): void {
+        fields.forEach(field => this.mutateField(field, designerFields));
     }
 }

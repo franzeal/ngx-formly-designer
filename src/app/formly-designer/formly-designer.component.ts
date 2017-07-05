@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { FormlyConfig, FormlyFieldConfig } from 'ng-formly';
+import { FieldsService } from './fields.service';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { FormlyDesignerService } from './formly-designer.service';
-import { Subscription } from 'rxjs/Rx';
+import { Observable, Subscription } from 'rxjs/Rx';
 
 
 @Component({
@@ -16,11 +17,6 @@ import { Subscription } from 'rxjs/Rx';
             </formly-form>
         </form>
     `,
-    styles: [`
-        :host-context(field-editor) field-picker, :host-context(field-group-editor) field-picker {
-            display: none;
-        }
-    `],
     providers: [FormlyDesignerService]
 })
 export class FormlyDesignerComponent implements OnDestroy, OnInit {
@@ -37,6 +33,7 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
     private subscriptions = new Array<Subscription>();
 
     constructor(
+        private fieldsService: FieldsService,
         private formBuilder: FormBuilder,
         private formlyConfig: FormlyConfig,
         private formlyDesignerConfig: FormlyDesignerConfig,
@@ -53,21 +50,14 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
     }
 
     @Input()
-    get preview(): boolean {
-        return this.formlyDesignerService.preview;
-    }
-
-    set preview(value: boolean) {
-        this.formlyDesignerService.preview = value;
-    }
-
-    @Input()
     get fields(): FormlyFieldConfig[] {
         return this.formlyDesignerService.fields;
     }
 
     set fields(value: FormlyFieldConfig[]) {
-        this.formlyDesignerService.fields = value;
+        const fields = this.formlyDesignerService.convertFields(value);
+        this.fieldsService.mutateFields(fields, false);
+        this.formlyDesignerService.fields = fields;
     }
 
     @Input()
@@ -94,7 +84,11 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
             this.formlyDesignerService.fields$
                 .subscribe(() => this.fieldsChanged.emit(this.formlyDesignerService.createDesignerFields())));
 
-        this.subscriptions.push(this.formlyDesignerService.model$.subscribe(value => this.modelChanged.emit(value)));
+        this.subscriptions.push(
+            Observable.merge(
+                this.formlyDesignerService.model$,
+                this.form.valueChanges
+            ).debounceTime(50).subscribe(() => this.modelChanged.emit(this.formlyDesignerService.model)));
     }
 
     ngOnDestroy(): void {

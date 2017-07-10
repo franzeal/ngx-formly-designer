@@ -47,10 +47,10 @@ export class FieldsService {
         }
         else if (field.fieldArray && field.fieldArray.fieldGroup) {
             // Treating fieldArrays as fieldGroups
-            field.templateOptions['$sourceType'] = field.type;
-            field.type = 'fieldArray';
+            field.templateOptions['$fieldArray'] = { type: field.type };
             field.fieldGroup = field.fieldArray.fieldGroup;
             delete field.fieldArray;
+            delete field.type;
 
             this.mutateFields(field.fieldGroup, designerField);
         }

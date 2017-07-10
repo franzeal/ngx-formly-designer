@@ -1,10 +1,10 @@
 import { Component, forwardRef, Input, OnDestroy, OnInit } from '@angular/core';
-import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
+import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { Observable, Subscription } from 'rxjs/Rx';
-import { clone, cloneDeep, isArray, isObject, isString } from 'lodash';
+import { clone, cloneDeep, isObject, isString } from 'lodash';
 
 
 const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -19,32 +19,35 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
         <form [formGroup]="form" novalidate>
             <div class="card">
                 <div class="card-header">
-                    <div class="form-group">
-                        <label>key</label>
+                    <div class="form-group" [ngClass]="{'has-danger': form.hasError('key') && (key.dirty || key.touched)}">
+                        <label class="form-control-label">key</label>
                         <input formControlName="key" class="form-control">
+                        <div *ngIf="form.hasError('key') && (key.dirty || key.touched)" class="form-control-feedback">
+                            key required.
+                        </div>
                     </div>
                     <div *ngIf="formlyDesignerConfig.settings.showClassName" class="form-group">
-                        <label>className</label>
+                        <label class="form-control-label">className</label>
                         <input formControlName="className" class="form-control">
                     </div>
-                    <div *ngIf="showType" class="form-group">
-                        <label>type</label>
+                    <div *ngIf="showType" class="form-group"
+                        [ngClass]="{'has-danger': form.hasError('type') && (type.dirty || type.touched)}">
+                        <label class="form-control-label">type</label>
                         <type-select formControlName="type"></type-select>
+                        <div *ngIf="form.hasError('type') && (type.dirty || type.touched)" class="form-control-feedback">
+                            type required.
+                        </div>
                     </div>
                     <div *ngIf="showWrappers" class="form-group">
-                        <label>wrappers</label>
+                        <label class="form-control-label">wrappers</label>
                         <wrappers-picker [field]="field"
                             (selected)="onWrappersSelected($event)">
                         </wrappers-picker>
                     </div>
                 </div>
-                <div *ngIf="fields.length > 0 || (showChildren && fieldArray)" class="card-block">
+                <div class="card-block">
                     <formly-form *ngIf="fields.length > 0" [form]="fieldForm" [fields]="fields" [model]="field">
                     </formly-form>
-                    <div *ngIf="showChildren && fieldArray" class="form-group">
-                        <label>child</label>
-                        <field-picker (selected)="onFieldSelected($event)"></field-picker>
-                    </div>
                     <ng-content></ng-content>
                 </div>
             </div>
@@ -62,7 +65,6 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
     @Input() showType: boolean;
     @Input() showWrappers: boolean;
-    @Input() showChildren: boolean;
 
     constructor(
         private fieldsService: FieldsService,
@@ -70,10 +72,10 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         public formlyDesignerConfig: FormlyDesignerConfig
     ) {
         this.form = formBuilder.group({
-            key: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])],
+            key: [''],
             className: [''],
-            type: ['', Validators.compose([Validators.required, Validators.pattern(/^\s*\S.*$/)])]
-        });
+            type: ['']
+        }, { validator: (control) => this.validator(control) });
         this.fieldForm = formBuilder.group({});
     }
 
@@ -95,7 +97,6 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     field: FormlyFieldConfig = {};
     fields = new Array<FormlyFieldConfig>();
     fieldArray: boolean;
-    childFields = new Array<FormlyFieldConfig>();
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
@@ -121,6 +122,8 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     writeValue(obj: any) {
         this.valueChangesSubscription.unsubscribe();
         this.updateField(obj);
+        this.form.markAsPristine();
+        this.form.markAsUntouched();
         this.subscribeValueChanges();
     }
 
@@ -141,19 +144,6 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         }
     }
 
-    onFieldSelected(field: FormlyFieldConfig): void {
-        if (!isObject(this.field.fieldArray)) {
-            this.field.fieldArray = {};
-        }
-        if (!isArray(this.field.fieldArray.fieldGroup)) {
-            this.field.fieldArray.fieldGroup = [];
-        }
-
-        this.field.fieldArray.fieldGroup.push(field);
-        this.childFields = cloneDeep(this.field.fieldArray.fieldGroup);
-        this.updateField(this.field);
-    }
-
     private subscribeValueChanges(): void {
         this.valueChangesSubscription = Observable.merge(this.fieldForm.valueChanges, this.form.valueChanges)
             .debounceTime(0)
@@ -169,7 +159,6 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         this.type.setValue(isString(field.type) ? field.type : '');
         this.fields = this.fieldsService.getTypeFields(this.type.value);
         this.fieldForm = this.formBuilder.group({});
-        this.childFields = field && field.fieldArray && isArray(field.fieldArray.fieldGroup) ? cloneDeep(field.fieldArray.fieldGroup) : [];
         this.field = cloneDeep(field);
     }
 
@@ -198,4 +187,20 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     onWrappersSelected(field: FormlyFieldConfig): void {
         this.updateField(field);
     }
+
+    private validator(control: FormGroup): { [key: string]: boolean } {
+        const type = control.get('type') as FormControl;
+        const hasType = isString(type.value) && type.value.trim().length > 0;
+        if (!this.showType && !hasType) {
+            return null;
+        }
+
+        const key = control.get('key') as FormControl;
+        const result = { key: false, type: !hasType };
+        if (hasType && (!isString(key.value) || key.value.trim().length === 0)) {
+            result.key = true;
+        }
+
+        return result.key || result.type ? result : null;
+    };
 }

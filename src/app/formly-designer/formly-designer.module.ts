@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { FieldEditorComponent } from './components/field-editor';
-import { FieldGroupEditorComponent } from './components/field-group-editor';
 import { FieldPickerComponent } from './components/field-picker';
 import { FieldsService } from './fields.service';
 import { FormlyConfig, FormlyModule } from 'ng-formly';
@@ -20,7 +19,6 @@ import { WrappersPickerComponent } from './components/wrappers-picker';
 @NgModule({
     declarations: [
         FieldEditorComponent,
-        FieldGroupEditorComponent,
         FieldPickerComponent,
         FormlyDesignerComponent,
         TypeSelectComponent,

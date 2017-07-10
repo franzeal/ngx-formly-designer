@@ -4,7 +4,7 @@ import { FieldsService } from './fields.service';
 import { FormlyFieldConfig, FormlyConfig, FormlyFormBuilder } from 'ng-formly';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
-import { cloneDeepWith, get, isArray, isEmpty, isNil, isString, set, unset } from 'lodash';
+import { cloneDeep, cloneDeepWith, get, isArray, isEmpty, isNil, isString, set, unset } from 'lodash';
 
 
 @Injectable()
@@ -29,7 +29,7 @@ export class FormlyDesignerService {
     }
 
     get disabled$(): Observable<boolean> {
-        return this._disabled.asObservable().debounceTime(0);
+        return this._disabled.asObservable();
     }
 
     get fields(): FormlyFieldConfig[] {
@@ -37,11 +37,12 @@ export class FormlyDesignerService {
     }
 
     set fields(value: FormlyFieldConfig[]) {
-        this._fields.next(isArray(value) ? value : []);
+        const fields = isArray(value) ? value : [];
+        this._fields.next(fields);
     }
 
     get fields$(): Observable<FormlyFieldConfig[]> {
-        return this._fields.asObservable().debounceTime(0);
+        return this._fields.asObservable();
     }
 
     get model(): any {
@@ -53,14 +54,14 @@ export class FormlyDesignerService {
     }
 
     get model$(): Observable<any> {
-        return this._model.asObservable().debounceTime(0);
+        return this._model.asObservable();
     }
 
     addField(field: FormlyFieldConfig): void {
         this.fieldsService.mutateField(field, false);
 
         // Test build
-        let fields = this.fields.slice();
+        let fields = cloneDeep(this.fields);
         fields.push(field);
         this.formlyFormBuilder.buildForm(new FormGroup({}), fields, {}, {});
 
@@ -68,15 +69,17 @@ export class FormlyDesignerService {
         fields.push(field);
 
         this.fields = fields;
+        this.model = cloneDeep(this.model);
     }
 
     removeField(field: FormlyFieldConfig): void {
         this.unsetField(field);
         if (this.replaceField(this.fields, field, undefined)) {
             this.removeControl(field.formControl);
-            this.model = {};
-            this.fields = this.fields.slice();
         }
+
+        this.fields = this.fields.slice();
+        this.model = cloneDeep(this.model);
     }
 
     updateField(original: FormlyFieldConfig, modified: FormlyFieldConfig): void {
@@ -95,6 +98,7 @@ export class FormlyDesignerService {
                 this.removeControl(original.formControl);
             }
             this.fields = this.fields.slice();
+            this.model = cloneDeep(this.model);
         }
     }
 
@@ -132,7 +136,7 @@ export class FormlyDesignerService {
     /** Prunes the field of paths not identified in the designer config */
     private createPrunedField(field: FormlyFieldConfig): FormlyFieldConfig {
         let pruned: FormlyFieldConfig;
-        const type = get(field, 'templateOptions.$sourceType', field.type);
+        const type = get(field, 'templateOptions.$fieldArray.type', field.type);
         const designerType = this.designerConfig.types[type];
         if (designerType) {
             pruned = { key: field.key, type: type };
@@ -264,9 +268,17 @@ export class FormlyDesignerService {
     }
 
     private unsetField(field: FormlyFieldConfig): void {
-        if (field.formControl) {
-            const path = this.path(field.formControl);
-            unset(this.model, path);
+        if (field) {
+            if (field.fieldArray) {
+                this.unsetField(field.fieldArray);
+            }
+            if (field.fieldGroup) {
+                field.fieldGroup.forEach(f => this.unsetField(f));
+            }
+            if (field.formControl) {
+                const path = this.path(field.formControl);
+                unset(this.model, path);
+            }
         }
     }
 

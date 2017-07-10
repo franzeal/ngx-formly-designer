@@ -21,12 +21,12 @@ import { Observable } from 'rxjs/Rx';
         </div>
         <div class="content">
             <div [hidden]="!editing">
-                <field-group-editor #editor [showWrappers]="true" [formControl]="fieldEdit">
+                <field-editor #editor [showWrappers]="true" [formControl]="fieldEdit">
                     <div class="footer">
                         <button (click)="cancel()" class="btn btn-secondary mr-1">Cancel</button>
                         <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary">Apply</button>
                     </div>
-                </field-group-editor>
+                </field-editor>
             </div>
             <div [hidden]="editing">
                 <div class="form-group">
@@ -45,7 +45,7 @@ import { Observable } from 'rxjs/Rx';
             align-items: flex-start;
             margin: .25em;
         }
-        field-group-editor .footer {
+        field-editor .footer {
             display: flex;
             justify-content: flex-end;
         }
@@ -105,6 +105,7 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper {
         const updatedField = cloneDeep(this.field);
         updatedField.fieldGroup = isArray(updatedField.fieldGroup) ? updatedField.fieldGroup.slice() : [];
         updatedField.fieldGroup.push(field);
+
         Observable.timer()
             .do(() => this.formlyDesignerService.updateField(this.field, updatedField))
             .catch(err => Observable.never())

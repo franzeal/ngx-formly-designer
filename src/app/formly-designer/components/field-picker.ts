@@ -96,7 +96,6 @@ export class FieldPickerComponent implements OnInit {
             this.fieldEdit.setValue({
                 fieldGroup: []
             });
-            this.selected.emit(this.fieldEdit.value);
         }
         else {
             const field = { type: type } as FormlyFieldConfig;
@@ -104,9 +103,8 @@ export class FieldPickerComponent implements OnInit {
                 field.fieldArray = { fieldGroup: new Array<FormlyFieldConfig>() };
             }
             this.fieldEdit.setValue(field);
-
-            this.modal.modal('show');
         }
+        this.modal.modal('show');
     }
 
     onApply(): void {

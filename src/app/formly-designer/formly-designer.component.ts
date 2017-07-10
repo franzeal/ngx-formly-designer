@@ -82,7 +82,10 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
 
         this.subscriptions.push(
             this.formlyDesignerService.fields$
-                .subscribe(() => this.fieldsChanged.emit(this.formlyDesignerService.createDesignerFields())));
+                .subscribe(() => {
+                    this.form = this.formBuilder.group({});
+                    this.fieldsChanged.emit(this.formlyDesignerService.createDesignerFields());
+                }));
 
         this.subscriptions.push(
             Observable.merge(
@@ -96,6 +99,9 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
     }
 
     onFieldSelected(field: FormlyFieldConfig): void {
-        this.formlyDesignerService.addField(field);
+        Observable.timer()
+            .do(() => this.formlyDesignerService.addField(field))
+            .catch(err => Observable.never())
+            .subscribe();
     }
 }

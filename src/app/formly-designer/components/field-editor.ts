@@ -18,7 +18,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     template: `
         <form [formGroup]="form" novalidate>
             <div class="card">
-                <div class="card-header">
+                <div class="card-header" [ngClass]="{solo: block.children.length === 0}">
                     <div class="form-group" [ngClass]="{'has-danger': form.hasError('key') && (key.dirty || key.touched)}">
                         <label class="form-control-label">key</label>
                         <input formControlName="key" class="form-control">
@@ -45,7 +45,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                         </wrappers-picker>
                     </div>
                 </div>
-                <div class="card-block">
+                <div #block class="card-block">
                     <formly-form *ngIf="fields.length > 0" [form]="fieldForm" [fields]="fields" [model]="field">
                     </formly-form>
                     <ng-content></ng-content>
@@ -54,8 +54,11 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
         </form>
     `,
     styles: [`
-        .card-header:last-child {
+        .card-header.solo {
             border-bottom: 0;
+        }
+        .card-header.solo + .card-block {
+            display: none;
         }
     `],
     providers: [

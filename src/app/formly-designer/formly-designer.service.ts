@@ -65,7 +65,7 @@ export class FormlyDesignerService {
         fields.push(field);
         this.formlyFormBuilder.buildForm(new FormGroup({}), fields, {}, {});
 
-        fields = this.fields.slice();
+        fields = cloneDeep(this.fields);
         fields.push(field);
 
         this.fields = fields;
@@ -78,7 +78,7 @@ export class FormlyDesignerService {
             this.removeControl(field.formControl);
         }
 
-        this.fields = this.fields.slice();
+        this.fields = cloneDeep(this.fields);
         this.model = cloneDeep(this.model);
     }
 
@@ -97,7 +97,7 @@ export class FormlyDesignerService {
                 this.unsetField(original);
                 this.removeControl(original.formControl);
             }
-            this.fields = this.fields.slice();
+            this.fields = cloneDeep(this.fields);
             this.model = cloneDeep(this.model);
         }
     }

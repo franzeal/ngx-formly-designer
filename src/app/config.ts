@@ -3,11 +3,15 @@ import { ConfigOption, FormlyFieldMultiCheckbox, FormlyFieldSelect } from 'ng-fo
 import { FormlyFieldCustomInputComponent } from './types/custom-input';
 import { FormlyFieldRepeatSectionComponent } from './types/repeat-section';
 import { FormlyWrapperExpanderComponent } from './wrappers/expander';
+import { FormlyWrapperTabComponent } from './wrappers/tab';
+import { FormlyWrapperTabsetComponent } from './wrappers/tabset';
 
 export const fieldComponents: Component[] = [
     FormlyFieldCustomInputComponent,
     FormlyFieldRepeatSectionComponent,
-    FormlyWrapperExpanderComponent
+    FormlyWrapperExpanderComponent,
+    FormlyWrapperTabComponent,
+    FormlyWrapperTabsetComponent
 ];
 
 export const config: ConfigOption = {
@@ -31,6 +35,8 @@ export const config: ConfigOption = {
         }
     ],
     wrappers: [
-        { name: 'expander', component: FormlyWrapperExpanderComponent }
+        { name: 'expander', component: FormlyWrapperExpanderComponent },
+        { name: 'tab', component: FormlyWrapperTabComponent },
+        { name: 'tabset', component: FormlyWrapperTabsetComponent }
     ]
 };

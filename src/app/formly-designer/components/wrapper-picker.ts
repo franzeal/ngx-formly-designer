@@ -4,9 +4,10 @@ import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
 import { cloneDeep, isArray, isObject } from 'lodash';
+import * as jquery from 'jquery';
 
 
-declare var $: any;
+declare var $: JQueryStatic;
 
 @Component({
     selector: 'wrapper-picker',

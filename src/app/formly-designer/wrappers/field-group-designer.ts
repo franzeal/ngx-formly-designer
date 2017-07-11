@@ -1,10 +1,16 @@
-import { ChangeDetectorRef, Component, ViewChild, ViewContainerRef } from '@angular/core';
+import {
+    AfterContentInit, AfterContentChecked, ChangeDetectorRef, Component,
+    ElementRef, ViewChild, ViewContainerRef
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FieldWrapper, FormlyConfig, FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerService } from '../formly-designer.service';
 import { cloneDeep, isArray } from 'lodash';
 import { Observable } from 'rxjs/Rx';
+import * as jquery from 'jquery';
 
+
+declare var $: JQueryStatic;
 
 @Component({
     selector: 'formly-wrapper-field-group-designer',
@@ -45,6 +51,9 @@ import { Observable } from 'rxjs/Rx';
             align-items: flex-start;
             margin: .25em;
         }
+        :host.designerEmpty {
+            display:none;
+        }
         field-editor .footer {
             display: flex;
             justify-content: flex-end;
@@ -60,7 +69,7 @@ import { Observable } from 'rxjs/Rx';
         }
     `]
 })
-export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper {
+export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper implements AfterContentInit, AfterContentChecked {
     @ViewChild('fieldComponent', { read: ViewContainerRef }) fieldComponent: ViewContainerRef;
 
     editing = false;
@@ -72,10 +81,19 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper {
 
     constructor(
         private changeDetector: ChangeDetectorRef,
+        private elementRef: ElementRef,
         private formlyConfig: FormlyConfig,
         private formlyDesignerService: FormlyDesignerService
     ) {
         super();
+    }
+
+    ngAfterContentInit(): void {
+        this.checkDesigner();
+    }
+
+    ngAfterContentChecked(): void {
+        this.checkDesigner();
     }
 
     edit(): void {
@@ -110,5 +128,20 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper {
             .do(() => this.formlyDesignerService.updateField(this.field, updatedField))
             .catch(err => Observable.never())
             .subscribe();
+    }
+
+    private checkDesigner(): void {
+        this.changeDetector.detectChanges();
+        const element = $(this.elementRef.nativeElement);
+        const designerEmpty = element.find('formly-wrapper-designer').length === 0;
+        if (designerEmpty !== element.hasClass('designerEmpty')) {
+            this.changeDetector.detectChanges();
+            if (designerEmpty) {
+                element.addClass('designerEmpty');
+            }
+            else {
+                element.removeClass('designerEmpty');
+            }
+        }
     }
 }

@@ -11,12 +11,16 @@ import { designerConfig } from './designer-config';
 
 import { AppComponent } from './app.component';
 import { ExpanderComponent } from './components/expander.component';
+import { TabComponent } from './components/tab.component';
+import { TabsetComponent } from './components/tabset/tabset.component';
 
 
 @NgModule({
     declarations: [
         AppComponent,
         ExpanderComponent,
+        TabComponent,
+        TabsetComponent,
 
         fieldComponents
     ],

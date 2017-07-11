@@ -202,6 +202,22 @@ export const designerConfig: DesignerConfigOption = {
                     defaultValue: true
                 }
             ]
+        },
+        {
+            name: 'tabset',
+            fields: []
+        },
+        {
+            name: 'tab',
+            fields: [
+                {
+                    key: 'templateOptions.tabTitle',
+                    type: 'input',
+                    templateOptions: {
+                        label: 'tabTitle'
+                    }
+                }
+            ]
         }
     ]
 };

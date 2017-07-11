@@ -1,10 +1,16 @@
-import { ChangeDetectorRef, Component, ViewChild, ViewContainerRef } from '@angular/core';
+import {
+    AfterContentInit, AfterContentChecked, ChangeDetectorRef, Component,
+    ElementRef, ViewChild, ViewContainerRef
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FieldWrapper, FormlyConfig } from 'ng-formly';
 import { FormlyDesignerService } from '../formly-designer.service';
 import { cloneDeep } from 'lodash';
 import { Observable } from 'rxjs/Rx';
+import * as jQuery from 'jquery';
 
+
+declare var $: JQueryStatic;
 
 @Component({
     selector: 'formly-wrapper-field-designer',
@@ -41,6 +47,9 @@ import { Observable } from 'rxjs/Rx';
             align-items: flex-start;
             margin: .25em;
         }
+        :host.designerEmpty {
+            display:none;
+        }
         .btn:not(:disabled), .dropdown-item:not(:disabled) {
             cursor: pointer;
         }
@@ -60,7 +69,7 @@ import { Observable } from 'rxjs/Rx';
         }
     `]
 })
-export class FormlyWrapperFieldDesignerComponent extends FieldWrapper {
+export class FormlyWrapperFieldDesignerComponent extends FieldWrapper implements AfterContentInit, AfterContentChecked {
     @ViewChild('fieldComponent', { read: ViewContainerRef }) fieldComponent: ViewContainerRef;
 
     editing = false;
@@ -68,10 +77,19 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper {
 
     constructor(
         private changeDetector: ChangeDetectorRef,
+        private elementRef: ElementRef,
         private formlyConfig: FormlyConfig,
         private formlyDesignerService: FormlyDesignerService
     ) {
         super();
+    }
+
+    ngAfterContentInit(): void {
+        this.checkDesigner();
+    }
+
+    ngAfterContentChecked(): void {
+        this.checkDesigner();
     }
 
     get disabled(): boolean {
@@ -99,5 +117,20 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper {
     cancel(): void {
         this.formlyDesignerService.disabled = false;
         this.editing = false;
+    }
+
+    private checkDesigner(): void {
+        this.changeDetector.detectChanges();
+        const element = $(this.elementRef.nativeElement);
+        const designerEmpty = element.find('formly-wrapper-designer').length === 0;
+        if (designerEmpty !== element.hasClass('designerEmpty')) {
+            this.changeDetector.detectChanges();
+            if (designerEmpty) {
+                element.addClass('designerEmpty');
+            }
+            else {
+                element.removeClass('designerEmpty');
+            }
+        }
     }
 }

@@ -2,9 +2,10 @@ import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FormlyFieldConfig } from 'ng-formly';
 import { FormlyDesignerConfig } from '../formly-designer-config';
+import * as jquery from 'jquery';
 
 
-declare var $: any;
+declare var $: JQueryStatic;
 
 @Component({
     selector: 'field-picker',

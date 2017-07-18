@@ -1,6 +1,6 @@
 import {
     AfterContentInit, AfterContentChecked, ChangeDetectorRef, Component,
-    ElementRef, ViewChild, ViewContainerRef
+    ElementRef, OnInit, ViewChild, ViewContainerRef
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FieldWrapper, FormlyConfig } from 'ng-formly';
@@ -15,15 +15,14 @@ declare var $: JQueryStatic;
 @Component({
     selector: 'formly-wrapper-field-designer',
     template: `
-        <div *ngIf="!editing" class="dropdown">
-            <button [disabled]="disabled" class="btn btn-sm btn-info mr-2" type="button" id="editorMenuButton"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-cogs" aria-hidden="true"></i>
+        <div *ngIf="!editing" class="bg-info text-white control-panel">
+            <span class="type">{{ type }}</span>
+            <button [disabled]="disabled" type="button" class="btn" (click)="edit()">
+                <i class="fa fa-pencil" aria-hidden="true" title="edit"></i>
             </button>
-            <div class="dropdown-menu" aria-labelledby="editorMenuButton">
-                <div class="dropdown-item" (click)="edit()">Edit</div>
-                <a class="dropdown-item" (click)="remove()">Remove</a>
-            </div>
+            <button [disabled]="disabled" type="button" class="btn" (click)="remove()">
+                <i class="fa fa-times" aria-hidden="true" title="remove"></i>
+            </button>
         </div>
         <div class="content">
             <div class="editor" [hidden]="!editing">
@@ -42,6 +41,7 @@ declare var $: JQueryStatic;
     styles: [`
         :host {
             display: flex;
+            position: relative;
             justify-content: flex-start;
             align-content: flex-start;
             align-items: flex-start;
@@ -53,27 +53,46 @@ declare var $: JQueryStatic;
         .btn:not(:disabled), .dropdown-item:not(:disabled) {
             cursor: pointer;
         }
+        .control-panel {
+            font-size: .8em;
+            position: absolute;
+            padding: 0 0 0 .5em;
+            border-radius: 0 5px 0 0;
+            right: 0;
+            top: 0;
+        }
+        .control-panel > * {
+            padding-right: .5em;
+        }
+        .control-panel > .btn {
+            font-size: unset;
+            background-color: unset;
+            padding: 0 .5em 0 0;
+            color: #fff;
+        }
         .content {
             border: 1px dashed #000;
             border-radius: 5px;
             min-height: 2em;
-            padding: 0 1em;
+            padding: 0.4em 1em 0 1em;
             width: 100%;
         }
         .editor {
             margin: 1em 0;
         }
-        field-editor .footer {
+        .footer {
             display: flex;
             justify-content: flex-end;
         }
     `]
 })
-export class FormlyWrapperFieldDesignerComponent extends FieldWrapper implements AfterContentInit, AfterContentChecked {
+export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
+    implements AfterContentInit, AfterContentChecked, OnInit {
     @ViewChild('fieldComponent', { read: ViewContainerRef }) fieldComponent: ViewContainerRef;
 
     editing = false;
     fieldEdit = new FormControl({});
+    type: string;
 
     constructor(
         private changeDetector: ChangeDetectorRef,
@@ -82,6 +101,10 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper implements
         private formlyDesignerService: FormlyDesignerService
     ) {
         super();
+    }
+
+    ngOnInit(): void {
+        this.type = this.field.type;
     }
 
     ngAfterContentInit(): void {

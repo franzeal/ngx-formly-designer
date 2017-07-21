@@ -5,7 +5,7 @@ import { TabsetService } from './tabset/tabset.service';
 @Component({
     selector: 'tab',
     template: `
-        <ng-content *ngIf="active"></ng-content>
+        <ng-content *ngIf="!tabsetService || active"></ng-content>
     `
 })
 export class TabComponent implements OnDestroy, OnInit {

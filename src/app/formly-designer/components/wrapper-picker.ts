@@ -101,8 +101,8 @@ export class WrapperPickerComponent implements OnInit {
     add(): void {
         if (isObject(this.field)) {
             const field = cloneDeep(this.field);
-            if (isArray(field.wrappers)) {
-                field.wrappers.push(this.wrapper);
+            if (isArray(field.wrappers) && field.wrappers.length > 0) {
+                field.wrappers.splice(field.wrappers.length - 1, 0, this.wrapper);
             }
             else {
                 field.wrappers = [this.wrapper];

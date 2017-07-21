@@ -1,5 +1,3 @@
-import { Component } from '@angular/core';
-
 import { ConfigOption } from 'ng-formly';
 
 import { FormlyWrapperDesignerComponent } from './wrappers/designer';
@@ -9,9 +7,9 @@ import { FormlyWrapperFieldGroupDesignerComponent } from './wrappers/field-group
 import { TemplateDesigner } from './run/designer';
 
 
-export const fieldComponents: Component[] = [];
+export const fieldComponents = [];
 
-export const wrapperComponents: Component[] = [
+export const wrapperComponents = [
     FormlyWrapperDesignerComponent,
     FormlyWrapperFieldDesignerComponent,
     FormlyWrapperFieldGroupDesignerComponent

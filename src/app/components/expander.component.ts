@@ -9,8 +9,8 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
                 <i [ngClass]="iconClass"></i>&nbsp;&nbsp;<span class="h4">{{heading}}</span>
             </span>
         </div>
-        <div [class.expanded]="showContent">
-            <ng-content *ngIf="showContent"></ng-content>
+        <div class="content" [class.expanded]="showContent">
+            <ng-content></ng-content>
         </div>
     `,
     styles: [`
@@ -27,6 +27,12 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+        }
+        .content {
+            display: none;
+        }
+        .content.expanded {
+            display: block;
         }
     `]
 })

@@ -4,6 +4,8 @@ import {
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FieldWrapper, FormlyConfig } from 'ng-formly';
+import { FieldsService } from '../fields.service';
+import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
 import { cloneDeep } from 'lodash';
 import { Observable } from 'rxjs/Rx';
@@ -17,10 +19,29 @@ declare var $: JQueryStatic;
     template: `
         <div *ngIf="!editing" class="bg-info text-white control-panel">
             <span class="type">{{ type }}</span>
-            <button [disabled]="disabled" type="button" class="btn" (click)="edit()">
+            <div class="btn-group">
+                <button type="button" class="btn" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false" title="wrappers">
+                    <i class="fa fa-clone" aria-hidden="true"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <button class="dropdown-item" type="button" [disabled]="disabled" title="add wrapper"
+                        *ngFor="let wrapper of wrappers" (click)="addWrapper(wrapper)">
+                        {{ wrapper }}
+                    </button>
+                    <ng-container *ngIf="fieldWrappers.length">
+                        <div *ngIf="wrappers.length" class="dropdown-divider"></div>
+                        <button class="dropdown-item" type="button" [disabled]="disabled"
+                            *ngFor="let wrapper of fieldWrappers; let i=index" (click)="removeWrapper(i)">
+                            {{ wrapper }}&nbsp;&nbsp;<i class="fa fa-times" aria-hidden="true" title="remove wrapper"></i>
+                        </button>
+                    </ng-container>
+                </div>
+            </div>
+            <button class="btn" type="button" [disabled]="disabled" (click)="edit()">
                 <i class="fa fa-pencil" aria-hidden="true" title="edit"></i>
             </button>
-            <button [disabled]="disabled" type="button" class="btn" (click)="remove()">
+            <button class="btn" type="button" [disabled]="disabled" (click)="remove()">
                 <i class="fa fa-times" aria-hidden="true" title="remove"></i>
             </button>
         </div>
@@ -64,7 +85,7 @@ declare var $: JQueryStatic;
         .control-panel > * {
             padding-right: .5em;
         }
-        .control-panel > .btn {
+        .control-panel .btn {
             font-size: unset;
             background-color: unset;
             padding: 0 .5em 0 0;
@@ -92,11 +113,15 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
 
     editing = false;
     fieldEdit = new FormControl({});
+    fieldWrappers = new Array<string>();
+    wrappers = new Array<string>();
     type: string;
 
     constructor(
         private changeDetector: ChangeDetectorRef,
+        private designerConfig: FormlyDesignerConfig,
         private elementRef: ElementRef,
+        private fieldsService: FieldsService,
         private formlyConfig: FormlyConfig,
         private formlyDesignerService: FormlyDesignerService
     ) {
@@ -105,6 +130,8 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
 
     ngOnInit(): void {
         this.type = this.field.type;
+        this.wrappers = Object.getOwnPropertyNames(this.designerConfig.wrappers);
+        this.fieldWrappers = this.formlyDesignerService.convertField(this.field).wrappers || [];
     }
 
     ngAfterContentInit(): void {
@@ -117,6 +144,24 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
 
     get disabled(): boolean {
         return this.formlyDesignerService.disabled;
+    }
+
+    addWrapper(wrapper: string): void {
+        const field = cloneDeep(this.field);
+        if (field.wrappers) {
+            field.wrappers.push(wrapper);
+        }
+        else {
+            field.wrappers = [wrapper];
+        }
+        this.formlyDesignerService.updateField(this.field, field);
+    }
+
+    removeWrapper(index: number): void {
+        const field = cloneDeep(this.field);
+        this.fieldWrappers.splice(index, 1);
+        field.wrappers = this.fieldWrappers;
+        this.formlyDesignerService.updateField(this.field, field);
     }
 
     edit(): void {

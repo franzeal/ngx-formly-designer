@@ -48,9 +48,11 @@ export class FormlyDesignerConfig {
             if (!this.types[options.name]) {
                 this.types[options.name] = <DesignerTypeOption>{};
             }
-            this.types[options.name].name = options.name;
-            this.types[options.name].fieldArray = !!options.fieldArray;
-            this.types[options.name].fields = options.fields;
+
+            const type = this.types[options.name];
+            type.name = options.name;
+            type.fieldArray = !!options.fieldArray;
+            type.fields = options.fields;
         }
     }
 
@@ -67,8 +69,10 @@ export class FormlyDesignerConfig {
             if (!this.wrappers[options.name]) {
                 this.wrappers[options.name] = <DesignerOption>{};
             }
-            this.wrappers[options.name].name = options.name;
-            this.wrappers[options.name].fields = options.fields;
+
+            const wrapper = this.wrappers[options.name];
+            wrapper.name = options.name;
+            wrapper.fields = options.fields;
         }
     }
 }

@@ -13,7 +13,7 @@ export class TabComponent implements OnDestroy, OnInit {
     @Input() title: string;
 
     constructor(
-        @Optional() private tabsetService: TabsetService
+        @Optional() public tabsetService: TabsetService
     ) { }
 
     ngOnInit(): void {

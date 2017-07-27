@@ -59,10 +59,6 @@ declare var $: JQueryStatic;
         type-select {
             flex-grow: 2;
         }
-        :host /deep/ type-select > select {
-            border-radius: .25rem 0 0 .25rem;
-            border-right: 0;
-        }
     `]
 })
 export class FieldPickerComponent implements OnInit {

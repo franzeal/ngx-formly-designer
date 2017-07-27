@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { FormlyConfig, FormlyFieldConfig } from 'ng-formly';
 import { FieldsService } from './fields.service';
@@ -17,6 +17,20 @@ import { Observable, Subscription } from 'rxjs/Rx';
             </formly-form>
         </form>
     `,
+    styles: [`
+        field-picker .form-group > .input-group > type-select > select {
+            border-radius: .25rem 0 0 .25rem;
+            border-right: 0;
+        }
+        wrapper-editor .card > .card-block .form-control {
+            width: 100%;
+        }
+        wrapper-picker .form-group > .input-group > wrapper-select > select {
+            border-radius: .25rem 0 0 .25rem;
+            border-right: 0;
+        }
+    `],
+    encapsulation: ViewEncapsulation.None,
     providers: [FormlyDesignerService]
 })
 export class FormlyDesignerComponent implements OnDestroy, OnInit {

@@ -26,11 +26,6 @@ const WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
             </div>
         </form>
     `,
-    styles: [`
-        :host /deep/ .form-control {
-            width: 100%;
-        }
-    `],
     providers: [
         WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR
     ]

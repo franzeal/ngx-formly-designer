@@ -64,10 +64,6 @@ declare var $: JQueryStatic;
         wrapper-select {
             flex-grow: 2;
         }
-        :host /deep/ wrapper-select > select {
-            border-radius: .25rem 0 0 .25rem;
-            border-right: 0;
-        }
     `]
 })
 export class WrapperPickerComponent implements OnInit {

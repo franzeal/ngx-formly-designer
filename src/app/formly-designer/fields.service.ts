@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FormlyFieldConfig } from 'ng-formly';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 import { DesignerOption, FormlyDesignerConfig } from './formly-designer-config';
 import { cloneDeep, isObject } from 'lodash';
 

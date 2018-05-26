@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { FieldsService } from './fields.service';
-import { FormlyFieldConfig, FormlyConfig, FormlyFormBuilder } from 'ng-formly';
+import { FormlyFieldConfig, FormlyConfig, FormlyFormBuilder } from '@ngx-formly/core';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
 import { cloneDeep, cloneDeepWith, get, isArray, isEmpty, isNil, isString, set, unset } from 'lodash';

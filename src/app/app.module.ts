@@ -1,8 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
-import { FormlyModule, FormlyBootstrapModule } from 'ng-formly';
+import { FormlyModule } from '@ngx-formly/core';
+import { FormlyBootstrapModule } from '@ngx-formly/bootstrap';
 
 import { FormlyDesignerModule } from './formly-designer/formly-designer.module';
 
@@ -27,6 +29,8 @@ import { TabsetComponent } from './components/tabset/tabset.component';
     imports: [
         BrowserModule,
         HttpModule,
+        FormsModule,
+        ReactiveFormsModule,
 
         FormlyModule.forRoot(config),
         FormlyBootstrapModule,

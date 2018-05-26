@@ -30,6 +30,7 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
         }
         .content {
             display: none;
+            padding-bottom: 1em;
         }
         .content.expanded {
             display: block;

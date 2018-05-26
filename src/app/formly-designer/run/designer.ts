@@ -1,4 +1,4 @@
-import { FormlyFieldConfig, FormlyConfig } from 'ng-formly';
+import { FormlyFieldConfig, FormlyConfig } from '@ngx-formly/core';
 
 
 export class TemplateDesigner {

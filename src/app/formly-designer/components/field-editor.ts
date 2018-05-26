@@ -1,9 +1,9 @@
-import { Component, forwardRef, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { FormlyFieldConfig } from 'ng-formly';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
-import { Observable, Subscription } from 'rxjs/Rx';
+import { Observable, Subscription, Subject } from 'rxjs/Rx';
 import { clone, cloneDeep, isObject, isString } from 'lodash';
 
 
@@ -18,7 +18,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     template: `
         <form [formGroup]="form" novalidate>
             <div class="card">
-                <div class="card-header" [ngClass]="{solo: block.children.length === 0}">
+                <div class="card-header" [ngClass]="{solo: !hasChildren}">
                     <div class="form-group" [ngClass]="{'has-danger': form.hasError('key') && (key.dirty || key.touched)}">
                         <label class="form-control-label">key</label>
                         <input formControlName="key" class="form-control">
@@ -68,6 +68,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
     @Input() showType: boolean;
     @Input() showWrappers: boolean;
+    @ViewChild('block') blockElRef: ElementRef;
 
     constructor(
         private fieldsService: FieldsService,
@@ -100,13 +101,28 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     field: FormlyFieldConfig = {};
     fields = new Array<FormlyFieldConfig>();
     fieldArray: boolean;
+    hasChildren: boolean;
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
     private subscriptions = new Array<Subscription>();
     private valueChangesSubscription: Subscription;
+    private blockChanges: MutationObserver;
 
     ngOnInit(): void {
+        const blockChangesSubject = new Subject<void>();
+        this.blockChanges = new MutationObserver((mutations: MutationRecord[]) => {
+            blockChangesSubject.next();
+        });
+
+        this.subscriptions.push(blockChangesSubject
+            .debounceTime(25)
+            .map(() => this.blockElRef.nativeElement.children.length > 0)
+            .distinctUntilChanged()
+            .subscribe(hasChildren => {
+                this.hasChildren = hasChildren;
+            }));
+
         this.subscriptions.push(this.type.valueChanges
             .subscribe(() => this.onTypeChange()));
 
@@ -120,6 +136,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     ngOnDestroy(): void {
         this.valueChangesSubscription.unsubscribe();
         this.subscriptions.splice(0).forEach(subscription => subscription.unsubscribe());
+        this.blockChanges.disconnect();
     }
 
     writeValue(obj: any) {

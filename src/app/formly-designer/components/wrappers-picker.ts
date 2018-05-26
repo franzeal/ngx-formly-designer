@@ -1,13 +1,10 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { FormlyFieldConfig } from 'ng-formly';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
 import { cloneDeep, isArray, isObject } from 'lodash';
-import * as jquery from 'jquery';
 
-
-declare var $: JQueryStatic;
 
 @Component({
     selector: 'wrappers-picker',
@@ -72,8 +69,8 @@ export class WrappersPickerComponent {
         private formlyDesignerService: FormlyDesignerService
     ) { }
 
-    private get modal(): any {
-        return $(this.modalRef.nativeElement);
+    private get $modal(): JQuery & { modal: (command: string) => void } {
+        return $(this.modalRef.nativeElement) as any;
     }
 
     onWrapperSelected(field: FormlyFieldConfig): void {
@@ -91,7 +88,7 @@ export class WrappersPickerComponent {
 
                 const fields = this.formlyDesignerConfig.wrappers[this.wrapper].fields;
                 if (isArray(fields) && fields.length > 0) {
-                    this.modal.modal('show');
+                    this.$modal.modal('show');
                 }
                 else {
                     this.onApply();
@@ -110,6 +107,6 @@ export class WrappersPickerComponent {
     onApply(): void {
         this.field = this.formlyDesignerService.convertField(this.fieldEdit.value);
         this.selected.emit(this.field);
-        this.modal.modal('hide');
+        this.$modal.modal('hide');
     }
 }

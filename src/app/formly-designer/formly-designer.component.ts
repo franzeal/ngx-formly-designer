@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { FormlyConfig, FormlyFieldConfig } from 'ng-formly';
+import { FormlyConfig, FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from './fields.service';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { FormlyDesignerService } from './formly-designer.service';

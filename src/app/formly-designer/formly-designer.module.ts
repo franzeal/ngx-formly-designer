@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FieldEditorComponent } from './components/field-editor';
 import { FieldPickerComponent } from './components/field-picker';
 import { FieldsService } from './fields.service';
-import { FormlyConfig, FormlyModule } from 'ng-formly';
+import { FormlyConfig, FormlyModule } from '@ngx-formly/core';
 import { FormlyDesignerComponent } from './formly-designer.component';
 import { DesignerConfigOption, FormlyDesignerConfig, FORMLY_DESIGNER_CONFIG_TOKEN } from './formly-designer-config';
 import { config, fieldComponents, wrapperComponents } from './config';
@@ -14,6 +14,7 @@ import { WrapperEditorComponent } from './components/wrapper-editor';
 import { WrapperSelectComponent } from './components/wrapper-select';
 import { WrapperPickerComponent } from './components/wrapper-picker';
 import { WrappersPickerComponent } from './components/wrappers-picker';
+import { DebouncePipe } from './pipes/debounce';
 
 
 @NgModule({
@@ -26,6 +27,8 @@ import { WrappersPickerComponent } from './components/wrappers-picker';
         WrapperSelectComponent,
         WrapperPickerComponent,
         WrappersPickerComponent,
+
+        DebouncePipe,
 
         fieldComponents,
         wrapperComponents

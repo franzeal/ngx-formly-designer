@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
-import { FieldType, FormlyFieldConfig } from 'ng-formly';
+import { FieldType, FormlyFieldConfig } from '@ngx-formly/core';
 
 import { clone, cloneDeep, isArray, isFunction, isUndefined } from 'lodash';
 

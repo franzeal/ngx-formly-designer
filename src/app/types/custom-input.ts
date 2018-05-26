@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FieldType } from 'ng-formly';
+import { FieldType } from '@ngx-formly/core';
 
 
 @Component({

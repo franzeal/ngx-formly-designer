@@ -3,16 +3,14 @@ import {
     ElementRef, OnInit, ViewChild, ViewContainerRef
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { FieldWrapper, FormlyConfig } from 'ng-formly';
+import { FieldWrapper, FormlyConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
 import { cloneDeep } from 'lodash';
 import { Observable } from 'rxjs/Rx';
-import * as jQuery from 'jquery';
+import * as $ from 'jquery';
 
-
-declare var $: JQueryStatic;
 
 @Component({
     selector: 'formly-wrapper-field-designer',

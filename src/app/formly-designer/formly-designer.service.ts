@@ -133,6 +133,31 @@ export class FormlyDesignerService {
         return prunedFields;
     }
 
+    public getWrappers(field: FormlyFieldConfig): string[] {
+        if (!field || !isString(field.type) || !isArray(field.wrappers)) {
+            return [];
+        }
+        const formlyType = this.formlyConfig.getType(field.type);
+        const typeWrappers = (formlyType.wrappers || [])
+            .concat(this.formlyConfig.templateManipulators.preWrapper.map(m => m(field)))
+            .concat(this.formlyConfig.templateManipulators.postWrapper.map(m => m(field)))
+            .filter(w => w);
+
+        const wrappers = field.wrappers.slice();
+        if (typeWrappers.length > 0) {
+            for (let i = wrappers.length - 1; i >= 0; i--) {
+                for (let j = typeWrappers.length - 1; j >= 0; j--) {
+                    if (wrappers[i] === typeWrappers[j]) {
+                        typeWrappers.splice(j, 1);
+                        wrappers.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        }
+        return wrappers;
+    }
+
     /** Prunes the field of paths not identified in the designer config */
     private createPrunedField(field: FormlyFieldConfig): FormlyFieldConfig {
         let pruned: FormlyFieldConfig;
@@ -159,29 +184,13 @@ export class FormlyDesignerService {
             pruned.className = className;
         }
 
-        if (isArray(field.wrappers)) {
-            const wrappers = field.wrappers.slice();
-            if (field.type) {
-                const typeWrappers = (this.formlyConfig.getType(field.type).wrappers || []).slice();
-                if (typeWrappers.length > 0) {
-                    for (let i = wrappers.length - 1; i >= 0; i--) {
-                        for (let j = typeWrappers.length - 1; j >= 0; j--) {
-                            if (wrappers[i] === typeWrappers[j]) {
-                                typeWrappers.splice(j, 1);
-                                wrappers.splice(i, 1);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            if (wrappers.length > 0) {
-                pruned.wrappers = wrappers;
-                const designerWrapperFields = wrappers.map(wrapper => this.designerConfig.wrappers[wrapper])
-                    .filter(designerOption => designerOption && isArray(designerOption.fields))
-                    .reduce<FormlyFieldConfig[]>((previous, current) => previous.concat(current.fields), []);
-                this.applyProperties(field, pruned, designerWrapperFields);
-            }
+        const wrappers = this.getWrappers(field);
+        if (wrappers.length > 0) {
+            pruned.wrappers = wrappers;
+            const designerWrapperFields = wrappers.map(wrapper => this.designerConfig.wrappers[wrapper])
+                .filter(designerOption => designerOption && isArray(designerOption.fields))
+                .reduce<FormlyFieldConfig[]>((previous, current) => previous.concat(current.fields), []);
+            this.applyProperties(field, pruned, designerWrapperFields);
         }
         return pruned;
     }

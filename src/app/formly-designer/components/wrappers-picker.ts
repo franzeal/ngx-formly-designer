@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyDesignerConfig } from '../formly-designer-config';
@@ -14,7 +14,7 @@ import { cloneDeep, isArray, isObject } from 'lodash';
                 <wrapper-picker [field]="field" (selected)="onWrapperSelected($event)">
                 </wrapper-picker>
             </div>
-            <div *ngFor="let wrapper of field?.wrappers; let i = index" class="badge badge-default noselect" (click)="edit(i)">
+            <div *ngFor="let wrapper of wrappers; let i = index" class="badge badge-default noselect" (click)="edit(i)">
                 {{ wrapper }}&nbsp;&nbsp;<i class="fa fa-times" aria-hidden="true" (click)="remove(i)"></i>
             </div>
         </div>
@@ -56,7 +56,7 @@ import { cloneDeep, isArray, isObject } from 'lodash';
         }
     `]
 })
-export class WrappersPickerComponent {
+export class WrappersPickerComponent implements OnChanges {
     @ViewChild('modal') modalRef: ElementRef;
     @Input() field: FormlyFieldConfig;
     @Output() selected = new EventEmitter<FormlyFieldConfig>();
@@ -64,10 +64,18 @@ export class WrappersPickerComponent {
     wrapper: string;
     fieldEdit = new FormControl({});
 
+    public wrappers: string[] = [];
+
     constructor(
         private formlyDesignerConfig: FormlyDesignerConfig,
         private formlyDesignerService: FormlyDesignerService
     ) { }
+
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes.field) {
+            this.wrappers = this.formlyDesignerService.getWrappers(changes.field.currentValue);
+        }
+    }
 
     private get $modal(): JQuery & { modal: (command: string) => void } {
         return $(this.modalRef.nativeElement) as any;
@@ -78,12 +86,10 @@ export class WrappersPickerComponent {
     }
 
     edit(index: number): void {
-        this.wrapper = this.field.wrappers[index];
-
+        this.wrapper = this.wrappers[index];
         if (isObject(this.field)) {
             const field = cloneDeep(this.field);
             if (isArray(field.wrappers)) {
-                this.wrapper = this.field.wrappers[index];
                 this.fieldEdit.setValue(field);
 
                 const fields = this.formlyDesignerConfig.wrappers[this.wrapper].fields;
@@ -98,8 +104,13 @@ export class WrappersPickerComponent {
     }
 
     remove(index: number): void {
+        const fieldWrappersIndex = this.field.wrappers.indexOf(this.wrappers[index]);
+        if (fieldWrappersIndex < 0) {
+            return;
+        }
+
         const field = cloneDeep(this.field);
-        field.wrappers.splice(index, 1);
+        field.wrappers.splice(fieldWrappersIndex, 1);
         this.field = this.formlyDesignerService.convertField(field);
         this.selected.emit(this.field);
     }

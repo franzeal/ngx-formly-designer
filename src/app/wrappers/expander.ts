@@ -6,7 +6,7 @@ import { FieldWrapper } from '@ngx-formly/core';
     selector: 'formly-wrapper-expander',
     template: `
         <expander [heading]="label" [expanded]="expanded">
-            <ng-container #fieldComponent></ng-container>
+            <ng-template #fieldComponent></ng-template>
         </expander>
     `
 })

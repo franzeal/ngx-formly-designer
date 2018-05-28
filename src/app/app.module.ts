@@ -32,8 +32,8 @@ import { TabsetComponent } from './components/tabset/tabset.component';
         FormsModule,
         ReactiveFormsModule,
 
-        FormlyModule.forRoot(config),
         FormlyBootstrapModule,
+        FormlyModule.forRoot(config),
 
         FormlyDesignerModule.forRoot(designerConfig)
     ],

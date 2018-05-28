@@ -57,7 +57,7 @@ import * as $ from 'jquery';
                     <label>child</label>
                     <field-picker (selected)="onFieldSelected($event)"></field-picker>
                 </div>
-                <ng-container #fieldComponent></ng-container>
+                <ng-template #fieldComponent></ng-template>
             </div>
         </div>
     `,

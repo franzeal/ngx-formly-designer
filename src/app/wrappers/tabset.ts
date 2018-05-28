@@ -10,7 +10,7 @@ declare var $: any;
     selector: 'formly-wrapper-tabset',
     template: `
         <tabset>
-            <ng-container #fieldComponent></ng-container>
+            <ng-template #fieldComponent></ng-template>
         </tabset>
     `
 })

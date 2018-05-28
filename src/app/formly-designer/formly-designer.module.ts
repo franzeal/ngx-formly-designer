@@ -14,7 +14,9 @@ import { WrapperEditorComponent } from './components/wrapper-editor';
 import { WrapperSelectComponent } from './components/wrapper-select';
 import { WrapperPickerComponent } from './components/wrapper-picker';
 import { WrappersPickerComponent } from './components/wrappers-picker';
-import { DebouncePipe } from './pipes/debounce';
+import { DecyclePipe } from './pipes/decycle';
+
+import { cloneDeep } from 'lodash';
 
 
 @NgModule({
@@ -28,7 +30,7 @@ import { DebouncePipe } from './pipes/debounce';
         WrapperPickerComponent,
         WrappersPickerComponent,
 
-        DebouncePipe,
+        DecyclePipe,
 
         fieldComponents,
         wrapperComponents

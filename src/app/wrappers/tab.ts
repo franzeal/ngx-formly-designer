@@ -6,8 +6,8 @@ import { FieldWrapper } from '@ngx-formly/core';
     selector: 'formly-wrapper-tab',
     template: `
         <tab [title]="tabTitle">
-            <ng-container #fieldComponent>
-            </ng-container>
+            <ng-template #fieldComponent>
+            </ng-template>
         </tab>
     `
 })

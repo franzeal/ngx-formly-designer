@@ -40,6 +40,7 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
     types = new Array<string>();
     wrappers = new Array<string>();
     properties = new Array<string>();
+    debugFields = new Array<FormlyFieldConfig>();
 
     form: FormGroup;
     options: any = {};

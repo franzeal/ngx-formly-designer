@@ -1,24 +1,22 @@
 import { FormlyFieldConfig, FormlyConfig } from '@ngx-formly/core';
+import { isArray, isString } from 'lodash';
 
 
 export class TemplateDesigner {
-    run(formlyConfig: FormlyConfig) {
-        formlyConfig.templateManipulators.preWrapper.push((field: FormlyFieldConfig) => {
-            if (!field || (field.templateOptions && field.templateOptions['$designerField'] === true)) {
-                return;
-            }
-            if (field.type) {
-                if (field.fieldGroup) {
-                    return 'fieldGroupDesigner';
-                }
-                return 'fieldDesigner';
+    private isNonDesignerField(field: FormlyFieldConfig): boolean {
+        return field && (!field.templateOptions || field.templateOptions['$designerField'] !== true);
+    }
+
+    run(fc: FormlyConfig) {
+        fc.templateManipulators.preWrapper.push((field: FormlyFieldConfig) => {
+            if (this.isNonDesignerField(field) && field.type) {
+                return field.fieldGroup ? 'fieldGroupDesigner' : 'fieldDesigner';
             }
         });
-        formlyConfig.templateManipulators.postWrapper.push((field: FormlyFieldConfig) => {
-            if (!field || (field.templateOptions && field.templateOptions['$designerField'] === true)) {
-                return;
+        fc.templateManipulators.postWrapper.push((field: FormlyFieldConfig) => {
+            if (this.isNonDesignerField(field)) {
+                return 'designer';
             }
-            return 'designer';
         });
     }
 }

@@ -53,7 +53,7 @@ import * as $ from 'jquery';
                 </field-editor>
             </div>
             <div [hidden]="editing">
-                <ng-container #fieldComponent></ng-container>
+                <ng-template #fieldComponent></ng-template>
             </div>
         </div>
     `,

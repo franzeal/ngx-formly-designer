@@ -60,12 +60,13 @@ export class FormlyDesignerService {
     addField(field: FormlyFieldConfig): void {
         this.fieldsService.mutateField(field, false);
 
-        // Test build
-        let fields = cloneDeep(this.fields);
-        fields.push(field);
-        this.formlyFormBuilder.buildForm(new FormGroup({}), fields, {}, {});
+        // { // Test build (commented out for now; subsequent calls to buildForm are applying templateManipulators redundantly)
+        //     const fields = cloneDeep(this.fields);
+        //     fields.push(field);
+        //     this.formlyFormBuilder.buildForm(new FormGroup({}), fields, {}, {});
+        // }
 
-        fields = cloneDeep(this.fields);
+        const fields = cloneDeep(this.fields);
         fields.push(field);
 
         this.fields = fields;
@@ -86,11 +87,12 @@ export class FormlyDesignerService {
         const pruned = this.createPrunedField(modified);
         this.fieldsService.mutateField(pruned, false);
 
-        // Test build
-        const fields = cloneDeepWith<any>(this.fields, (value: any, key: number | string, object: any, stack: any) => {
-            return value === original ? pruned : undefined;
-        }) as FormlyFieldConfig[];
-        this.formlyFormBuilder.buildForm(new FormGroup({}), fields, {}, {});
+        // { // Test build
+        //     const fields = cloneDeepWith<any>(this.fields, (value: any, key: number | string, object: any, stack: any) => {
+        //         return value === original ? pruned : undefined;
+        //     }) as FormlyFieldConfig[];
+        //     this.formlyFormBuilder.buildForm(new FormGroup({}), fields, {}, {});
+        // }
 
         if (this.replaceField(this.fields, original, pruned)) {
             if (original.formControl !== pruned.formControl) {

@@ -93,7 +93,7 @@ import * as $ from 'jquery';
             border: 1px dashed #000;
             border-radius: 5px;
             min-height: 2em;
-            padding: 0.4em 1em 0 1em;
+            padding: 1.5em 1em 0 1em;
             width: 100%;
         }
         .editor {

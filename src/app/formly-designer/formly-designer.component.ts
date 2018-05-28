@@ -4,6 +4,7 @@ import { FormlyConfig, FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from './fields.service';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { FormlyDesignerService } from './formly-designer.service';
+import { cloneDeep } from 'lodash';
 import { Observable, Subscription } from 'rxjs/Rx';
 
 
@@ -16,6 +17,10 @@ import { Observable, Subscription } from 'rxjs/Rx';
             <formly-form [options]="options" [model]="model" [form]="form" [fields]="fields">
             </formly-form>
         </form>
+        <div>
+            Designer Fields:
+            <pre>{{ fields | decycle | json }}</pre>
+        </div>
     `,
     styles: [`
         field-picker .form-group > .input-group > type-select > select {

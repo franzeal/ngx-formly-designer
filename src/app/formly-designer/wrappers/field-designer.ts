@@ -96,6 +96,9 @@ import * as $ from 'jquery';
             padding: 1.5em 1em 0 1em;
             width: 100%;
         }
+        .content:first-child {
+            padding-top: 0;
+        }
         .editor {
             margin: 1em 0;
         }
@@ -129,7 +132,7 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
     ngOnInit(): void {
         this.type = this.field.type;
         this.wrappers = Object.getOwnPropertyNames(this.designerConfig.wrappers);
-        this.fieldWrappers = this.formlyDesignerService.convertField(this.field).wrappers || [];
+        this.fieldWrappers = this.formlyDesignerService.getWrappers(this.formlyDesignerService.convertField(this.field)) || [];
     }
 
     ngAfterContentInit(): void {

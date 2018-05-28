@@ -18,7 +18,7 @@ const WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     template: `
         <form [formGroup]="fieldForm" novalidate>
             <div class="card">
-                <div class="card-block">
+                <div class="card-body">
                     <formly-form [form]="fieldForm" [fields]="fields" [model]="field">
                     </formly-form>
                     <ng-content></ng-content>
@@ -49,7 +49,7 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
-    private subscriptions = new Array<Subscription>();
+    private readonly subscriptions = new Array<Subscription>();
     private valueChangesSubscription: Subscription;
 
     ngOnInit(): void {

@@ -1,4 +1,4 @@
-import { Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild, HostBinding } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
@@ -18,7 +18,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     template: `
         <form [formGroup]="form" novalidate>
             <div class="card">
-                <div class="card-header" [ngClass]="{solo: !hasChildren}">
+                <div class="card-header" [ngClass]="{solo: solo | async}">
                     <div class="form-group" [ngClass]="{'has-danger': form.hasError('key') && (key.dirty || key.touched)}">
                         <label class="form-control-label">key</label>
                         <input formControlName="key" class="form-control">
@@ -45,7 +45,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                         </wrappers-picker>
                     </div>
                 </div>
-                <div #block class="card-block">
+                <div #block class="card-body">
                     <formly-form *ngIf="fields.length > 0" [form]="fieldForm" [fields]="fields" [model]="field">
                     </formly-form>
                     <ng-content></ng-content>
@@ -57,7 +57,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
         .card-header.solo {
             border-bottom: 0;
         }
-        .card-header.solo + .card-block {
+        .card-header.solo + .card-body {
             display: none;
         }
     `],
@@ -83,6 +83,12 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         this.fieldForm = formBuilder.group({});
     }
 
+    get solo(): Observable<boolean> {
+        return Observable
+            .of((!this.fields || !this.fields.length) && (!this.blockElRef || !this.blockElRef.nativeElement.children.length))
+            .delay(0);
+    }
+
     get key(): FormControl {
         return this.form.get('key') as FormControl;
     }
@@ -101,28 +107,13 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     field: FormlyFieldConfig = {};
     fields = new Array<FormlyFieldConfig>();
     fieldArray: boolean;
-    hasChildren: boolean;
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
-    private subscriptions = new Array<Subscription>();
+    private readonly subscriptions = new Array<Subscription>();
     private valueChangesSubscription: Subscription;
-    private blockChanges: MutationObserver;
 
     ngOnInit(): void {
-        const blockChangesSubject = new Subject<void>();
-        this.blockChanges = new MutationObserver((mutations: MutationRecord[]) => {
-            blockChangesSubject.next();
-        });
-
-        this.subscriptions.push(blockChangesSubject
-            .debounceTime(25)
-            .map(() => this.blockElRef.nativeElement.children.length > 0)
-            .distinctUntilChanged()
-            .subscribe(hasChildren => {
-                this.hasChildren = hasChildren;
-            }));
-
         this.subscriptions.push(this.type.valueChanges
             .subscribe(() => this.onTypeChange()));
 
@@ -136,7 +127,6 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     ngOnDestroy(): void {
         this.valueChangesSubscription.unsubscribe();
         this.subscriptions.splice(0).forEach(subscription => subscription.unsubscribe());
-        this.blockChanges.disconnect();
     }
 
     writeValue(obj: any) {

@@ -9,7 +9,7 @@ export class TemplateDesigner {
 
     run(fc: FormlyConfig) {
         fc.templateManipulators.preWrapper.push((field: FormlyFieldConfig) => {
-            if (this.isNonDesignerField(field) && field.type) {
+            if (this.isNonDesignerField(field)) {
                 return field.fieldGroup ? 'fieldGroupDesigner' : 'fieldDesigner';
             }
         });

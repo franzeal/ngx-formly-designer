@@ -17,10 +17,10 @@ import { Observable, Subscription } from 'rxjs/Rx';
             <formly-form [options]="options" [model]="model" [form]="form" [fields]="fields">
             </formly-form>
         </form>
-        <div>
+        <!--<div>
             Designer Fields Debug:
             <pre>{{ fields | decycle | json }}</pre>
-        </div>
+        </div>-->
     `,
     styles: [`
         field-picker .form-group > .input-group > type-select > select {

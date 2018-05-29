@@ -37,7 +37,9 @@ export class FormlyDesignerService {
     }
 
     set fields(value: FormlyFieldConfig[]) {
-        const fields = isArray(value) ? value : [];
+        // Prune the fields because ngx-formly pollutes them with internal state,
+        // causing it to behave incorrectly when re-applied as is.
+        const fields = this.createPrunedFields(isArray(value) ? value : []);
         this._fields.next(fields);
     }
 

@@ -3,7 +3,7 @@ import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACC
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
-import { Observable, Subscription, Subject } from 'rxjs/Rx';
+import { Observable, Subscription } from 'rxjs/Rx';
 import { clone, cloneDeep, isObject, isString } from 'lodash';
 
 

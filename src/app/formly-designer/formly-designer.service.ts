@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { FieldsService } from './fields.service';
-import { FormlyFieldConfig, FormlyConfig, FormlyFormBuilder } from '@ngx-formly/core';
+import { FormlyFieldConfig, FormlyConfig } from '@ngx-formly/core';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
-import { cloneDeep, cloneDeepWith, get, isArray, isEmpty, isNil, isString, set, unset } from 'lodash';
+import { cloneDeep, get, isArray, isEmpty, isNil, isString, set, unset } from 'lodash';
 
 
 @Injectable()
@@ -12,8 +12,7 @@ export class FormlyDesignerService {
     constructor(
         private designerConfig: FormlyDesignerConfig,
         private fieldsService: FieldsService,
-        private formlyConfig: FormlyConfig,
-        private formlyFormBuilder: FormlyFormBuilder
+        private formlyConfig: FormlyConfig
     ) { }
 
     private readonly _disabled = new BehaviorSubject<boolean>(false);
@@ -62,12 +61,6 @@ export class FormlyDesignerService {
     addField(field: FormlyFieldConfig): void {
         this.fieldsService.mutateField(field, false);
 
-        // { // Test build (commented out for now; subsequent calls to buildForm are applying templateManipulators redundantly)
-        //     const fields = cloneDeep(this.fields);
-        //     fields.push(field);
-        //     this.formlyFormBuilder.buildForm(new FormGroup({}), fields, {}, {});
-        // }
-
         const fields = cloneDeep(this.fields);
         fields.push(field);
 
@@ -86,15 +79,7 @@ export class FormlyDesignerService {
     }
 
     updateField(original: FormlyFieldConfig, modified: FormlyFieldConfig): void {
-        const pruned = this.createPrunedField(modified);
-        this.fieldsService.mutateField(pruned, false);
-
-        // { // Test build
-        //     const fields = cloneDeepWith<any>(this.fields, (value: any, key: number | string, object: any, stack: any) => {
-        //         return value === original ? pruned : undefined;
-        //     }) as FormlyFieldConfig[];
-        //     this.formlyFormBuilder.buildForm(new FormGroup({}), fields, {}, {});
-        // }
+        const pruned = this.fieldsService.mutateField(this.createPrunedField(modified), false);
 
         if (this.replaceField(this.fields, original, pruned)) {
             if (original.formControl !== pruned.formControl) {

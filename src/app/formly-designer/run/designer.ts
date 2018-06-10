@@ -1,5 +1,4 @@
 import { FormlyFieldConfig, FormlyConfig } from '@ngx-formly/core';
-import { isArray, isString } from 'lodash';
 
 
 export class TemplateDesigner {

@@ -3,7 +3,7 @@ import {
     ElementRef, OnInit, ViewChild, ViewContainerRef
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { FieldWrapper, FormlyConfig } from '@ngx-formly/core';
+import { FieldWrapper } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
@@ -123,7 +123,6 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
         private designerConfig: FormlyDesignerConfig,
         private elementRef: ElementRef,
         private fieldsService: FieldsService,
-        private formlyConfig: FormlyConfig,
         private formlyDesignerService: FormlyDesignerService
     ) {
         super();
@@ -176,6 +175,9 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
     }
 
     accept(): void {
+        if (!this.fieldsService.checkField(this.fieldEdit.value, this.formlyDesignerService.fields)) {
+            return;
+        }
         Observable.timer().subscribe(() => {
             this.formlyDesignerService.updateField(this.field, this.fieldEdit.value);
             this.formlyDesignerService.disabled = false;

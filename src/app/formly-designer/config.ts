@@ -25,4 +25,3 @@ export const config: ConfigOption = {
         { class: TemplateDesigner, method: 'run' }
     ]
 };
-

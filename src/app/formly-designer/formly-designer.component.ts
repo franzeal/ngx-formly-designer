@@ -1,10 +1,8 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { FormlyConfig, FormlyFieldConfig } from '@ngx-formly/core';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from './fields.service';
-import { FormlyDesignerConfig } from './formly-designer-config';
 import { FormlyDesignerService } from './formly-designer.service';
-import { cloneDeep } from 'lodash';
 import { Observable, Subscription } from 'rxjs/Rx';
 
 
@@ -56,8 +54,6 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
     constructor(
         private fieldsService: FieldsService,
         private formBuilder: FormBuilder,
-        private formlyConfig: FormlyConfig,
-        private formlyDesignerConfig: FormlyDesignerConfig,
         private formlyDesignerService: FormlyDesignerService
     ) { }
 
@@ -121,8 +117,12 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
 
     onFieldSelected(field: FormlyFieldConfig): void {
         Observable.timer()
-            .do(() => this.formlyDesignerService.addField(field))
-            .catch(err => Observable.never())
+            .do(() => {
+                if (this.fieldsService.checkField(field, this.formlyDesignerService.fields)) {
+                    this.formlyDesignerService.addField(field);
+                }
+            })
+            .catch(() => Observable.never())
             .subscribe();
     }
 }

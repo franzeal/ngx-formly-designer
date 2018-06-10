@@ -2,7 +2,6 @@ import { Component, forwardRef, Input, OnChanges, OnDestroy, OnInit, SimpleChang
 import { ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
-import { FormlyDesignerConfig } from '../formly-designer-config';
 import { Observable, Subscription } from 'rxjs/Rx';
 import { clone, cloneDeep, isObject } from 'lodash';
 
@@ -35,8 +34,7 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
 
     constructor(
         private fieldsService: FieldsService,
-        private formBuilder: FormBuilder,
-        private formlyDesignerConfig: FormlyDesignerConfig
+        private formBuilder: FormBuilder
     ) {
         this.fieldForm = formBuilder.group({});
     }

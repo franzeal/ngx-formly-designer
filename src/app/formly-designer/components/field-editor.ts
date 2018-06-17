@@ -4,7 +4,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { Observable, Subscription } from 'rxjs/Rx';
-import { clone, cloneDeep, isObject, isString } from 'lodash';
+import { clone, cloneDeep, isObject, isString } from 'lodash-es';
 
 
 const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -18,7 +18,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     template: `
         <form [formGroup]="form" novalidate>
             <div class="card">
-                <div class="card-header" [ngClass]="{solo: solo | async}">
+                <div class="card-header" [ngClass]="{solo: !hasContent && fields.length === 0}">
                     <div class="form-group" [ngClass]="{'has-danger': form.hasError('key') && (key.dirty || key.touched)}">
                         <label class="form-control-label">key</label>
                         <input formControlName="key" class="form-control">
@@ -68,6 +68,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
     @Input() showType: boolean;
     @Input() showWrappers: boolean;
+    @Input() hasContent: boolean;
     @ViewChild('block') blockElRef: ElementRef;
 
     constructor(
@@ -81,12 +82,6 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
             type: ['']
         }, { validator: (control) => this.validator(control) });
         this.fieldForm = formBuilder.group({});
-    }
-
-    get solo(): Observable<boolean> {
-        return Observable
-            .of((!this.fields || !this.fields.length) && (!this.blockElRef || !this.blockElRef.nativeElement.children.length))
-            .delay(0);
     }
 
     get key(): FormControl {
@@ -201,12 +196,9 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     private validator(control: FormGroup): { [key: string]: boolean } {
         const type = control.get('type') as FormControl;
         const hasType = isString(type.value) && type.value.trim().length > 0;
-        if (!this.showType && !hasType) {
-            return null;
-        }
 
         const key = control.get('key') as FormControl;
-        const result = { key: false, type: !hasType };
+        const result = { key: false, type: this.showType && !hasType, conflict: false };
         if (hasType && (!isString(key.value) || key.value.trim().length === 0)) {
             result.key = true;
         }

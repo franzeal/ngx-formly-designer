@@ -4,7 +4,7 @@ import { FieldsService } from './fields.service';
 import { FormlyFieldConfig, FormlyConfig } from '@ngx-formly/core';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
-import { cloneDeep, get, isArray, isEmpty, isNil, isString, set, unset } from 'lodash';
+import { cloneDeep, get, isArray, isEmpty, isNil, isString, set, unset } from 'lodash-es';
 
 
 @Injectable()

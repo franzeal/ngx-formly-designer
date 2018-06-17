@@ -35,7 +35,7 @@
     "@angular/cli": "^1.7.0",
     "@angular/compiler-cli": "^5.2.5",
     "@types/jquery": "^3.2.0",
-    "@types/lodash": "^4.14.104",
+    "@types/lodash-es": "^4.17.0",
     "@types/moment-timezone": "^0.5.4",
     "@types/node": "~6.0.60",
     "ajv": "^6.0.0",

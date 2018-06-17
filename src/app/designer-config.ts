@@ -63,7 +63,8 @@ export const designerConfig: DesignerConfigOption = {
                     type: 'checkbox',
                     templateOptions: {
                         label: 'required'
-                    }
+                    },
+                    defaultValue: false
                 }
             ]
         },
@@ -134,7 +135,8 @@ export const designerConfig: DesignerConfigOption = {
                     type: 'checkbox',
                     templateOptions: {
                         label: 'required'
-                    }
+                    },
+                    defaultValue: false
                 }
             ]
         },

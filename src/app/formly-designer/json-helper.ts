@@ -1,4 +1,4 @@
-import { cloneDeep, isArray, isObject, isNil, isUndefined } from 'lodash';
+import { cloneDeep, isArray, isObject, isNil, isUndefined } from 'lodash-es';
 
 export function decycle<T>(value: T): T {
     if (isNil(value)) {

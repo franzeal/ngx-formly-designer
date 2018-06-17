@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { DesignerOption, FormlyDesignerConfig } from './formly-designer-config';
 import { equalType, getKeyPath, traverseFields } from './util';
-import { cloneDeep, isObject } from 'lodash';
+import { cloneDeep, isObject } from 'lodash-es';
 
 
 @Injectable()

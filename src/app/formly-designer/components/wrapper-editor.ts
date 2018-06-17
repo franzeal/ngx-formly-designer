@@ -3,7 +3,7 @@ import { ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR } from 
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { Observable, Subscription } from 'rxjs/Rx';
-import { clone, cloneDeep, isObject } from 'lodash';
+import { clone, cloneDeep, isObject } from 'lodash-es';
 
 
 const WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR: any = {

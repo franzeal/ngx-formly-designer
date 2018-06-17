@@ -7,7 +7,7 @@ import { FieldWrapper, FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
-import { cloneDeep, isArray } from 'lodash';
+import { cloneDeep, isArray } from 'lodash-es';
 import { Observable } from 'rxjs/Rx';
 import * as $ from 'jquery';
 
@@ -45,7 +45,7 @@ import * as $ from 'jquery';
         </div>
         <div class="content">
             <div [hidden]="!editing">
-                <field-editor #editor [showWrappers]="true" [formControl]="fieldEdit">
+                <field-editor #editor [hasContent]="true" [showWrappers]="true" [formControl]="fieldEdit">
                     <div class="footer">
                         <button (click)="cancel()" class="btn btn-secondary mr-1">Cancel</button>
                         <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary">Apply</button>
@@ -213,7 +213,6 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper
     }
 
     private checkDesigner(): void {
-        this.changeDetector.detectChanges();
         const element = $(this.elementRef.nativeElement);
         const designerEmpty = element.find('formly-wrapper-designer').length === 0;
         if (designerEmpty !== element.hasClass('designerEmpty')) {

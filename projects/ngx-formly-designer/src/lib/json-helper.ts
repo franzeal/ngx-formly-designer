@@ -1,4 +1,4 @@
-import { cloneDeep, isArray, isObject, isUndefined } from 'lodash-es';
+import { cloneDeep, isArray, isObject } from './util';
 
 export function decycle<T>(value: T): T {
     if (value == null) {
@@ -40,7 +40,7 @@ function traverse<T>(obj: T, replace: (key, value) => any): T {
 
 function traverseValue(key: any, value: any, replace: (key, value) => any): void {
     const replacement = replace(key, value);
-    if (isUndefined(replacement)) {
+    if (replacement === undefined) {
         traverse(value, replace);
     } else {
         this[key] = replacement;

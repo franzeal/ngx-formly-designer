@@ -4,7 +4,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { Subscription, timer } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
-import { clone, cloneDeep, isObject } from 'lodash-es';
+import { cloneDeep, isObject } from '../util';
 
 const WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR,
@@ -70,7 +70,7 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
             }
             this.fields = this.fieldsService.getWrapperFields(this.wrapper);
             this.fieldForm = this.formBuilder.group({});
-            this.field = clone(this.field);
+            this.field = Object.assign({}, this.field);
             if (this.valueChangesSubscription) {
                 this.subscribeValueChanges();
             }

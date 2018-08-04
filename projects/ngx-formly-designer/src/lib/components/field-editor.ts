@@ -1,11 +1,11 @@
-import { Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild, HostBinding } from '@angular/core';
+import { Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { merge, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { clone, cloneDeep, isObject, isString } from 'lodash-es';
+import { cloneDeep, isObject, isString } from '../util';
 
 const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR,
@@ -105,7 +105,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     field: FormlyFieldConfig = {};
     fields: FormlyFieldConfig[] = [];
     fieldArray: boolean;
-    protected onChange = (value: any) => { };
+    protected onChange = (_: any) => { };
     protected onTouched = () => { };
 
     ngOnInit(): void {
@@ -184,7 +184,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         const designerType = this.formlyDesignerConfig.types[this.type.value];
         this.fieldArray = designerType ? designerType.fieldArray : false;
         this.fieldForm = this.formBuilder.group({});
-        this.field = clone(this.field);
+        this.field = Object.assign({}, this.field);
         this.subscribeValueChanges();
     }
 

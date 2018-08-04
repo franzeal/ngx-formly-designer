@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { DesignerOption, FormlyDesignerConfig } from './formly-designer-config';
-import { equalType, getKeyPath, traverseFields } from './util';
-import { cloneDeep, isObject } from 'lodash-es';
+import { cloneDeep, equalType, getKeyPath, isObject, traverseFields } from './util';
 
 @Injectable()
 export class FieldsService {
@@ -33,10 +32,7 @@ export class FieldsService {
                     return true;
                 }
             }
-            if (equalType(field, f)) {
-                return true;
-            }
-            return false;
+            return equalType(field, f);
         });
     }
 

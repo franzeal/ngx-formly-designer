@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from './fields.service';
 import { FormlyDesignerService } from './formly-designer.service';
-import { Subscription, merge, never, timer } from 'rxjs';
+import { merge, NEVER, Subscription, timer } from 'rxjs';
 import { catchError, debounceTime, tap } from 'rxjs/operators';
 
 @Component({
@@ -122,6 +122,6 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
                     this.formlyDesignerService.addField(field);
                 }
             }),
-            catchError(() => never())).subscribe();
+            catchError(() => NEVER)).subscribe();
     }
 }

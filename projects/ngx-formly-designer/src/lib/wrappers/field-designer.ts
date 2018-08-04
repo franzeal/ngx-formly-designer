@@ -1,13 +1,19 @@
 import {
-    AfterContentInit, AfterContentChecked, ChangeDetectorRef, Component,
-    ElementRef, OnInit, ViewChild, ViewContainerRef
+  AfterContentChecked,
+  AfterContentInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  ViewContainerRef
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FieldWrapper } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep } from '../util';
 import { timer } from 'rxjs';
 
 @Component({

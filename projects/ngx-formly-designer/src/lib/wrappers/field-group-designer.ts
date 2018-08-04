@@ -1,14 +1,20 @@
 import {
-    AfterContentInit, AfterContentChecked, ChangeDetectorRef, Component,
-    ElementRef, OnInit, ViewChild, ViewContainerRef
+  AfterContentChecked,
+  AfterContentInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  ViewContainerRef
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FieldWrapper, FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
-import { cloneDeep, isArray } from 'lodash-es';
-import { never, timer } from 'rxjs';
+import { cloneDeep, isArray } from '../util';
+import { NEVER, timer } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 @Component({
@@ -204,7 +210,7 @@ export class FormlyDesignerFieldGroupWrapperComponent extends FieldWrapper
         timer()
             .pipe(
                 tap(() => this.formlyDesignerService.updateField(this.field, updatedField)),
-                catchError(() => never())
+                catchError(() => NEVER)
             )
             .subscribe();
     }

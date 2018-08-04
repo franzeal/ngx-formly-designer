@@ -3,7 +3,8 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
-import { cloneDeep, isArray, isObject } from 'lodash-es';
+import { cloneDeep, isArray, isObject } from '../util';
+
 declare var $;
 
 @Component({

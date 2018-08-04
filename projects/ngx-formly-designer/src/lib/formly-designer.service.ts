@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { FieldsService } from './fields.service';
-import { FormlyFieldConfig, FormlyConfig } from '@ngx-formly/core';
+import { FormlyConfig, FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyDesignerConfig } from './formly-designer-config';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { cloneDeep, get, isArray, isEmpty, isString, set, unset } from 'lodash-es';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { get, set, unset } from 'lodash-es';
+import { cloneDeep, isArray, isEmpty, isString } from './util';
 
 @Injectable()
 export class FormlyDesignerService {
@@ -225,10 +226,7 @@ export class FormlyDesignerService {
         if (fieldArray.fieldGroup && this.replaceField(fieldArray.fieldGroup, original, modified)) {
             return true;
         }
-        if (fieldArray.fieldArray && this.replaceFieldArray(fieldArray, original, modified)) {
-            return true;
-        }
-        return false;
+        return fieldArray.fieldArray && this.replaceFieldArray(fieldArray, original, modified);
     }
 
     private buildPath(key: string, path: string, arrayNext: boolean = false) {

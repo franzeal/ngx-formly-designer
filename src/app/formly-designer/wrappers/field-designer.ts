@@ -1,15 +1,21 @@
 import {
-    AfterContentInit, AfterContentChecked, ChangeDetectorRef, Component,
-    ElementRef, OnInit, ViewChild, ViewContainerRef, OnDestroy
+  AfterContentChecked,
+  AfterContentInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  ViewContainerRef
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FieldWrapper } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
-import { cloneDeep } from 'lodash-es';
-import { Observable } from 'rxjs/Rx';
 import * as $ from 'jquery';
+import { Observable, timer } from 'rxjs';
+import { cloneDeep } from '../../../utils';
 
 
 @Component({
@@ -114,8 +120,8 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
 
     editing = false;
     fieldEdit = new FormControl({});
-    fieldWrappers = new Array<string>();
-    wrappers = new Array<string>();
+    fieldWrappers: string[] = [];
+    wrappers: string[] = [];
     type: string;
 
     constructor(
@@ -150,8 +156,7 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
         const field = cloneDeep(this.field);
         if (field.wrappers) {
             field.wrappers.push(wrapper);
-        }
-        else {
+        } else {
             field.wrappers = [wrapper];
         }
         this.formlyDesignerService.updateField(this.field, field);
@@ -178,7 +183,7 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
         if (!this.fieldsService.checkField(this.fieldEdit.value, this.formlyDesignerService.fields)) {
             return;
         }
-        Observable.timer().subscribe(() => {
+        Observable.create().pipe(timer()).subscribe(() => {
             this.formlyDesignerService.updateField(this.field, this.fieldEdit.value);
             this.formlyDesignerService.disabled = false;
             this.editing = false;
@@ -197,8 +202,7 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
             this.changeDetector.detectChanges();
             if (designerEmpty) {
                 element.addClass('designerEmpty');
-            }
-            else {
+            } else {
                 element.removeClass('designerEmpty');
             }
         }

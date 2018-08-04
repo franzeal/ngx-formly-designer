@@ -2,8 +2,10 @@ import { Component, forwardRef, Input, OnChanges, OnDestroy, OnInit, SimpleChang
 import { ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
-import { Observable, Subscription } from 'rxjs/Rx';
-import { clone, cloneDeep, isObject } from 'lodash-es';
+import { Observable, Subscription, timer } from 'rxjs';
+import { debounceTime, switchMap } from 'rxjs/operators';
+import { clone } from '@ngx-formly/core/lib/utils';
+import { cloneDeep, isObject } from '../../../utils';
 
 
 const WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -52,7 +54,7 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
 
     ngOnInit(): void {
         this.subscriptions.push(this.fieldForm.statusChanges
-            .switchMap(() => Observable.timer())
+            .pipe(switchMap(() => Observable.create().pipe(timer())))
             .subscribe(() => this.invalid = this.fieldForm.invalid));
 
         this.subscribeValueChanges();
@@ -99,15 +101,14 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
     setDisabledState(isDisabled: boolean): void {
         if (isDisabled) {
             this.fieldForm.disable();
-        }
-        else {
+        } else {
             this.fieldForm.enable();
         }
     }
 
     private subscribeValueChanges(): void {
         this.valueChangesSubscription = this.fieldForm.valueChanges
-            .debounceTime(0)
+            .pipe(debounceTime(0))
             .subscribe(() => this.updateValue());
     }
 

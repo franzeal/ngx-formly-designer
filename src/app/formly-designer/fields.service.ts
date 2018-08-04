@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { DesignerOption, FormlyDesignerConfig } from './formly-designer-config';
 import { equalType, getKeyPath, traverseFields } from './util';
-import { cloneDeep, isObject } from 'lodash-es';
+import { cloneDeep, isObject } from '../../utils';
 
 
 @Injectable()
@@ -34,24 +34,19 @@ export class FieldsService {
                     return true;
                 }
             }
-            if (equalType(field, f)) {
-                return true;
-            }
-            return false;
+            return equalType(field, f);
         });
     }
 
     mutateField(field: FormlyFieldConfig, designerField: boolean): FormlyFieldConfig {
         if (isObject(field.templateOptions)) {
             field.templateOptions['$designerField'] = designerField;
-        }
-        else {
+        } else {
             field.templateOptions = { $designerField: designerField };
         }
         if (field.fieldGroup) {
             this.mutateFields(field.fieldGroup, designerField);
-        }
-        else if (field.fieldArray && field.fieldArray.fieldGroup) {
+        } else if (field.fieldArray && field.fieldArray.fieldGroup) {
             // Treating fieldArrays as fieldGroups
             field.templateOptions['$fieldArray'] = { type: field.type };
             field.fieldGroup = field.fieldArray.fieldGroup;

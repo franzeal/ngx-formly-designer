@@ -1,8 +1,6 @@
-import { AfterContentInit, Component, ElementRef, ViewContainerRef, ViewChild } from '@angular/core';
+import { AfterContentInit, Component, ElementRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { FieldWrapper } from '@ngx-formly/core';
-
-import { isString } from 'lodash-es';
-
+import { isString } from '../../utils';
 
 declare var $: any;
 

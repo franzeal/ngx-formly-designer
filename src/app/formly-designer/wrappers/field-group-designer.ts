@@ -1,15 +1,21 @@
 import {
-    AfterContentInit, AfterContentChecked, ChangeDetectorRef, Component,
-    ElementRef, OnInit, ViewChild, ViewContainerRef
+  AfterContentChecked,
+  AfterContentInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  ViewContainerRef
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FieldWrapper, FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
-import { cloneDeep, isArray } from 'lodash-es';
-import { Observable } from 'rxjs/Rx';
 import * as $ from 'jquery';
+import { cloneDeep, isArray } from '../../../utils';
+import { NEVER, Observable, timer } from 'rxjs';
 
 
 @Component({
@@ -112,8 +118,8 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper
     type: string;
     editing = false;
     fieldEdit = new FormControl({});
-    fieldWrappers = new Array<string>();
-    wrappers = new Array<string>();
+    fieldWrappers: string[] = [];
+    wrappers: string[] = [];
 
     constructor(
         private changeDetector: ChangeDetectorRef,
@@ -128,11 +134,9 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper
     ngOnInit(): void {
         if (this.field.templateOptions.$fieldArray) {
             this.type = this.field.templateOptions.$fieldArray.type || 'fieldArray';
-        }
-        else if (this.field.type) {
+        } else if (this.field.type) {
             this.type = this.field.type;
-        }
-        else if (this.field.fieldGroup) {
+        } else if (this.field.fieldGroup) {
             this.type = 'fieldGroup';
         }
         this.wrappers = Object.getOwnPropertyNames(this.designerConfig.wrappers);
@@ -155,8 +159,7 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper
         const field = cloneDeep(this.field);
         if (field.wrappers) {
             field.wrappers.push(wrapper);
-        }
-        else {
+        } else {
             field.wrappers = [wrapper];
         }
         this.formlyDesignerService.updateField(this.field, field);
@@ -184,7 +187,7 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper
             return;
         }
 
-        Observable.timer().subscribe(() => {
+        Observable.create().pipe(timer()).subscribe(() => {
             this.formlyDesignerService.updateField(this.field, this.fieldEdit.value);
             this.formlyDesignerService.disabled = false;
             this.editing = false;
@@ -206,9 +209,9 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper
 
         updatedField.fieldGroup.push(field);
 
-        Observable.timer()
+        Observable.create().pipe(timer())
             .do(() => this.formlyDesignerService.updateField(this.field, updatedField))
-            .catch(() => Observable.never())
+            .catch(() => NEVER)
             .subscribe();
     }
 
@@ -219,8 +222,7 @@ export class FormlyWrapperFieldGroupDesignerComponent extends FieldWrapper
             this.changeDetector.detectChanges();
             if (designerEmpty) {
                 element.addClass('designerEmpty');
-            }
-            else {
+            } else {
                 element.removeClass('designerEmpty');
             }
         }

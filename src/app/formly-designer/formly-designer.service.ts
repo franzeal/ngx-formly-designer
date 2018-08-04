@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { FieldsService } from './fields.service';
-import { FormlyFieldConfig, FormlyConfig } from '@ngx-formly/core';
+import { FormlyConfig, FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyDesignerConfig } from './formly-designer-config';
-import { Observable, BehaviorSubject } from 'rxjs/Rx';
-import { cloneDeep, get, isArray, isEmpty, isNil, isString, set, unset } from 'lodash-es';
+import { set, unset } from 'lodash-es';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { cloneDeep, isArray, isEmpty, isNil, isString } from '../../utils';
 
 
 @Injectable()
@@ -110,8 +111,7 @@ export class FormlyDesignerService {
                 const pruned = this.createPrunedField(field);
                 if (field.fieldArray) {
                     pruned.fieldArray = this.createPrunedField(field.fieldArray);
-                }
-                else if (field.fieldGroup && !pruned.fieldArray) {
+                } else if (field.fieldGroup && !pruned.fieldArray) {
                     pruned.fieldGroup = this.createPrunedFields(field.fieldGroup);
                 }
                 if (Object.keys(pruned).length > 0) {
@@ -160,8 +160,7 @@ export class FormlyDesignerService {
                     fieldGroup: this.createPrunedFields(field.fieldGroup)
                 };
             }
-        }
-        else {
+        } else {
             pruned = isEmpty(field.key) ? {} : { key: field.key };
             if (isArray(field.fieldGroup)) {
                 pruned.fieldGroup = this.createPrunedFields(field.fieldGroup);
@@ -189,7 +188,7 @@ export class FormlyDesignerService {
             designerFields.forEach(designerField => {
                 const value = get(field, designerField.key);
                 if (!isNil(value) && (!isString(value) || value.length > 0) && value !== designerField.defaultValue) {
-                    set(designed, designerField.key, value);
+                  set(designed, designerField.key, value);
                 }
             });
         }
@@ -203,8 +202,7 @@ export class FormlyDesignerService {
                 if (field === original) {
                     if (isNil(modified)) {
                         fields.splice(i, 1);
-                    }
-                    else {
+                    } else {
                         fields[i] = modified;
                     }
                     return true;
@@ -229,16 +227,14 @@ export class FormlyDesignerService {
         if (fieldArray.fieldGroup && this.replaceField(fieldArray.fieldGroup, original, modified)) {
             return true;
         }
-        if (fieldArray.fieldArray && this.replaceFieldArray(fieldArray, original, modified)) {
-            return true;
-        }
-        return false;
+        return fieldArray.fieldArray && this.replaceFieldArray(fieldArray, original, modified);
     }
 
     private path(control: AbstractControl, includeSelf: boolean = true): string {
         let path = '';
         let arrayNext = false;
-        const buildPath = (key: string, path: string, arrayNext: boolean = false) => path ? key + (arrayNext ? path : '.' + path) : key;
+        const buildPath = (key: string, path_: string,
+                           arrayNext_: boolean = false) => path_ ? key + (arrayNext_ ? path_ : '.' + path_) : key;
         if (!includeSelf) {
             control = (control || {} as AbstractControl).parent;
         }
@@ -251,8 +247,7 @@ export class FormlyDesignerService {
                         break;
                     }
                 }
-            }
-            else if (parent instanceof FormArray) {
+            } else if (parent instanceof FormArray) {
                 for (let i = 0; i < parent.length; i++) {
                     if (parent.at(i) === child) {
                         path = buildPath('[' + i + ']', path, arrayNext);
@@ -289,8 +284,7 @@ export class FormlyDesignerService {
                     return;
                 }
             }
-        }
-        else if (parent instanceof FormArray) {
+        } else if (parent instanceof FormArray) {
             for (let i = 0; i < parent.length; i++) {
                 if (parent.at(i) === control) {
                     parent.removeAt(i);

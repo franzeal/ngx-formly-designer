@@ -3,7 +3,8 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from './fields.service';
 import { FormlyDesignerService } from './formly-designer.service';
-import { Observable, Subscription } from 'rxjs/Rx';
+import { merge, NEVER, Observable, Subscription, timer } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 
 @Component({
@@ -41,15 +42,15 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
     @Output() fieldsChanged = new EventEmitter<FormlyFieldConfig[]>();
     @Output() modelChanged = new EventEmitter<any>();
 
-    types = new Array<string>();
-    wrappers = new Array<string>();
-    properties = new Array<string>();
-    debugFields = new Array<FormlyFieldConfig>();
+    types: string[] = [];
+    wrappers: string[] = [];
+    properties: string[] = [];
+    debugFields: FormlyFieldConfig[] = [];
 
     form: FormGroup;
     options: any = {};
 
-    private readonly subscriptions = new Array<Subscription>();
+    private readonly subscriptions: Subscription[] = [];
 
     constructor(
         private fieldsService: FieldsService,
@@ -105,10 +106,10 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
                 }));
 
         this.subscriptions.push(
-            Observable.merge(
+            merge(
                 this.formlyDesignerService.model$,
                 this.form.valueChanges
-            ).debounceTime(50).subscribe(() => this.modelChanged.emit(this.formlyDesignerService.model)));
+            ).pipe(debounceTime(50)).subscribe(() => this.modelChanged.emit(this.formlyDesignerService.model)));
     }
 
     ngOnDestroy(): void {
@@ -116,13 +117,13 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
     }
 
     onFieldSelected(field: FormlyFieldConfig): void {
-        Observable.timer()
+        Observable.create().pipe(timer())
             .do(() => {
                 if (this.fieldsService.checkField(field, this.formlyDesignerService.fields)) {
                     this.formlyDesignerService.addField(field);
                 }
             })
-            .catch(() => Observable.never())
+            .catch(() => NEVER)
             .subscribe();
     }
 }

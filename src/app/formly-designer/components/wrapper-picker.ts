@@ -3,7 +3,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
-import { cloneDeep, isArray, isObject } from 'lodash-es';
+import { cloneDeep, isArray, isObject } from '../../../utils';
 
 
 @Component({
@@ -96,8 +96,7 @@ export class WrapperPickerComponent implements OnInit {
             const field = cloneDeep(this.field);
             if (isArray(field.wrappers) && field.wrappers.length > 0) {
                 field.wrappers.splice(field.wrappers.length - 1, 0, this.wrapper);
-            }
-            else {
+            } else {
                 field.wrappers = [this.wrapper];
             }
             this.fieldEdit.setValue(field);
@@ -105,8 +104,7 @@ export class WrapperPickerComponent implements OnInit {
             const fields = this.formlyDesignerConfig.wrappers[this.wrapper].fields;
             if (isArray(fields) && fields.length > 0) {
                 this.$modal.modal('show');
-            }
-            else {
+            } else {
                 this.onApply();
             }
         }

@@ -90,8 +90,7 @@ export class FieldPickerComponent implements OnInit {
             this.fieldEdit.setValue({
                 fieldGroup: []
             });
-        }
-        else {
+        } else {
             const field = { type: type } as FormlyFieldConfig;
             if (this.formlyDesignerConfig.types[type].fieldArray) {
                 field.fieldArray = { fieldGroup: new Array<FormlyFieldConfig>() };

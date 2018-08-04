@@ -1,10 +1,11 @@
-import { Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild, HostBinding } from '@angular/core';
+import { Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
-import { Observable, Subscription } from 'rxjs/Rx';
-import { clone, cloneDeep, isObject, isString } from 'lodash-es';
+import { merge, Subscription } from 'rxjs';
+import { cloneDeep, isObject, isString } from '../../../utils';
+import { debounceTime } from 'rxjs/operators';
 
 
 const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -113,8 +114,8 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
             .subscribe(() => this.onTypeChange()));
 
         this.subscriptions.push(this.form.statusChanges
-            .debounceTime(0)
-            .subscribe(() => this.invalid = this.form.invalid));
+          .pipe(debounceTime(0))
+          .subscribe(() => this.invalid = this.form.invalid));
 
         this.subscribeValueChanges();
     }
@@ -143,16 +144,15 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     setDisabledState(isDisabled: boolean): void {
         if (isDisabled) {
             this.form.disable();
-        }
-        else {
+        } else {
             this.form.enable();
         }
     }
 
     private subscribeValueChanges(): void {
-        this.valueChangesSubscription = Observable.merge(this.fieldForm.valueChanges, this.form.valueChanges)
-            .debounceTime(0)
-            .subscribe(() => this.updateValue());
+        this.valueChangesSubscription = merge(this.fieldForm.valueChanges, this.form.valueChanges).pipe(
+            debounceTime(0)
+        ).subscribe(() => this.updateValue());
     }
 
     private updateField(field: FormlyFieldConfig): void {
@@ -185,7 +185,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         const designerType = this.formlyDesignerConfig.types[this.type.value];
         this.fieldArray = designerType ? designerType.fieldArray : false;
         this.fieldForm = this.formBuilder.group({});
-        this.field = clone(this.field);
+        this.field = Object.assign({}, this.field);
         this.subscribeValueChanges();
     }
 
@@ -204,5 +204,5 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         }
 
         return result.key || result.type ? result : null;
-    };
+    }
 }

@@ -1,13 +1,10 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { FormlyFieldConfig } from 'ng-formly';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
-import { cloneDeep, isArray, isObject } from 'lodash';
-import * as jquery from 'jquery';
+import { cloneDeep, isArray, isObject } from '../../../utils';
 
-
-declare var $: JQueryStatic;
 
 @Component({
     selector: 'wrappers-picker',
@@ -17,7 +14,7 @@ declare var $: JQueryStatic;
                 <wrapper-picker [field]="field" (selected)="onWrapperSelected($event)">
                 </wrapper-picker>
             </div>
-            <div *ngFor="let wrapper of field?.wrappers; let i = index" class="badge badge-default noselect" (click)="edit(i)">
+            <div *ngFor="let wrapper of wrappers; let i = index" class="badge badge-default noselect" (click)="edit(i)">
                 {{ wrapper }}&nbsp;&nbsp;<i class="fa fa-times" aria-hidden="true" (click)="remove(i)"></i>
             </div>
         </div>
@@ -59,7 +56,7 @@ declare var $: JQueryStatic;
         }
     `]
 })
-export class WrappersPickerComponent {
+export class WrappersPickerComponent implements OnChanges {
     @ViewChild('modal') modalRef: ElementRef;
     @Input() field: FormlyFieldConfig;
     @Output() selected = new EventEmitter<FormlyFieldConfig>();
@@ -67,13 +64,21 @@ export class WrappersPickerComponent {
     wrapper: string;
     fieldEdit = new FormControl({});
 
+    public wrappers: string[] = [];
+
     constructor(
         private formlyDesignerConfig: FormlyDesignerConfig,
         private formlyDesignerService: FormlyDesignerService
     ) { }
 
-    private get modal(): any {
-        return $(this.modalRef.nativeElement);
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes.field) {
+            this.wrappers = this.formlyDesignerService.getWrappers(changes.field.currentValue);
+        }
+    }
+
+    private get $modal(): JQuery & { modal: (command: string) => void } {
+        return $(this.modalRef.nativeElement) as any;
     }
 
     onWrapperSelected(field: FormlyFieldConfig): void {
@@ -81,19 +86,16 @@ export class WrappersPickerComponent {
     }
 
     edit(index: number): void {
-        this.wrapper = this.field.wrappers[index];
-
+        this.wrapper = this.wrappers[index];
         if (isObject(this.field)) {
             const field = cloneDeep(this.field);
             if (isArray(field.wrappers)) {
-                this.wrapper = this.field.wrappers[index];
                 this.fieldEdit.setValue(field);
 
                 const fields = this.formlyDesignerConfig.wrappers[this.wrapper].fields;
                 if (isArray(fields) && fields.length > 0) {
-                    this.modal.modal('show');
-                }
-                else {
+                    this.$modal.modal('show');
+                } else {
                     this.onApply();
                 }
             }
@@ -101,8 +103,13 @@ export class WrappersPickerComponent {
     }
 
     remove(index: number): void {
+        const fieldWrappersIndex = this.field.wrappers.indexOf(this.wrappers[index]);
+        if (fieldWrappersIndex < 0) {
+            return;
+        }
+
         const field = cloneDeep(this.field);
-        field.wrappers.splice(index, 1);
+        field.wrappers.splice(fieldWrappersIndex, 1);
         this.field = this.formlyDesignerService.convertField(field);
         this.selected.emit(this.field);
     }
@@ -110,6 +117,6 @@ export class WrappersPickerComponent {
     onApply(): void {
         this.field = this.formlyDesignerService.convertField(this.fieldEdit.value);
         this.selected.emit(this.field);
-        this.modal.modal('hide');
+        this.$modal.modal('hide');
     }
 }

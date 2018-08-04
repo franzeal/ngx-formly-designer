@@ -1,11 +1,11 @@
 import { Component, ViewChild, ViewContainerRef } from '@angular/core';
-import { FieldWrapper } from 'ng-formly';
+import { FieldWrapper } from '@ngx-formly/core';
 
 
 @Component({
     selector: 'formly-wrapper-designer',
     template: `
-        <ng-container #fieldComponent></ng-container>
+        <ng-template #fieldComponent></ng-template>
     `
 })
 export class FormlyWrapperDesignerComponent extends FieldWrapper {

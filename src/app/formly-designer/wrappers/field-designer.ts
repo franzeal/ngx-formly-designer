@@ -1,18 +1,22 @@
 import {
-    AfterContentInit, AfterContentChecked, ChangeDetectorRef, Component,
-    ElementRef, OnInit, ViewChild, ViewContainerRef
+  AfterContentChecked,
+  AfterContentInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  ViewContainerRef
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { FieldWrapper, FormlyConfig } from 'ng-formly';
+import { FieldWrapper } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
-import { cloneDeep } from 'lodash';
-import { Observable } from 'rxjs/Rx';
-import * as jQuery from 'jquery';
+import * as $ from 'jquery';
+import { Observable, timer } from 'rxjs';
+import { cloneDeep } from '../../../utils';
 
-
-declare var $: JQueryStatic;
 
 @Component({
     selector: 'formly-wrapper-field-designer',
@@ -47,7 +51,7 @@ declare var $: JQueryStatic;
         </div>
         <div class="content">
             <div class="editor" [hidden]="!editing">
-                <field-editor #editor [showType]="true" [showWrappers]="true" [formControl]="fieldEdit">
+                <field-editor #editor [hasContent]="true" [showType]="true" [showWrappers]="true" [formControl]="fieldEdit">
                     <div class="footer">
                         <button (click)="cancel()" class="btn btn-secondary mr-1">Cancel</button>
                         <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary">Apply</button>
@@ -55,7 +59,7 @@ declare var $: JQueryStatic;
                 </field-editor>
             </div>
             <div [hidden]="editing">
-                <ng-container #fieldComponent></ng-container>
+                <ng-template #fieldComponent></ng-template>
             </div>
         </div>
     `,
@@ -95,8 +99,11 @@ declare var $: JQueryStatic;
             border: 1px dashed #000;
             border-radius: 5px;
             min-height: 2em;
-            padding: 0.4em 1em 0 1em;
+            padding: 1.5em 1em 0 1em;
             width: 100%;
+        }
+        .content:first-child {
+            padding-top: 0;
         }
         .editor {
             margin: 1em 0;
@@ -122,7 +129,6 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
         private designerConfig: FormlyDesignerConfig,
         private elementRef: ElementRef,
         private fieldsService: FieldsService,
-        private formlyConfig: FormlyConfig,
         private formlyDesignerService: FormlyDesignerService
     ) {
         super();
@@ -131,7 +137,7 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
     ngOnInit(): void {
         this.type = this.field.type;
         this.wrappers = Object.getOwnPropertyNames(this.designerConfig.wrappers);
-        this.fieldWrappers = this.formlyDesignerService.convertField(this.field).wrappers || [];
+        this.fieldWrappers = this.formlyDesignerService.getWrappers(this.formlyDesignerService.convertField(this.field)) || [];
     }
 
     ngAfterContentInit(): void {
@@ -150,8 +156,7 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
         const field = cloneDeep(this.field);
         if (field.wrappers) {
             field.wrappers.push(wrapper);
-        }
-        else {
+        } else {
             field.wrappers = [wrapper];
         }
         this.formlyDesignerService.updateField(this.field, field);
@@ -175,7 +180,10 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
     }
 
     accept(): void {
-        Observable.timer().subscribe(() => {
+        if (!this.fieldsService.checkField(this.fieldEdit.value, this.formlyDesignerService.fields)) {
+            return;
+        }
+        Observable.create().pipe(timer()).subscribe(() => {
             this.formlyDesignerService.updateField(this.field, this.fieldEdit.value);
             this.formlyDesignerService.disabled = false;
             this.editing = false;
@@ -188,7 +196,6 @@ export class FormlyWrapperFieldDesignerComponent extends FieldWrapper
     }
 
     private checkDesigner(): void {
-        this.changeDetector.detectChanges();
         const element = $(this.elementRef.nativeElement);
         const designerEmpty = element.find('formly-wrapper-designer').length === 0;
         if (designerEmpty !== element.hasClass('designerEmpty')) {

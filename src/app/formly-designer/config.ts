@@ -1,4 +1,4 @@
-import { ConfigOption } from 'ng-formly';
+import { ConfigOption } from '@ngx-formly/core';
 
 import { FormlyWrapperDesignerComponent } from './wrappers/designer';
 import { FormlyWrapperFieldDesignerComponent } from './wrappers/field-designer';
@@ -25,4 +25,3 @@ export const config: ConfigOption = {
         { class: TemplateDesigner, method: 'run' }
     ]
 };
-

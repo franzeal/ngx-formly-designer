@@ -1,7 +1,7 @@
 import { AfterContentInit, Component, OnDestroy } from '@angular/core';
 import { TabsetService } from './tabset.service';
 import { TabComponent } from '../tab.component';
-import { Observable, Subscription } from 'rxjs/Rx';
+import { Observable, Subscription, timer } from 'rxjs';
 
 
 @Component({
@@ -62,7 +62,7 @@ export class TabsetComponent implements AfterContentInit, OnDestroy {
     }
 
     private onTabsChanged(): void {
-        Observable.timer().subscribe(() => {
+        Observable.create().pipe(timer()).subscribe(() => {
             if (this.tabsSubscription.closed) {
                 return;
             }

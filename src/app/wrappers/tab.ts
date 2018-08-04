@@ -1,13 +1,13 @@
 import { Component, ViewContainerRef, ViewChild } from '@angular/core';
-import { FieldWrapper } from 'ng-formly';
+import { FieldWrapper } from '@ngx-formly/core';
 
 
 @Component({
     selector: 'formly-wrapper-tab',
     template: `
         <tab [title]="tabTitle">
-            <ng-container #fieldComponent>
-            </ng-container>
+            <ng-template #fieldComponent>
+            </ng-template>
         </tab>
     `
 })

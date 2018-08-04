@@ -1,10 +1,10 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { FormlyConfig, FormlyFieldConfig } from 'ng-formly';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from './fields.service';
-import { FormlyDesignerConfig } from './formly-designer-config';
 import { FormlyDesignerService } from './formly-designer.service';
-import { Observable, Subscription } from 'rxjs/Rx';
+import { merge, NEVER, Observable, Subscription, timer } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 
 @Component({
@@ -16,13 +16,17 @@ import { Observable, Subscription } from 'rxjs/Rx';
             <formly-form [options]="options" [model]="model" [form]="form" [fields]="fields">
             </formly-form>
         </form>
+        <!--<div>
+            Designer Fields Debug:
+            <pre>{{ fields | decycle | json }}</pre>
+        </div>-->
     `,
     styles: [`
         field-picker .form-group > .input-group > type-select > select {
             border-radius: .25rem 0 0 .25rem;
             border-right: 0;
         }
-        wrapper-editor .card > .card-block .form-control {
+        wrapper-editor .card > .card-body .form-control {
             width: 100%;
         }
         wrapper-picker .form-group > .input-group > wrapper-select > select {
@@ -34,23 +38,23 @@ import { Observable, Subscription } from 'rxjs/Rx';
     providers: [FormlyDesignerService]
 })
 export class FormlyDesignerComponent implements OnDestroy, OnInit {
+    @ViewChild('formlyFormContainer', { read: ViewContainerRef }) formlyFormContainer;
     @Output() fieldsChanged = new EventEmitter<FormlyFieldConfig[]>();
     @Output() modelChanged = new EventEmitter<any>();
 
     types = new Array<string>();
     wrappers = new Array<string>();
     properties = new Array<string>();
+    debugFields = new Array<FormlyFieldConfig>();
 
     form: FormGroup;
     options: any = {};
 
-    private subscriptions = new Array<Subscription>();
+    private readonly subscriptions = new Array<Subscription>();
 
     constructor(
         private fieldsService: FieldsService,
         private formBuilder: FormBuilder,
-        private formlyConfig: FormlyConfig,
-        private formlyDesignerConfig: FormlyDesignerConfig,
         private formlyDesignerService: FormlyDesignerService
     ) { }
 
@@ -102,10 +106,10 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
                 }));
 
         this.subscriptions.push(
-            Observable.merge(
+            merge(
                 this.formlyDesignerService.model$,
                 this.form.valueChanges
-            ).debounceTime(50).subscribe(() => this.modelChanged.emit(this.formlyDesignerService.model)));
+            ).pipe(debounceTime(50)).subscribe(() => this.modelChanged.emit(this.formlyDesignerService.model)));
     }
 
     ngOnDestroy(): void {
@@ -113,9 +117,13 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
     }
 
     onFieldSelected(field: FormlyFieldConfig): void {
-        Observable.timer()
-            .do(() => this.formlyDesignerService.addField(field))
-            .catch(err => Observable.never())
+        Observable.create().pipe(timer())
+            .do(() => {
+                if (this.fieldsService.checkField(field, this.formlyDesignerService.fields)) {
+                    this.formlyDesignerService.addField(field);
+                }
+            })
+            .catch(() => NEVER)
             .subscribe();
     }
 }

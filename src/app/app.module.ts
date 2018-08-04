@@ -1,8 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
-import { FormlyModule, FormlyBootstrapModule } from 'ng-formly';
+import { FormlyModule } from '@ngx-formly/core';
+import { FormlyBootstrapModule } from '@ngx-formly/bootstrap';
 
 import { FormlyDesignerModule } from './formly-designer/formly-designer.module';
 
@@ -13,6 +15,7 @@ import { AppComponent } from './app.component';
 import { ExpanderComponent } from './components/expander.component';
 import { TabComponent } from './components/tab.component';
 import { TabsetComponent } from './components/tabset/tabset.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 @NgModule({
@@ -27,11 +30,15 @@ import { TabsetComponent } from './components/tabset/tabset.component';
     imports: [
         BrowserModule,
         HttpModule,
+        FormsModule,
+        ReactiveFormsModule,
 
-        FormlyModule.forRoot(config),
         FormlyBootstrapModule,
+        FormlyModule.forRoot(config),
 
-        FormlyDesignerModule.forRoot(designerConfig)
+        FormlyDesignerModule.forRoot(designerConfig),
+
+        BrowserAnimationsModule
     ],
     providers: [],
     bootstrap: [AppComponent]

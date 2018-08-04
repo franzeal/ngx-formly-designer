@@ -1,10 +1,11 @@
 import { Component, forwardRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { FormlyFieldConfig } from 'ng-formly';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
-import { FormlyDesignerConfig } from '../formly-designer-config';
-import { Observable, Subscription } from 'rxjs/Rx';
-import { clone, cloneDeep, isObject } from 'lodash';
+import { Observable, Subscription, timer } from 'rxjs';
+import { debounceTime, switchMap } from 'rxjs/operators';
+import { clone } from '@ngx-formly/core/lib/utils';
+import { cloneDeep, isObject } from '../../../utils';
 
 
 const WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -18,7 +19,7 @@ const WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     template: `
         <form [formGroup]="fieldForm" novalidate>
             <div class="card">
-                <div class="card-block">
+                <div class="card-body">
                     <formly-form [form]="fieldForm" [fields]="fields" [model]="field">
                     </formly-form>
                     <ng-content></ng-content>
@@ -35,8 +36,7 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
 
     constructor(
         private fieldsService: FieldsService,
-        private formBuilder: FormBuilder,
-        private formlyDesignerConfig: FormlyDesignerConfig
+        private formBuilder: FormBuilder
     ) {
         this.fieldForm = formBuilder.group({});
     }
@@ -49,12 +49,12 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
     protected onChange = (value: any) => { };
     protected onTouched = () => { };
 
-    private subscriptions = new Array<Subscription>();
+    private readonly subscriptions = new Array<Subscription>();
     private valueChangesSubscription: Subscription;
 
     ngOnInit(): void {
         this.subscriptions.push(this.fieldForm.statusChanges
-            .switchMap(() => Observable.timer())
+            .pipe(switchMap(() => Observable.create().pipe(timer())))
             .subscribe(() => this.invalid = this.fieldForm.invalid));
 
         this.subscribeValueChanges();
@@ -101,15 +101,14 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
     setDisabledState(isDisabled: boolean): void {
         if (isDisabled) {
             this.fieldForm.disable();
-        }
-        else {
+        } else {
             this.fieldForm.enable();
         }
     }
 
     private subscribeValueChanges(): void {
         this.valueChangesSubscription = this.fieldForm.valueChanges
-            .debounceTime(0)
+            .pipe(debounceTime(0))
             .subscribe(() => this.updateValue());
     }
 

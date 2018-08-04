@@ -1,8 +1,6 @@
-import { AfterContentInit, Component, ElementRef, ViewContainerRef, ViewChild } from '@angular/core';
-import { FieldWrapper } from 'ng-formly';
-
-import { isString } from 'lodash';
-
+import { AfterContentInit, Component, ElementRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { FieldWrapper } from '@ngx-formly/core';
+import { isString } from '../../utils';
 
 declare var $: any;
 
@@ -10,7 +8,7 @@ declare var $: any;
     selector: 'formly-wrapper-tabset',
     template: `
         <tabset>
-            <ng-container #fieldComponent></ng-container>
+            <ng-template #fieldComponent></ng-template>
         </tabset>
     `
 })

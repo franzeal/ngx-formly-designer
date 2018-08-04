@@ -1,11 +1,8 @@
 import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { FormlyFieldConfig } from 'ng-formly';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyDesignerConfig } from '../formly-designer-config';
-import * as jquery from 'jquery';
 
-
-declare var $: JQueryStatic;
 
 @Component({
     selector: 'field-picker',
@@ -77,8 +74,8 @@ export class FieldPickerComponent implements OnInit {
         return this.form.get('type').value;
     }
 
-    private get modal(): any {
-        return $(this.modalRef.nativeElement);
+    private get $modal(): JQuery & { modal: (command: string) => void } {
+        return $(this.modalRef.nativeElement) as any;
     }
 
     ngOnInit(): void {
@@ -101,11 +98,11 @@ export class FieldPickerComponent implements OnInit {
             }
             this.fieldEdit.setValue(field);
         }
-        this.modal.modal('show');
+        this.$modal.modal('show');
     }
 
     onApply(): void {
         this.selected.emit(this.fieldEdit.value);
-        this.modal.modal('hide');
+        this.$modal.modal('hide');
     }
 }

@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, forwardRef, OnDestroy, OnInit } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormlyDesignerConfig } from '../formly-designer-config';
-import { Observable, Subscription } from 'rxjs/Rx';
+import { Observable, Subscription, timer } from 'rxjs';
 
 
 const TYPE_SELECT_CONTROL_VALUE_ACCESSOR: any = {
@@ -38,7 +38,7 @@ export class TypeSelectComponent implements AfterViewInit, ControlValueAccessor,
     private valueChangesSubscription: Subscription;
 
     ngAfterViewInit(): void {
-        Observable.timer().subscribe(() => {
+        Observable.create().pipe(timer()).subscribe(() => {
             this.types = Object.keys(this.formlyDesignerConfig.types);
             if (this.types.length > 0) {
                 this.formControl.setValue(this.types[0]);
@@ -74,8 +74,7 @@ export class TypeSelectComponent implements AfterViewInit, ControlValueAccessor,
     setDisabledState(isDisabled: boolean): void {
         if (isDisabled) {
             this.formControl.disable();
-        }
-        else {
+        } else {
             this.formControl.enable();
         }
     }

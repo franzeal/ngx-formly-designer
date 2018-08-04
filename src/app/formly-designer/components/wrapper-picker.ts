@@ -1,13 +1,10 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { FormlyFieldConfig } from 'ng-formly';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { FormlyDesignerService } from '../formly-designer.service';
-import { cloneDeep, isArray, isObject } from 'lodash';
-import * as jquery from 'jquery';
+import { cloneDeep, isArray, isObject } from '../../../utils';
 
-
-declare var $: JQueryStatic;
 
 @Component({
     selector: 'wrapper-picker',
@@ -84,8 +81,8 @@ export class WrapperPickerComponent implements OnInit {
         return this.form.get('wrapper').value;
     }
 
-    private get modal(): any {
-        return $(this.modalRef.nativeElement);
+    private get $modal(): JQuery & { modal: (command: string) => void } {
+        return $(this.modalRef.nativeElement) as any;
     }
 
     ngOnInit(): void {
@@ -99,17 +96,15 @@ export class WrapperPickerComponent implements OnInit {
             const field = cloneDeep(this.field);
             if (isArray(field.wrappers) && field.wrappers.length > 0) {
                 field.wrappers.splice(field.wrappers.length - 1, 0, this.wrapper);
-            }
-            else {
+            } else {
                 field.wrappers = [this.wrapper];
             }
             this.fieldEdit.setValue(field);
 
             const fields = this.formlyDesignerConfig.wrappers[this.wrapper].fields;
             if (isArray(fields) && fields.length > 0) {
-                this.modal.modal('show');
-            }
-            else {
+                this.$modal.modal('show');
+            } else {
                 this.onApply();
             }
         }
@@ -118,6 +113,6 @@ export class WrapperPickerComponent implements OnInit {
     onApply(): void {
         this.field = this.formlyDesignerService.convertField(this.fieldEdit.value);
         this.selected.emit(this.fieldEdit.value);
-        this.modal.modal('hide');
+        this.$modal.modal('hide');
     }
 }

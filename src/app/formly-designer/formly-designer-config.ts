@@ -1,8 +1,8 @@
-import { Injectable, Inject, OpaqueToken } from '@angular/core';
-import { FormlyConfig, FormlyFieldConfig } from 'ng-formly';
+import { Injectable, Inject, InjectionToken } from '@angular/core';
+import { FormlyConfig, FormlyFieldConfig } from '@ngx-formly/core';
 
 
-export const FORMLY_DESIGNER_CONFIG_TOKEN = new OpaqueToken('FORMLY_DESIGNER_CONFIG_TOKEN');
+export const FORMLY_DESIGNER_CONFIG_TOKEN = new InjectionToken<string>('FORMLY_DESIGNER_CONFIG_TOKEN');
 
 @Injectable()
 export class FormlyDesignerConfig {

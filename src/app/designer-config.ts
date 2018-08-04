@@ -1,4 +1,4 @@
-import { DesignerConfigOption } from './formly-designer/formly-designer-config';
+import { DesignerConfigOption } from 'ngx-formly-designer';
 
 export const designerConfig: DesignerConfigOption = {
     types: [
@@ -63,7 +63,8 @@ export const designerConfig: DesignerConfigOption = {
                     type: 'checkbox',
                     templateOptions: {
                         label: 'required'
-                    }
+                    },
+                    defaultValue: false
                 }
             ]
         },
@@ -134,7 +135,8 @@ export const designerConfig: DesignerConfigOption = {
                     type: 'checkbox',
                     templateOptions: {
                         label: 'required'
-                    }
+                    },
+                    defaultValue: false
                 }
             ]
         },

@@ -1,6 +1,5 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 
-
 @Component({
     selector: 'expander',
     template: `
@@ -30,6 +29,7 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
         }
         .content {
             display: none;
+            padding-bottom: 1em;
         }
         .content.expanded {
             display: block;
@@ -37,14 +37,6 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
     `]
 })
 export class ExpanderComponent implements OnChanges, OnInit {
-    @Input() heading: string;
-    @Input() expanded: boolean;
-
-    title: string;
-    iconClass: any;
-
-    private _showContent: boolean;
-
     private static expandedState = {
         title: 'Select to collapse',
         iconClass: ['fa', 'fa-chevron-up']
@@ -54,6 +46,14 @@ export class ExpanderComponent implements OnChanges, OnInit {
         title: 'Select to expand',
         iconClass: ['fa', 'fa-chevron-down']
     };
+
+    @Input() heading: string;
+    @Input() expanded: boolean;
+
+    title: string;
+    iconClass: any;
+
+    private _showContent: boolean;
 
     get showContent(): boolean {
         return this._showContent;
@@ -69,7 +69,7 @@ export class ExpanderComponent implements OnChanges, OnInit {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['expanded']) {
+        if (changes.expanded) {
             this.showContent = this.expanded;
         }
     }

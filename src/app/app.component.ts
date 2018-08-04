@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormlyFieldConfig } from 'ng-formly';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 
 
 @Component({

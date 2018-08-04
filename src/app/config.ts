@@ -1,17 +1,13 @@
-import { Component } from '@angular/core';
-import { ConfigOption, FormlyFieldMultiCheckbox, FormlyFieldSelect } from 'ng-formly';
+import { ConfigOption } from '@ngx-formly/core';
+import { FormlyFieldMultiCheckbox, FormlyFieldSelect } from '@ngx-formly/bootstrap';
 import { FormlyFieldCustomInputComponent } from './types/custom-input';
 import { FormlyFieldRepeatSectionComponent } from './types/repeat-section';
 import { FormlyWrapperExpanderComponent } from './wrappers/expander';
-import { FormlyWrapperTabComponent } from './wrappers/tab';
-import { FormlyWrapperTabsetComponent } from './wrappers/tabset';
 
-export const fieldComponents: Component[] = [
+export const fieldComponents = [
     FormlyFieldCustomInputComponent,
     FormlyFieldRepeatSectionComponent,
-    FormlyWrapperExpanderComponent,
-    FormlyWrapperTabComponent,
-    FormlyWrapperTabsetComponent
+    FormlyWrapperExpanderComponent
 ];
 
 export const config: ConfigOption = {
@@ -35,8 +31,6 @@ export const config: ConfigOption = {
         }
     ],
     wrappers: [
-        { name: 'expander', component: FormlyWrapperExpanderComponent },
-        { name: 'tab', component: FormlyWrapperTabComponent },
-        { name: 'tabset', component: FormlyWrapperTabsetComponent }
+        { name: 'expander', component: FormlyWrapperExpanderComponent }
     ]
 };

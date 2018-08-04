@@ -1,24 +1,23 @@
-import { cloneDeep, isArray, isObject, isNil, isUndefined } from 'lodash-es';
+import { cloneDeep, isArray, isNil, isObject } from '../../utils';
 
 export function decycle<T>(value: T): T {
     if (isNil(value)) {
         return value;
     }
 
-    let nextId = 1;
+    // let nextId = 1;
     const objects = new Map<any, number>();
-    return traverse(cloneDeep(value), (key, value) => {
-        if (isObject(value)) {
-            if (objects.has(value)) {
-                let id = objects.get(value);
+    return traverse(cloneDeep(value), (key, val) => {
+        if (isObject(val)) {
+            if (objects.has(val)) {
+                const id = objects.get(val);
                 if (!id) {
-                    value.$id = id = nextId++;
-                    objects.set(value, id);
+
+                    objects.set(val, id);
                 }
                 return { $ref: id };
-            }
-            else {
-                objects.set(value, 0);
+            } else {
+                objects.set(val, 0);
             }
         }
     });
@@ -29,8 +28,7 @@ function traverse<T>(obj: T, replace: (key, value) => any): T {
         for (let i = 0; i < obj.length; i++) {
             traverseValue.bind(obj, i, obj[i], replace)();
         }
-    }
-    else if (isObject(obj)) {
+    } else if (isObject(obj)) {
         for (const key in obj) {
             if (obj.hasOwnProperty(key)) {
                 traverseValue.bind(obj, key, obj[key], replace)();
@@ -42,10 +40,9 @@ function traverse<T>(obj: T, replace: (key, value) => any): T {
 
 function traverseValue(key: any, value: any, replace: (key, value) => any): void {
     const replacement = replace(key, value);
-    if (isUndefined(replacement)) {
+    if (replacement === undefined) {
         traverse(value, replace);
-    }
-    else {
+    } else {
         this[key] = replacement;
     }
 }

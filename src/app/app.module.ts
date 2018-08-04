@@ -15,6 +15,7 @@ import { AppComponent } from './app.component';
 import { ExpanderComponent } from './components/expander.component';
 import { TabComponent } from './components/tab.component';
 import { TabsetComponent } from './components/tabset/tabset.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 @NgModule({
@@ -35,7 +36,9 @@ import { TabsetComponent } from './components/tabset/tabset.component';
         FormlyBootstrapModule,
         FormlyModule.forRoot(config),
 
-        FormlyDesignerModule.forRoot(designerConfig)
+        FormlyDesignerModule.forRoot(designerConfig),
+
+        BrowserAnimationsModule
     ],
     providers: [],
     bootstrap: [AppComponent]

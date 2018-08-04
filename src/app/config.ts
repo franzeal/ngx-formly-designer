@@ -1,4 +1,3 @@
-import { Component } from '@angular/core';
 import { ConfigOption } from '@ngx-formly/core';
 import { FormlyFieldMultiCheckbox, FormlyFieldSelect } from '@ngx-formly/bootstrap';
 import { FormlyFieldCustomInputComponent } from './types/custom-input';

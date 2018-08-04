@@ -1,5 +1,6 @@
 import { ConfigOption } from '@ngx-formly/core';
 import { FormlyFieldMultiCheckbox, FormlyFieldSelect } from '@ngx-formly/bootstrap';
+
 import { FormlyFieldCustomInputComponent } from './types/custom-input';
 import { FormlyFieldRepeatSectionComponent } from './types/repeat-section';
 import { FormlyWrapperExpanderComponent } from './wrappers/expander';

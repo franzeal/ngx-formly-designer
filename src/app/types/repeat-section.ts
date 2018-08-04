@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { FieldType, FormlyFieldConfig } from '@ngx-formly/core';
 
-import { clone, cloneDeep, isArray, isFunction, isUndefined } from 'lodash-es';
+import { cloneDeep, isArray, isFunction } from 'ngx-formly-designer';
 
 @Component({
     selector: 'formly-field-repeat-section',
@@ -13,7 +13,7 @@ import { clone, cloneDeep, isArray, isFunction, isUndefined } from 'lodash-es';
             </button>
         </div>
         <div class="body" [ngClass]="{interactive: canAdd()}">
-            <div class="section flex-container" *ngFor="let control of formArray.controls; let i=index"
+            <div class="section flex-container" *ngFor="let control of formArray.controls; index as i"
                 [ngClass]="{interactive: canRemove(i)}">
                 <button type="button" class="remove-btn btn btn-sm btn-danger" (click)="remove(i)" *ngIf="canRemove(i)">
                     <i class="fa fa-times" aria-hidden="true"></i>
@@ -63,7 +63,7 @@ export class FormlyFieldRepeatSectionComponent extends FieldType implements OnIn
     }
 
     get newOptions(): any {
-        return clone(this.options);
+        return Object.assign({}, this.options);
     }
 
     ngOnInit(): void {
@@ -90,7 +90,7 @@ export class FormlyFieldRepeatSectionComponent extends FieldType implements OnIn
 
     canAdd(): boolean {
         const canAdd = this.to['canAdd'] as Function | boolean;
-        return isUndefined(canAdd) || (isFunction(canAdd) ? canAdd.apply(this) : canAdd) === true;
+        return canAdd === undefined || (isFunction(canAdd) ? (canAdd as Function).apply(this) : canAdd) === true;
     }
 
     canRemove(index: number): boolean {
@@ -104,7 +104,7 @@ export class FormlyFieldRepeatSectionComponent extends FieldType implements OnIn
             return false;
         }
 
-        return !isFunction(canRemove) || canRemove.apply(this, [index]) === true;
+        return !isFunction(canRemove) || (canRemove as Function).apply(this, [index]) === true;
     }
 
     add(): void {

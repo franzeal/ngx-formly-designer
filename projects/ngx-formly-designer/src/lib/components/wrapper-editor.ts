@@ -32,7 +32,7 @@ const WRAPPER_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, OnDestroy, OnInit {
     @Input() wrapper: string;
 
-    private readonly subscriptions = new Array<Subscription>();
+    private readonly subscriptions: Subscription[] = [];
     private valueChangesSubscription: Subscription;
 
     constructor(
@@ -45,7 +45,7 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
     invalid: boolean;
     fieldForm: FormGroup;
     field: FormlyFieldConfig;
-    fields = new Array<FormlyFieldConfig>();
+    fields: FormlyFieldConfig[] = [];
 
     protected onChange = (value: any) => { };
     protected onTouched = () => { };

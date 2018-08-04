@@ -103,7 +103,7 @@ export class FormlyDesignerService {
     }
 
     private createPrunedFields(fields: FormlyFieldConfig[]): FormlyFieldConfig[] {
-        const prunedFields = new Array<FormlyFieldConfig>();
+        const prunedFields: FormlyFieldConfig[] = [];
         if (isArray(fields)) {
             fields.forEach(field => {
                 const pruned = this.createPrunedField(field);

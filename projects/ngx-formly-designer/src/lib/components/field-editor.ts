@@ -71,7 +71,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     @Input() hasContent: boolean;
     @ViewChild('block') blockElRef: ElementRef;
 
-    private readonly subscriptions = new Array<Subscription>();
+    private readonly subscriptions: Subscription[] = [];
     private valueChangesSubscription: Subscription;
 
     constructor(
@@ -103,7 +103,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     form: FormGroup;
     fieldForm: FormGroup;
     field: FormlyFieldConfig = {};
-    fields = new Array<FormlyFieldConfig>();
+    fields: FormlyFieldConfig[] = [];
     fieldArray: boolean;
     protected onChange = (value: any) => { };
     protected onTouched = () => { };

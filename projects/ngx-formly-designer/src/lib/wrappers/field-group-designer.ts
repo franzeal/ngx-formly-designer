@@ -111,8 +111,8 @@ export class FormlyDesignerFieldGroupWrapperComponent extends FieldWrapper
     type: string;
     editing = false;
     fieldEdit = new FormControl({});
-    fieldWrappers = new Array<string>();
-    wrappers = new Array<string>();
+    fieldWrappers: string[] = [];
+    wrappers: string[] = [];
 
     constructor(
         private changeDetector: ChangeDetectorRef,

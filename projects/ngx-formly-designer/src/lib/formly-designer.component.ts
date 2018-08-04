@@ -41,15 +41,15 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
     @Output() fieldsChanged = new EventEmitter<FormlyFieldConfig[]>();
     @Output() modelChanged = new EventEmitter<any>();
 
-    types = new Array<string>();
-    wrappers = new Array<string>();
-    properties = new Array<string>();
-    debugFields = new Array<FormlyFieldConfig>();
+    types: string[] = [];
+    wrappers: string[] = [];
+    properties: string[] = [];
+    debugFields: FormlyFieldConfig[] = [];
 
     form: FormGroup;
     options: any = {};
 
-    private readonly subscriptions = new Array<Subscription>();
+    private readonly subscriptions: Subscription[] = [];
 
     constructor(
         private fieldsService: FieldsService,

@@ -10,7 +10,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 export class AppComponent {
     fields: FormlyFieldConfig[] = [];
     model: any = {};
-    designerFields = new Array<FormlyFieldConfig>();
+    designerFields: FormlyFieldConfig[] = [];
     designerModel: any;
 
     onFieldsChanged(fields: FormlyFieldConfig[]): void {

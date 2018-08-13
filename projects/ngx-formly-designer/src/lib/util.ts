@@ -1,5 +1,7 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
+export { cloneDeep } from 'lodash-es';
+
 // Source: https://github.com/formly-js/ngx-formly/blob/master/src/core/src/lib/utils.ts
 export function getKeyPath(field: { key?: string | string[] }): (string | number)[] {
     /* We store the keyPath in the field for performance reasons. This function will be called frequently. */
@@ -52,19 +54,19 @@ export function traverseFields(fields: FormlyFieldConfig[], callback: (field: Fo
 // import { cloneDeep, get, isArray, isEmpty, isNil, isString, set, unset } from 'lodash-es';
 
 // https://stackoverflow.com/a/40294058
-export const cloneDeep = (obj, hash = new WeakMap()): typeof obj => {
-  if (Object(obj) !== obj) return obj; // primitives
-  if (hash.has(obj)) return hash.get(obj); // cyclic reference
-  const result = obj instanceof Date ? new Date(obj)
-    : obj instanceof RegExp ? new RegExp(obj.source, obj.flags)
-      : obj.constructor ? new obj.constructor()
-        : Object.create(null);
-  hash.set(obj, result);
-  if (obj instanceof Map)
-    Array.from(obj, ([key, val]) => result.set(key, cloneDeep(val, hash)));
-  return Object.assign(result, ...Object.keys(obj).map(
-    key => ({ [key]: cloneDeep(obj[key], hash) })));
-};
+// export const cloneDeep = (obj, hash = new WeakMap()): typeof obj => {
+//   if (Object(obj) !== obj) return obj; // primitives
+//   if (hash.has(obj)) return hash.get(obj); // cyclic reference
+//   const result = obj instanceof Date ? new Date(obj)
+//     : obj instanceof RegExp ? new RegExp(obj.source, obj.flags)
+//       : obj.constructor ? new obj.constructor()
+//         : Object.create(null);
+//   hash.set(obj, result);
+//   if (obj instanceof Map)
+//     Array.from(obj, ([key, val]) => result.set(key, cloneDeep(val, hash)));
+//   return Object.assign(result, ...Object.keys(obj).map(
+//     key => ({ [key]: cloneDeep(obj[key], hash) })));
+// };
 
 export const isArray = Array.isArray;
 

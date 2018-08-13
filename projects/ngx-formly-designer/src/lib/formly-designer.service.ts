@@ -9,6 +9,9 @@ import { cloneDeep, isArray, isEmpty, isString } from './util';
 
 @Injectable()
 export class FormlyDesignerService {
+    // Todo: move into the designer config so that it's configurable
+    private readonly reserved = new Set(['label', 'fieldset', 'description', 'validation-message']);
+
     constructor(
         private designerConfig: FormlyDesignerConfig,
         private fieldsService: FieldsService,
@@ -86,6 +89,7 @@ export class FormlyDesignerService {
                 this.unsetField(original);
                 this.removeControl(original.formControl);
             }
+
             this.fields = cloneDeep(this.fields);
             this.model = cloneDeep(this.model);
         }
@@ -122,16 +126,23 @@ export class FormlyDesignerService {
     }
 
     getWrappers(field: FormlyFieldConfig): string[] {
-        if (!field || !isString(field.type) || !isArray(field.wrappers)) {
+        if (!field || !isArray(field.wrappers)) {
             return [];
         }
-        const formlyType = this.formlyConfig.getType(field.type);
-        const typeWrappers = (formlyType.wrappers || [])
-            .concat(this.formlyConfig.templateManipulators.preWrapper.map(m => m(field)))
-            .concat(this.formlyConfig.templateManipulators.postWrapper.map(m => m(field)))
+
+        const clonedField = cloneDeep(field);
+
+        // Todo: make reserved wrappers part of the designer config
+        const wrappers = clonedField.wrappers = (clonedField.wrappers || []).filter(w => !this.reserved.has(w));
+
+        // Determine those part of the formly configuration (static and dynamic) to exclude them from the result
+        const staticWrappers = isString(field.type) ? this.formlyConfig.getType(field.type).wrappers || [] : [];
+        const typeWrappers = staticWrappers
+            .concat(this.formlyConfig.templateManipulators.preWrapper.map(m => m(clonedField)))
+            .concat(this.formlyConfig.templateManipulators.postWrapper.map(m => m(clonedField)))
             .filter(w => w);
 
-        const wrappers = field.wrappers.slice();
+        // Remove wrappers part of the formly configuration from the result
         if (typeWrappers.length > 0) {
             for (let i = wrappers.length - 1; i >= 0; i--) {
                 for (let j = typeWrappers.length - 1; j >= 0; j--) {

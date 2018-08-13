@@ -9,4 +9,3 @@ export * from './lib/formly-designer.service';
 export * from './lib/formly-designer.component';
 export * from './lib/formly-designer.module';
 export * from './lib/json-helper';
-export * from './lib/util';

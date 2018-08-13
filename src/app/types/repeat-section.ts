@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { FieldType, FormlyFieldConfig } from '@ngx-formly/core';
 
-import { cloneDeep, isArray, isFunction } from 'ngx-formly-designer';
+import { cloneDeep, isArray, isFunction } from 'lodash-es';
 
 @Component({
     selector: 'formly-field-repeat-section',

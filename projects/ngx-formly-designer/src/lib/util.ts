@@ -97,9 +97,6 @@ export const isEmpty = (val: any): boolean => {
   return false;
 };
 
-export const isNil = (val: any): boolean => val == null;
-
 export const isString = (val: any): boolean => typeof val === 'string' || val instanceof String;
 
-export const isObject = (val: any): boolean => typeof val === 'object' && !isNil(val);
-export const isFunction = (val: any): boolean => typeof val === 'function';
+export const isObject = (val: any): boolean => typeof val === 'object' && val != null;

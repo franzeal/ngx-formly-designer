@@ -1,6 +1,6 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
-export { cloneDeep } from 'lodash-es';
+export { cloneDeep, get, set, unset } from 'lodash-es';
 
 // Source: https://github.com/formly-js/ngx-formly/blob/master/src/core/src/lib/utils.ts
 export function getKeyPath(field: { key?: string | string[] }): (string | number)[] {
@@ -51,8 +51,6 @@ export function traverseFields(fields: FormlyFieldConfig[], callback: (field: Fo
     return true;
 }
 
-// import { cloneDeep, get, isArray, isEmpty, isNil, isString, set, unset } from 'lodash-es';
-
 // https://stackoverflow.com/a/40294058
 // export const cloneDeep = (obj, hash = new WeakMap()): typeof obj => {
 //   if (Object(obj) !== obj) return obj; // primitives
@@ -97,6 +95,8 @@ export const isEmpty = (val: any): boolean => {
   return false;
 };
 
-export const isString = (val: any): boolean => typeof val === 'string' || val instanceof String;
+export const isFunction = (val: any): boolean => typeof val === 'function';
 
 export const isObject = (val: any): boolean => typeof val === 'object' && val != null;
+
+export const isString = (val: any): boolean => typeof val === 'string' || val instanceof String;

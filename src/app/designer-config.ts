@@ -1,6 +1,15 @@
 import { DesignerConfigOption } from 'ngx-formly-designer';
 
+const reserved = new Set(['label', 'fieldset', 'description', 'validation-message']);
+
+export function formlyBootstrapfilterWrapper(wrapper: string) {
+    return reserved.has(wrapper);
+}
+
 export const designerConfig: DesignerConfigOption = {
+    settings: {
+        filterWrapper: formlyBootstrapfilterWrapper
+    },
     types: [
         {
             name: 'input',

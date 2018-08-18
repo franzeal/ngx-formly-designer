@@ -85,6 +85,7 @@ export interface DesignerTypeOption extends DesignerOption {
 
 export interface DesignerSettings {
     showClassName?: boolean;
+    filterWrapper?: (wrapper: string, field: FormlyFieldConfig) => boolean;
 }
 
 export interface DesignerConfigOption {

@@ -4,14 +4,10 @@ import { FieldsService } from './fields.service';
 import { FormlyConfig, FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyDesignerConfig } from './formly-designer-config';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { get, set, unset } from 'lodash-es';
-import { cloneDeep, isArray, isEmpty, isString } from './util';
+import { cloneDeep, get, isArray, isEmpty, isFunction, isString, set, unset } from './util';
 
 @Injectable()
 export class FormlyDesignerService {
-    // Todo: move into the designer config so that it's configurable
-    private readonly reserved = new Set(['label', 'fieldset', 'description', 'validation-message']);
-
     constructor(
         private designerConfig: FormlyDesignerConfig,
         private fieldsService: FieldsService,
@@ -131,9 +127,10 @@ export class FormlyDesignerService {
         }
 
         const clonedField = cloneDeep(field);
-
-        // Todo: make reserved wrappers part of the designer config
-        const wrappers = clonedField.wrappers = (clonedField.wrappers || []).filter(w => !this.reserved.has(w));
+        let wrappers = clonedField.wrappers = (clonedField.wrappers || []);
+        if (isFunction(this.designerConfig.settings.filterWrapper)) {
+            wrappers = wrappers.filter(w => this.designerConfig.settings.filterWrapper(w, clonedField));
+        }
 
         // Determine those part of the formly configuration (static and dynamic) to exclude them from the result
         const staticWrappers = isString(field.type) ? this.formlyConfig.getType(field.type).wrappers || [] : [];

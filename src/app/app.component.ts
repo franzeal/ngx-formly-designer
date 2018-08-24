@@ -13,11 +13,11 @@ export class AppComponent {
     designerFields: FormlyFieldConfig[] = [];
     designerModel: any;
 
-    onFieldsChanged(fields: FormlyFieldConfig[]): void {
+    onFieldsChange(fields: FormlyFieldConfig[]): void {
         this.designerFields = fields;
     }
 
-    onModelChanged(model: any): void {
+    onModelChange(model: any): void {
         this.designerModel = model;
     }
 }

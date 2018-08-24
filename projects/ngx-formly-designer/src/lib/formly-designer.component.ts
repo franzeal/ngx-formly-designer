@@ -38,8 +38,8 @@ import { catchError, debounceTime, tap } from 'rxjs/operators';
 })
 export class FormlyDesignerComponent implements OnDestroy, OnInit {
     @ViewChild('formlyFormContainer', { read: ViewContainerRef }) formlyFormContainer;
-    @Output() fieldsChanged = new EventEmitter<FormlyFieldConfig[]>();
-    @Output() modelChanged = new EventEmitter<any>();
+    @Output() fieldsChange = new EventEmitter<FormlyFieldConfig[]>();
+    @Output() modelChange = new EventEmitter<any>();
 
     types: string[] = [];
     wrappers: string[] = [];
@@ -100,7 +100,7 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
         this.subscriptions.push(this.formlyDesignerService.fields$
             .subscribe(() => {
                 this.form = this.formBuilder.group({});
-                this.fieldsChanged.emit(this.formlyDesignerService.createDesignerFields());
+                this.fieldsChange.emit(this.formlyDesignerService.createDesignerFields());
             }));
 
         this.subscriptions.push(merge(
@@ -108,7 +108,7 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
             this.form.valueChanges
         )
             .pipe(debounceTime(50))
-            .subscribe(() => this.modelChanged.emit(this.formlyDesignerService.model)));
+            .subscribe(() => this.modelChange.emit(this.formlyDesignerService.model)));
     }
 
     ngOnDestroy(): void {

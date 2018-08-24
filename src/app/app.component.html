@@ -1,7 +1,7 @@
 <div class="row" style="margin:2em">
     <div class="col-sm-12 col-md-8 col-lg-6">
         <formly-designer [model]="model" [fields]="fields" class="container-fluid"
-            (modelChanged)="onModelChanged($event)" (fieldsChanged)="onFieldsChanged($event)">
+            (modelChange)="onModelChange($event)" (fieldsChange)="onFieldsChange($event)">
         </formly-designer>
         <div>
             Fields:

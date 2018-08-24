@@ -1,27 +1,107 @@
-# NgxFormlyDesignerApp
+# ngx-formly-designer
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.7.
+A formly form to design [Ngx Formly](https://formly-js.github.io/ngx-formly/) forms.
 
-## Development server
+The current version is basic and intended for use with bootstrap.  Feel welcome to issue feature requests or submit PRs.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Quick Start
 
-## Code scaffolding
+Follow these steps to get started with Ngx Formly Designer. Also check out the [demo](https://franzeal.github.io/ngx-formly-designer) for an example.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+#### 1. Install the ngx-formly-designer package:
+```bash
+  npm install ngx-formly-designer --save
+```
 
-## Build
+#### 2. Define the designer config:
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+```typescript
+import {DesignerConfigOption} from 'ngx-formly-designer';
 
-## Running unit tests
+export const designerConfig: DesignerConfigOption = {
+  types: [
+    {
+      name: 'checkbox',
+      fields: [
+        {
+          key: 'templateOptions.label',
+          type: 'input',
+          templateOptions: {
+            label: 'label'
+          }
+        },
+        {
+          key: 'defaultValue',
+          type: 'checkbox',
+          templateOptions: {
+            label: 'default value'
+          }
+        }
+      ]
+    },
+    ...
+  ],
+  wrappers: [
+    {
+      name: 'expander',
+      fields: [
+        {
+          key: 'templateOptions.label',
+          type: 'input',
+          templateOptions: {
+            label: 'label'
+          }
+        },
+        {
+          key: 'templateOptions.expanded',
+          type: 'checkbox',
+          templateOptions: {
+            label: 'expanded'
+          },
+          defaultValue: true
+        }
+      ]
+    },
+    ...
+  ]
+};
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+#### 3. Import the `FormlyDesignerModule`:
 
-## Running end-to-end tests
+```typescript
+import {NgModule} from '@angular/core';
+import {ReactiveFormsModule} from '@angular/forms';
+import {FormlyModule} from '@ngx-formly/core';
+import {FormlyBootstrapModule} from '@ngx-formly/bootstrap';
+import {designerConfig} from './designer-config';
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+@NgModule({
+  imports: [
+    ...,
+    ReactiveFormsModule,
+    FormlyModule.forRoot(),
+    FormlyBootstrapModule,
+    FormlyDesignerModule.forRoot(designerConfig)
+  ],
+})
+export class AppModule {}
+```
 
-## Further help
+#### 4. Use the formly-designer within your component:
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+```typescript
+import {Component} from '@angular/core';
+import {FormlyFieldConfig} from '@ngx-formly/core';
+
+@Component({
+  selector: 'app',
+  template: `
+    <formly-designer [(fields)]="fields">
+    </formly-designer>
+  `,
+})
+export class AppComponent {
+    fields: FormlyFieldConfig[] = [];
+}
+```

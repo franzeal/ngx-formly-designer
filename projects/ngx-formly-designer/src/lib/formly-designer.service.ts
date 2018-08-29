@@ -132,8 +132,8 @@ export class FormlyDesignerService {
             wrappers = wrappers.filter(w => this.designerConfig.settings.filterWrapper(w, clonedField));
         }
 
-        // Determine those part of the formly configuration (static and dynamic) to exclude them from the result
-        const staticWrappers = isString(field.type) ? this.formlyConfig.getType(field.type).wrappers || [] : [];
+        // Determine wrappers part of the formly configuration (static and dynamic) to exclude them from the result
+        const staticWrappers = field.type ? this.formlyConfig.getType(field.type).wrappers || [] : [];
         const typeWrappers = staticWrappers
             .concat(this.formlyConfig.templateManipulators.preWrapper.map(m => m(clonedField)))
             .concat(this.formlyConfig.templateManipulators.postWrapper.map(m => m(clonedField)))

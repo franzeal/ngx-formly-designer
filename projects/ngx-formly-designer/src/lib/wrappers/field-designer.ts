@@ -1,13 +1,5 @@
-import {
-  AfterContentChecked,
-  AfterContentInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  OnInit,
-  ViewChild,
-  ViewContainerRef
-} from '@angular/core';
+import { AfterContentChecked, AfterContentInit, ChangeDetectorRef, Component, ElementRef,
+    NgZone, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FieldWrapper } from '@ngx-formly/core';
 import { FieldsService } from '../fields.service';
@@ -127,7 +119,8 @@ export class FormlyDesignerFieldWrapperComponent extends FieldWrapper
         private designerConfig: FormlyDesignerConfig,
         private elementRef: ElementRef,
         private fieldsService: FieldsService,
-        private formlyDesignerService: FormlyDesignerService
+        private formlyDesignerService: FormlyDesignerService,
+        private zone: NgZone
     ) {
         super();
     }
@@ -139,11 +132,11 @@ export class FormlyDesignerFieldWrapperComponent extends FieldWrapper
     }
 
     ngAfterContentInit(): void {
-        this.checkDesigner();
+        this.zone.runOutsideAngular(() => setTimeout(() => this.checkDesigner()));
     }
 
     ngAfterContentChecked(): void {
-        this.checkDesigner();
+        this.zone.runOutsideAngular(() => setTimeout(() => this.checkDesigner()));
     }
 
     get disabled(): boolean {
@@ -194,14 +187,18 @@ export class FormlyDesignerFieldWrapperComponent extends FieldWrapper
     }
 
     private checkDesigner(): void {
-        const element = $(this.elementRef.nativeElement) as JQuery;
-        const designerEmpty = element.find('formly-designer-wrapper').length === 0;
-        if (designerEmpty !== element.hasClass('designerEmpty')) {
+        const element = this.elementRef.nativeElement as HTMLElement;
+        if (element.parentNode == null) {
+            return;
+        }
+
+        const designerEmpty = element.querySelector('formly-designer-wrapper') == null;
+        if (designerEmpty !== element.classList.contains('designerEmpty')) {
             this.changeDetector.detectChanges();
             if (designerEmpty) {
-                element.addClass('designerEmpty');
+                element.classList.add('designerEmpty');
             } else {
-                element.removeClass('designerEmpty');
+                element.classList.remove('designerEmpty');
             }
         }
     }

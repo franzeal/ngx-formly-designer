@@ -89,12 +89,6 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
     ngOnInit(): void {
         // Designer forms will be restricted to a single field depth; all designer keys should be
         // complex (e.g. "templateOptions.some.property")
-
-        // Wrappers for each type of field (group, array, control); depending on the field type, would apply one or more wrappers;
-        // e.g. group then control, array then control, or just control; the control wrapper will expose the field editor.  The group
-        // wrapper would expose a group editor, and the array wrapper would expose an array editor.
-
-        // The designer should be able to produce complex forms once wrappers for group and array types are present.
         this.form = this.formBuilder.group({});
 
         this.subscriptions.push(this.formlyDesignerService.fields$

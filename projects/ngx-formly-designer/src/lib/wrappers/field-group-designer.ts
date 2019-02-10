@@ -192,7 +192,8 @@ export class FormlyDesignerFieldGroupWrapperComponent extends FieldWrapper
     }
 
     onFieldSelected(field: FormlyFieldConfig): void {
-        if (isArray(this.field.fieldGroup) && !this.fieldsService.checkField(field, this.formlyDesignerService.fields)) {
+        if (isArray(this.field.fieldGroup) &&
+            !this.fieldsService.checkField(field, this.formlyDesignerService.fields, this.field)) {
             return;
         }
 

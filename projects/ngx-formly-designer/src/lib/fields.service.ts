@@ -9,6 +9,24 @@ export class FieldsService {
         private formlyDesignerConfig: FormlyDesignerConfig
     ) { }
 
+    getFullKeyPath(field: FormlyFieldConfig, fields: FormlyFieldConfig[]): (string | number)[] {
+        let keyPath = [];
+        if (field && field.key) {
+            const parents = new Map<FormlyFieldConfig, FormlyFieldConfig>();
+            traverseFields(fields, (f, path, parent) => {
+                parents.set(f, parent);
+            });
+
+            keyPath = getKeyPath(field);
+            let cur = parents.get(field);
+            while (cur) {
+                keyPath = getKeyPath(cur).concat(keyPath);
+                cur = parents.get(cur);
+            }
+        }
+        return keyPath;
+    }
+
     getTypeFields(type: string): FormlyFieldConfig[] {
         return this.getFields(type, 'type');
     }
@@ -18,21 +36,22 @@ export class FieldsService {
     }
 
     /** Check the field for control type conflict */
-    checkField(field: FormlyFieldConfig, fields: FormlyFieldConfig[]): boolean {
+    checkField(field: FormlyFieldConfig, fields: FormlyFieldConfig[], parent?: FormlyFieldConfig): boolean {
         const fullPathByField = new Map<FormlyFieldConfig, (string | number)[]>();
-        const newPath = getKeyPath(field);
+
+        const newPath = this.getFullKeyPath(parent || {}, fields).concat(getKeyPath(field));
         const length = newPath.length;
-        return traverseFields(fields, (f, p) => {
+        return !traverseFields(fields, (f, p) => {
             const path = fullPathByField.get(f) || fullPathByField.set(f, (p || []).concat(getKeyPath(f))).get(f);
             if (path.length !== length) {
-                return true;
+                return;
             }
             for (let i = 0; i < length; i++) {
                 if (path[i] !== newPath[i]) {
-                    return true;
+                    return;
                 }
             }
-            return equalType(field, f);
+            return !equalType(field, f);
         });
     }
 

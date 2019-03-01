@@ -1,6 +1,14 @@
 {
   "name": "ngx-formly-designer",
-  "version": "0.0.2",
+  "version": "0.0.3",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/franzeal/ngx-formly-designer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/franzeal/ngx-formly-designer/issues"
+  },
+  "homepage": "https://github.com/franzeal/ngx-formly-designer#readme",
   "peerDependencies": {
     "@angular/common": "^6.0.0",
     "@angular/core": "^6.0.0",

@@ -1251,9 +1251,7 @@ var FormlyDesignerFieldWrapperComponent = /** @class */ (function (_super) {
     function () {
         this.editing = true;
         this.formlyDesignerService.disabled = true;
-        /** @type {?} */
-        var editFields = this.formlyDesignerService.convertField(Object(lodash_es__WEBPACK_IMPORTED_MODULE_0__["cloneDeep"])(this.field));
-        this.fieldEdit.setValue(editFields);
+        this.fieldEdit.setValue(this.formlyDesignerService.convertField(Object(lodash_es__WEBPACK_IMPORTED_MODULE_0__["cloneDeep"])(this.field)));
     };
     /**
      * @return {?}
@@ -3691,7 +3689,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _angular_forms__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/forms */ "./node_modules/@angular/forms/fesm5/forms.js");
 /* harmony import */ var _ngx_formly_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ngx-formly/core */ "./node_modules/@ngx-formly/core/fesm5/ngx-formly-core.js");
-/* harmony import */ var lodash_es__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash-es */ "./node_modules/lodash-es/lodash.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -3711,44 +3708,46 @@ var __decorate = (undefined && undefined.__decorate) || function (decorators, ta
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 
 
 
 var FormlyFieldRepeatSectionComponent = /** @class */ (function (_super) {
     __extends(FormlyFieldRepeatSectionComponent, _super);
-    function FormlyFieldRepeatSectionComponent() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this._fields = [];
+    function FormlyFieldRepeatSectionComponent(formlyFormBuilder) {
+        var _this = _super.call(this, formlyFormBuilder) || this;
+        _this.formlyFormBuilder = formlyFormBuilder;
         return _this;
     }
+    /**
+     * Necessary because FormlyFormBuilder doesn't seem to handle
+     * FieldArray types correctly if the key contains periods.
+     * For v5, will need to use the prePopulate hook insetead of createControl.
+     * */
     FormlyFieldRepeatSectionComponent.createControl = function (model, field) {
-        return new _angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormArray"]([], field.validators ? field.validators.validation : undefined, field.asyncValidators ? field.asyncValidators.validation : undefined);
+        return new _angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormArray"]([]);
     };
-    Object.defineProperty(FormlyFieldRepeatSectionComponent.prototype, "formArray", {
+    Object.defineProperty(FormlyFieldRepeatSectionComponent.prototype, "fieldArrayClassName", {
         get: function () {
-            return this.formControl;
+            return this.field.fieldArray.className;
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(FormlyFieldRepeatSectionComponent.prototype, "newOptions", {
-        get: function () {
-            return Object.assign({}, this.options);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    FormlyFieldRepeatSectionComponent.prototype.fields = function (index) {
-        if (this._fields[index]) {
-            return this._fields[index];
+    FormlyFieldRepeatSectionComponent.prototype.ngOnInit = function () {
+        // Make sure the form array reflects the model; see comment above
+        var form = new _angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormArray"]([]);
+        for (var i = 0; i < this.model.length; i++) {
+            this.formlyFormBuilder.buildForm(form, [this.field.fieldGroup[i]], this.model, this.options);
+            this.formControl.insert(i, form.at(0));
         }
-        this._fields.splice(index, 0, Object(lodash_es__WEBPACK_IMPORTED_MODULE_3__["cloneDeep"])(this.field.fieldArray.fieldGroup));
-        return this._fields[index];
+        this.options.resetTrackModelChanges();
     };
     FormlyFieldRepeatSectionComponent.prototype.canAdd = function () {
         var canAdd = this.to['canAdd'];
-        return canAdd === undefined || (Object(lodash_es__WEBPACK_IMPORTED_MODULE_3__["isFunction"])(canAdd) ? canAdd.apply(this) : canAdd) === true;
+        return canAdd == null || (typeof canAdd === 'function' ? canAdd.apply(this) : canAdd) === true;
     };
     FormlyFieldRepeatSectionComponent.prototype.canRemove = function (index) {
         var canRemove = this.to['canRemove'];
@@ -3759,37 +3758,18 @@ var FormlyFieldRepeatSectionComponent = /** @class */ (function (_super) {
         if (value && value.canRemove === false) {
             return false;
         }
-        return !Object(lodash_es__WEBPACK_IMPORTED_MODULE_3__["isFunction"])(canRemove) || canRemove.apply(this, [index]) === true;
-    };
-    FormlyFieldRepeatSectionComponent.prototype.add = function () {
-        var formGroup = new _angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormGroup"]({});
-        var added = {};
-        var onSectionAdded = this.to['onSectionAdded'];
-        if (Object(lodash_es__WEBPACK_IMPORTED_MODULE_3__["isFunction"])(onSectionAdded)) {
-            onSectionAdded.apply(this, [added]);
-        }
-        this.model.push(added);
-        this._fields.push(Object(lodash_es__WEBPACK_IMPORTED_MODULE_3__["cloneDeep"])(this.field.fieldArray.fieldGroup));
-        this.formControl.push(formGroup);
-    };
-    FormlyFieldRepeatSectionComponent.prototype.remove = function (index) {
-        this.formControl.removeAt(index);
-        var removed = this.model.splice(index, 1);
-        var onSectionRemoved = this.to['onSectionRemoved'];
-        if (Object(lodash_es__WEBPACK_IMPORTED_MODULE_3__["isFunction"])(onSectionRemoved)) {
-            onSectionRemoved.apply(this, [removed, index]);
-        }
-        this._fields.splice(index, 1);
+        return typeof canRemove !== 'function' || canRemove.apply(this, [index]) === true;
     };
     FormlyFieldRepeatSectionComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
             selector: 'formly-field-repeat-section',
-            template: "\n        <div class=\"header\" *ngIf=\"canAdd()\">\n            <button type=\"button\" class=\"add-btn btn btn-sm btn-primary\" (click)=\"add()\">\n                <i class=\"fa fa-plus\" aria-hidden=\"true\"></i>\n            </button>\n        </div>\n        <div class=\"body\" [ngClass]=\"{interactive: canAdd()}\">\n            <div class=\"section flex-container\" *ngFor=\"let control of formArray.controls; index as i\"\n                [ngClass]=\"{interactive: canRemove(i)}\">\n                <button type=\"button\" class=\"remove-btn btn btn-sm btn-danger\" (click)=\"remove(i)\" *ngIf=\"canRemove(i)\">\n                    <i class=\"fa fa-times\" aria-hidden=\"true\"></i>\n                </button>\n                <formly-form [model]=\"model[i]\" [fields]=\"fields(i)\" [options]=\"newOptions\"\n                    [form]=\"formArray.at(i)\" [ngClass]=\"field.fieldArray.className\">\n                </formly-form>\n            </div>\n        </div>\n    ",
+            template: "\n    <div class=\"header\" *ngIf=\"canAdd()\">\n        <button type=\"button\" class=\"add-btn btn btn-sm btn-primary\" (click)=\"add()\">\n            <i class=\"fa fa-plus\" aria-hidden=\"true\"></i>\n        </button>\n    </div>\n    <div class=\"body\" [ngClass]=\"{interactive: canAdd()}\">\n        <div class=\"section flex-container\" *ngFor=\"let field of field.fieldGroup; let i = index;\" [ngClass]=\"{interactive: canRemove(i)}\">\n            <button type=\"button\" class=\"remove-btn btn btn-sm btn-danger\" (click)=\"remove(i)\" *ngIf=\"canRemove(i)\">\n                <i class=\"fa fa-times\" aria-hidden=\"true\"></i>\n            </button>\n            <formly-group\n                [model]=\"model[i]\"\n                [field]=\"field\"\n                [options]=\"options\"\n                [form]=\"formControl\"\n                [ngClass]=\"fieldArrayClassName\">\n            </formly-group>\n        </div>\n    </div>\n   ",
             styles: ["\n        .header {\n            margin-top: .5em;\n        }\n        .flex-container.interactive {\n            display: flex;\n            align-items: flex-start;\n            flex-wrap: nowrap;\n        }\n        formly-form {\n            flex-grow: 1;\n        }\n        .body.interactive {\n            margin-top: 0.5em;\n        }\n        .section {\n            margin-bottom: .25em;\n        }\n        .section>button {\n            margin-top: .25em;\n        }\n    "]
-        })
+        }),
+        __metadata("design:paramtypes", [_ngx_formly_core__WEBPACK_IMPORTED_MODULE_2__["FormlyFormBuilder"]])
     ], FormlyFieldRepeatSectionComponent);
     return FormlyFieldRepeatSectionComponent;
-}(_ngx_formly_core__WEBPACK_IMPORTED_MODULE_2__["FieldType"]));
+}(_ngx_formly_core__WEBPACK_IMPORTED_MODULE_2__["FieldArrayType"]));
 
 
 

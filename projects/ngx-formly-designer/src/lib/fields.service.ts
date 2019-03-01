@@ -64,13 +64,17 @@ export class FieldsService {
         if (field.fieldGroup) {
             this.mutateFields(field.fieldGroup, designerField);
         } else if (field.fieldArray && field.fieldArray.fieldGroup) {
-            // Treating fieldArrays as fieldGroups
-            field.templateOptions['$fieldArray'] = { type: field.type };
-            field.fieldGroup = field.fieldArray.fieldGroup;
-            delete field.fieldArray;
-            delete field.type;
+            if (designerField) {
+                this.mutateField(field.fieldArray, designerField);
+            } else {
+                // Treating fieldArrays as fieldGroups
+                field.templateOptions['$fieldArray'] = { type: field.type };
+                field.fieldGroup = field.fieldArray.fieldGroup;
+                delete field.fieldArray;
+                delete field.type;
 
-            this.mutateFields(field.fieldGroup, designerField);
+                this.mutateFields(field.fieldGroup, designerField);
+            }
         }
         return field;
     }

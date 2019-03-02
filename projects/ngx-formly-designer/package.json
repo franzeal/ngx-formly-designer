@@ -1,6 +1,7 @@
 {
   "name": "ngx-formly-designer",
   "version": "0.0.3",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/franzeal/ngx-formly-designer.git"

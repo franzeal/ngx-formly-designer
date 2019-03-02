@@ -1,6 +1,7 @@
 {
   "name": "ngx-formly-designer-app",
   "version": "0.0.0",
+  "license": "MIT",
   "scripts": {
     "ng": "ng",
     "debug": "concurrently \"ng serve -c development\"  \"ng build ngx-formly-designer --watch\"",
@@ -9,7 +10,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "copy": "node tools/copy.js README.md dist/ngx-formly-designer/README.md",
+    "copy": "node tools/copy.js README.md dist/ngx-formly-designer/README.md && node tools/copy.js LICENSE dist/ngx-formly-designer/LICENSE",
     "build_lib": "ng build ngx-formly-designer --prod",
     "npm_pack": "npm run copy && cd dist/ngx-formly-designer && npm pack",
     "package": "npm run build_lib && npm run npm_pack"

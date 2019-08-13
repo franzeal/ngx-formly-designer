@@ -81,6 +81,7 @@ export interface DesignerOption {
 
 export interface DesignerTypeOption extends DesignerOption {
     fieldArray?: boolean;
+    fieldGroup?: boolean;
 }
 
 export interface DesignerSettings {

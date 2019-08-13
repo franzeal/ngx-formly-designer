@@ -5,7 +5,7 @@ import { FieldsService } from '../fields.service';
 import { FormlyDesignerConfig } from '../formly-designer-config';
 import { merge, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { cloneDeep, isObject, isString } from '../util';
+import { cloneDeep, isArray, isObject, isString } from '../util';
 
 const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR,
@@ -29,6 +29,10 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
                     <div *ngIf="formlyDesignerConfig.settings.showClassName" class="form-group">
                         <label class="form-control-label">className</label>
                         <input formControlName="className" class="form-control">
+                    </div>
+                    <div *ngIf="fieldGroup && formlyDesignerConfig.settings.showClassName" class="form-group">
+                        <label class="form-control-label">fieldGroupClassName</label>
+                        <input formControlName="fieldGroupClassName" class="form-control">
                     </div>
                     <div *ngIf="showType" class="form-group"
                         [ngClass]="{'has-danger': form.hasError('type') && (type.dirty || type.touched)}">
@@ -66,6 +70,7 @@ const FIELD_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     ]
 })
 export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
+    @Input() fieldGroup: boolean;
     @Input() showType: boolean;
     @Input() showWrappers: boolean;
     @Input() hasContent: boolean;
@@ -76,35 +81,30 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
 
     constructor(
         private fieldsService: FieldsService,
-        private formBuilder: FormBuilder,
+        private fb: FormBuilder,
         public formlyDesignerConfig: FormlyDesignerConfig
     ) {
-        this.form = formBuilder.group({
-            key: [''],
-            className: [''],
-            type: ['']
+        this.form = fb.group({
+            key: this.key = fb.control(''),
+            className: this.className = fb.control(''),
+            fieldGroupClassName: this.fieldGroupClassName = fb.control(''),
+            type: this.type = fb.control('')
         }, { validator: (control) => this.validator(control) });
-        this.fieldForm = formBuilder.group({});
+        this.fieldForm = fb.group({});
     }
 
-    get key(): FormControl {
-        return this.form.get('key') as FormControl;
-    }
+    readonly form: FormGroup;
+    readonly key: FormControl;
+    readonly className: FormControl;
+    readonly fieldGroupClassName: FormControl;
+    readonly type: FormControl;
 
-    get className(): FormControl {
-        return this.form.get('className') as FormControl;
-    }
-
-    get type(): FormControl {
-        return this.form.get('type') as FormControl;
-    }
-
-    invalid: boolean;
-    form: FormGroup;
     fieldForm: FormGroup;
     field: FormlyFieldConfig = {};
     fields: FormlyFieldConfig[] = [];
     fieldArray: boolean;
+    invalid: boolean;
+
     protected onChange = (_: any) => { };
     protected onTouched = () => { };
 
@@ -160,9 +160,10 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         }
         this.key.setValue(isString(field.key) ? field.key : '');
         this.className.setValue(isString(field.className) ? field.className : '');
+        this.fieldGroupClassName.setValue(isString(field.fieldGroupClassName) ? field.fieldGroupClassName : '');
         this.type.setValue(isString(field.type) ? field.type : '');
         this.fields = this.fieldsService.getTypeFields(this.type.value);
-        this.fieldForm = this.formBuilder.group({});
+        this.fieldForm = this.fb.group({});
         this.field = cloneDeep(field);
     }
 
@@ -174,16 +175,18 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
         const field = this.field;
         field.key = this.key.value;
         field.className = this.className.value;
+        field.fieldGroupClassName = this.fieldGroupClassName.value;
         field.type = this.type.value;
         this.onChange(field);
     }
 
     private onTypeChange(): void {
         this.valueChangesSubscription.unsubscribe();
-        this.fields = this.fieldsService.getTypeFields(this.type.value);
-        const designerType = this.formlyDesignerConfig.types[this.type.value];
-        this.fieldArray = designerType ? designerType.fieldArray : false;
-        this.fieldForm = this.formBuilder.group({});
+        const type = this.type.value;
+        this.fields = this.fieldsService.getTypeFields(type);
+        const designerType = this.formlyDesignerConfig.types[type];
+        this.fieldArray = designerType && designerType.fieldArray;
+        this.fieldForm = this.fb.group({});
         this.field = Object.assign({}, this.field);
         this.subscribeValueChanges();
     }

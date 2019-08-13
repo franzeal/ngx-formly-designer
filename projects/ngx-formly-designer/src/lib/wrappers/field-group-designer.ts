@@ -42,7 +42,8 @@ import { catchError, tap } from 'rxjs/operators';
         </div>
         <div class="content">
             <div [hidden]="!editing">
-                <formly-designer-field-editor #editor [hasContent]="true" [showWrappers]="true" [formControl]="fieldEdit">
+                <formly-designer-field-editor #editor [fieldGroup]="true" [hasContent]="true" [showWrappers]="true"
+                    [formControl]="fieldEdit">
                     <div class="footer">
                         <button (click)="cancel()" class="btn btn-secondary mr-1">Cancel</button>
                         <button [disabled]="editor.invalid" (click)="accept()" class="btn btn-primary">Apply</button>

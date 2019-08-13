@@ -171,6 +171,11 @@ export class FormlyDesignerService {
             pruned = isEmpty(field.key) ? {} : { key: field.key };
             if (isArray(field.fieldGroup)) {
                 pruned.fieldGroup = this.createPrunedFields(field.fieldGroup);
+
+                let fieldGroupClassName: string;
+                if (isString(field.fieldGroupClassName) && (fieldGroupClassName = field.fieldGroupClassName.trim()).length > 0) {
+                    pruned.fieldGroupClassName = fieldGroupClassName;
+                }
             }
         }
 

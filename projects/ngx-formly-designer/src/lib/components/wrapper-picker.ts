@@ -65,7 +65,7 @@ declare var $;
     `]
 })
 export class WrapperPickerComponent implements OnInit {
-    @ViewChild('modal') modalRef: ElementRef;
+    @ViewChild('modal', { static: true }) modalRef: ElementRef;
     @Input() field: FormlyFieldConfig;
     @Output() selected = new EventEmitter<FormlyFieldConfig>();
 

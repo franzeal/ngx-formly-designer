@@ -74,7 +74,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
     @Input() showType: boolean;
     @Input() showWrappers: boolean;
     @Input() hasContent: boolean;
-    @ViewChild('block') blockElRef: ElementRef;
+    @ViewChild('block', { static: true }) blockElRef: ElementRef;
 
     private readonly subscriptions: Subscription[] = [];
     private valueChangesSubscription: Subscription;
@@ -201,7 +201,7 @@ export class FieldEditorComponent implements ControlValueAccessor, OnDestroy, On
 
         const key = control.get('key') as FormControl;
         const result = { key: false, type: this.showType && !hasType, conflict: false };
-        if (hasType && (!isString(key.value) || key.value.trim().length === 0)) {
+        if (!this.fieldGroup && hasType && (!isString(key.value) || key.value.trim().length === 0)) {
             result.key = true;
         }
 

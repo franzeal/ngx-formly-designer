@@ -58,7 +58,7 @@ import { DesignerTypeOption, FormlyDesignerConfig } from '../formly-designer-con
     `]
 })
 export class FieldPickerComponent {
-    @ViewChild('modal') modalRef: ElementRef;
+    @ViewChild('modal', { static: true }) modalRef: ElementRef;
     @Output() selected = new EventEmitter<FormlyFieldConfig>();
 
     constructor(

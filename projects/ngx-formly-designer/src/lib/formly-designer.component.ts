@@ -37,7 +37,7 @@ import { catchError, debounceTime, tap } from 'rxjs/operators';
     providers: [FormlyDesignerService]
 })
 export class FormlyDesignerComponent implements OnDestroy, OnInit {
-    @ViewChild('formlyFormContainer', { read: ViewContainerRef }) formlyFormContainer;
+    @ViewChild('formlyFormContainer', { read: ViewContainerRef, static: true }) formlyFormContainer;
     @Output() fieldsChange = new EventEmitter<FormlyFieldConfig[]>();
     @Output() modelChange = new EventEmitter<any>();
 

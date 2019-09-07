@@ -56,7 +56,7 @@ import { cloneDeep, isArray, isObject } from '../util';
     `]
 })
 export class WrappersPickerComponent implements OnChanges {
-    @ViewChild('modal') modalRef: ElementRef;
+    @ViewChild('modal', { static: true }) modalRef: ElementRef;
     @Input() field: FormlyFieldConfig;
     @Output() selected = new EventEmitter<FormlyFieldConfig>();
 

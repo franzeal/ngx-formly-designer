@@ -105,7 +105,7 @@ import { catchError, tap } from 'rxjs/operators';
 })
 export class FormlyDesignerFieldGroupWrapperComponent extends FieldWrapper
     implements AfterContentInit, AfterContentChecked, OnInit {
-    @ViewChild('fieldComponent', { read: ViewContainerRef }) fieldComponent: ViewContainerRef;
+    @ViewChild('fieldComponent', { read: ViewContainerRef, static: true }) fieldComponent: ViewContainerRef;
 
     type: string;
     editing = false;

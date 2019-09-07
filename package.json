@@ -28,7 +28,7 @@
     "@angular/router": "^8.2.5",
     "@ngx-formly/core": "^5.4.1",
     "@ngx-formly/bootstrap": "^5.4.1",
-    "ngx-formly-tabs": "^1.1.0",
+    "ngx-formly-tabs": "^5.3.0",
     "bootstrap": "^4.3.1",
     "font-awesome": "^4.7.0",
     "jquery": "^3.4.1",

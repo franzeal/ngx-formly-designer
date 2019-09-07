@@ -50,6 +50,7 @@ export class FormlyDesignerConfig {
             const type = this.types[options.name];
             type.name = options.name;
             type.fieldArray = !!options.fieldArray;
+            type.fieldGroup = !!options.fieldGroup;
             type.fields = options.fields;
         }
     }

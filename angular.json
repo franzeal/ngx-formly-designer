@@ -34,7 +34,12 @@
           },
           "configurations": {
             "development": {
-              "tsConfig": "tsconfig.dev.json"
+              "tsConfig": "tsconfig.dev.json",
+              "sourceMap": {
+                "scripts": true,
+                "styles": true,
+                "vendor": true
+              }
             },
             "production": {
               "fileReplacements": [
@@ -45,13 +50,17 @@
               ],
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true
+              "buildOptimizer": true,
+              "sourceMap": {
+                "scripts": true,
+                "styles": true,
+                "vendor": true
+              }
             }
           }
         },
@@ -146,6 +155,11 @@
             "project": "projects/ngx-formly-designer/ng-package.json"
           },
           "configurations": {
+            "sourceMap": {
+              "scripts": true,
+              "styles": true,
+              "vendor": true
+            },
             "production": {
               "project": "projects/ngx-formly-designer/ng-package.prod.json"
             }

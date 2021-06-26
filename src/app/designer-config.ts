@@ -233,10 +233,6 @@ export const designerConfig: DesignerConfigOption = {
           defaultValue: true
         }
       ]
-    },
-    {
-      name: 'tab',
-      fields: tabFields
     }
   ]
 };

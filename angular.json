@@ -13,6 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "dist/ngx-formly-designer-app",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -34,6 +35,12 @@
           },
           "configurations": {
             "development": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "tsConfig": "tsconfig.dev.json",
               "sourceMap": {
                 "scripts": true,
@@ -42,6 +49,12 @@
               }
             },
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -162,7 +175,8 @@
             },
             "production": {
               "project": "projects/ngx-formly-designer/ng-package.prod.json"
-            }
+            ,              "tsConfig": "projects/ngx-formly-designer/tsconfig.lib.prod.json"
+}
           }
         },
         "test": {

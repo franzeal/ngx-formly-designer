@@ -59,7 +59,7 @@ export class FormlyDesignerModule {
     formlyConfig.addConfig(config);
   }
 
-  static forRoot(designerConfig: DesignerConfigOption = {}): ModuleWithProviders {
+  static forRoot(designerConfig: DesignerConfigOption = {}): ModuleWithProviders<FormlyDesignerModule> {
     return {
       ngModule: FormlyDesignerModule,
       providers: [

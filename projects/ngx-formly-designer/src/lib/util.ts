@@ -5,13 +5,13 @@ export { cloneDeep, get, set, unset } from 'lodash-es';
 const keyPathMemberName = '_formlyDesignerKeyPath';
 
 // Source: https://github.com/formly-js/ngx-formly/blob/master/src/core/src/lib/utils.ts
-export function getKeyPath(field: { key?: string | string[], fieldGroup?: any, fieldArray?: any }): (string | number)[] {
+export function getKeyPath(field: { key?: string | number | string[], fieldGroup?: any, fieldArray?: any }): (string | number)[] {
     /* We store the keyPath in the field for performance reasons. This function will be called frequently. */
     if (!(<any>field)[keyPathMemberName] || (<any>field)[keyPathMemberName].key !== field.key) {
         let keyPath: (string | number)[] = [];
         if (field.key) {
             /* Also allow for an array key, hence the type check  */
-            const pathElements = typeof field.key === 'string' ? field.key.split('.') : field.key;
+            const pathElements = isArray(field.key) ? field.key : field.key.toString().split('.');
             for (let pathElement of pathElements) {
                 if (typeof pathElement === 'string') {
                     /* replace paths of the form names[2] by names.2, cfr. angular formly */

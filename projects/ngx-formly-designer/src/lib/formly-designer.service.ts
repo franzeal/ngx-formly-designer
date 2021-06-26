@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
-import { FieldsService } from './fields.service';
 import { FormlyConfig, FormlyFieldConfig } from '@ngx-formly/core';
-import { FormlyDesignerConfig } from './formly-designer-config';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { FieldsService } from './fields.service';
+import { DESIGNER_WRAPPER_TYPES, FormlyDesignerConfig } from './formly-designer-config';
 import { cloneDeep, get, isArray, isEmpty, isFunction, isString, set, unset } from './util';
 
 @Injectable()
@@ -137,7 +137,7 @@ export class FormlyDesignerService {
     const typeWrappers = staticWrappers
       .concat(this.formlyConfig.templateManipulators.preWrapper.map(m => m(clonedField)))
       .concat(this.formlyConfig.templateManipulators.postWrapper.map(m => m(clonedField)))
-      .filter(w => w);
+      .concat(DESIGNER_WRAPPER_TYPES);
 
     // Remove wrappers part of the formly configuration from the result
     if (typeWrappers.length > 0) {

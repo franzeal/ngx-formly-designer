@@ -7,7 +7,8 @@ import { FieldsService } from './fields.service';
 import { FormlyConfig, FormlyForm, FormlyModule } from '@ngx-formly/core';
 import { FormlyDesignerComponent } from './formly-designer.component';
 import { DesignerConfigOption, FormlyDesignerConfig, FORMLY_DESIGNER_CONFIG_TOKEN } from './formly-designer-config';
-import { config, fieldComponents, wrapperComponents } from './config';
+import { Config, fieldComponents, wrapperComponents } from './config';
+import { DesignerExtension } from './extensions/designer';
 import { TypeSelectComponent } from './components/type-select';
 import { WrapperEditorComponent } from './components/wrapper-editor';
 import { WrapperSelectComponent } from './components/wrapper-select';
@@ -17,51 +18,54 @@ import { DecyclePipe } from './pipes/decycle';
 import 'jquery';
 
 @NgModule({
-    declarations: [
-        FieldEditorComponent,
-        FieldPickerComponent,
-        FormlyDesignerComponent,
-        TypeSelectComponent,
-        WrapperEditorComponent,
-        WrapperSelectComponent,
-        WrapperPickerComponent,
-        WrappersPickerComponent,
+  declarations: [
+    FieldEditorComponent,
+    FieldPickerComponent,
+    FormlyDesignerComponent,
+    TypeSelectComponent,
+    WrapperEditorComponent,
+    WrapperSelectComponent,
+    WrapperPickerComponent,
+    WrappersPickerComponent,
 
-        DecyclePipe,
+    DecyclePipe,
 
-        fieldComponents,
-        wrapperComponents
-    ],
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
+    fieldComponents,
+    wrapperComponents
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
 
-        FormlyModule.forChild()
-    ],
-    exports: [
-        FormlyDesignerComponent
-    ],
-    providers: [
-        FormlyDesignerConfig,
-        FieldsService
-    ],
-    entryComponents: [FormlyForm]
+    FormlyModule.forChild()
+  ],
+  exports: [
+    FormlyDesignerComponent
+  ],
+  providers: [
+    Config,
+    DesignerExtension,
+    FormlyDesignerConfig,
+    FieldsService
+  ],
+  entryComponents: [FormlyForm]
 })
 export class FormlyDesignerModule {
-    constructor(
-        formlyConfig: FormlyConfig
-    ) {
-        formlyConfig.addConfig(config);
-    }
+  constructor(
+    config: Config,
+    formlyConfig: FormlyConfig
+  ) {
+    formlyConfig.addConfig(config);
+  }
 
-    static forRoot(designerConfig: DesignerConfigOption = {}): ModuleWithProviders {
-        return {
-            ngModule: FormlyDesignerModule,
-            providers: [
-                { provide: ANALYZE_FOR_ENTRY_COMPONENTS, useValue: [fieldComponents, wrapperComponents], multi: true },
-                { provide: FORMLY_DESIGNER_CONFIG_TOKEN, useValue: designerConfig, multi: true }
-            ]
-        };
-    }
+  static forRoot(designerConfig: DesignerConfigOption = {}): ModuleWithProviders {
+    return {
+      ngModule: FormlyDesignerModule,
+      providers: [
+        { provide: ANALYZE_FOR_ENTRY_COMPONENTS, useValue: [fieldComponents, wrapperComponents], multi: true },
+        { provide: FORMLY_DESIGNER_CONFIG_TOKEN, useValue: designerConfig, multi: true }
+      ]
+    };
+  }
 }

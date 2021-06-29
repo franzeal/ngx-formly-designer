@@ -3,19 +3,26 @@ import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { FormlyConfig, FormlyFieldConfig } from '@ngx-formly/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { FieldsService } from './fields.service';
-import { DESIGNER_WRAPPER_TYPES, FormlyDesignerConfig } from './formly-designer-config';
+import { DesignerTypeOption, DESIGNER_WRAPPER_TYPES, FormlyDesignerConfig } from './formly-designer-config';
 import { cloneDeep, get, isArray, isEmpty, isFunction, isString, set, unset } from './util';
+
+export enum FieldType {
+  Plain,
+  Designer,
+}
 
 @Injectable()
 export class FormlyDesignerService {
   constructor(
     private designerConfig: FormlyDesignerConfig,
     private fieldsService: FieldsService,
-    private formlyConfig: FormlyConfig
+    private formlyConfig: FormlyConfig,
   ) { }
 
   private readonly _disabled = new BehaviorSubject<boolean>(false);
+  private readonly _designerFields = new BehaviorSubject<FormlyFieldConfig[]>([]);
   private readonly _fields = new BehaviorSubject<FormlyFieldConfig[]>([]);
+  private readonly _selectedField = new BehaviorSubject<FormlyFieldConfig | null>(null);
   private readonly _model = new BehaviorSubject<any>({});
 
   get disabled(): boolean {
@@ -30,6 +37,31 @@ export class FormlyDesignerService {
     return this._disabled.asObservable();
   }
 
+  get selectedField$(): Observable<FormlyFieldConfig | null> {
+    return this._selectedField.asObservable();
+  }
+
+  get selectedDesignerId(): string {
+    return this._selectedField.getValue()?.templateOptions?.$designerId;
+  }
+
+  get designerFields(): FormlyFieldConfig[] {
+    return this._designerFields.value;
+  }
+
+  set designerFields(value: FormlyFieldConfig[]) {
+    // Prune the fields because ngx-formly pollutes them with internal state
+    // causing incorrect behavior when re-applied.
+    const fields = isArray(value) ? cloneDeep(value) : [];
+    const designerFields = this.createPrunedFields(fields, FieldType.Designer);
+    this._designerFields.next(designerFields);
+    this._fields.next(this.createPrunedFields(cloneDeep(designerFields), FieldType.Plain));
+  }
+
+  get designerFields$(): Observable<FormlyFieldConfig[]> {
+    return this._designerFields.asObservable();
+  }
+
   get fields(): FormlyFieldConfig[] {
     return this._fields.value;
   }
@@ -37,88 +69,80 @@ export class FormlyDesignerService {
   set fields(value: FormlyFieldConfig[]) {
     // Prune the fields because ngx-formly pollutes them with internal state
     // causing incorrect behavior when re-applied.
-    const fields = this.createPrunedFields(isArray(value) ? value : []);
-    this._fields.next(fields);
+    const fields = cloneDeep(value);
+    const designerFields = this.createPrunedFields(fields, FieldType.Designer);
+    this.fieldsService.mutateFields(designerFields, false);
+    this._selectedField.next(null);
+    this._designerFields.next(designerFields);
+    this._fields.next(this.createPrunedFields(cloneDeep(designerFields), FieldType.Plain));
   }
 
   get fields$(): Observable<FormlyFieldConfig[]> {
     return this._fields.asObservable();
   }
 
-  get model(): any {
+  get model(): unknown {
     return this._model.value;
   }
 
-  set model(value: any) {
+  set model(value: unknown) {
     this._model.next(value == null ? {} : value);
   }
 
-  get model$(): Observable<any> {
+  get model$(): Observable<unknown> {
     return this._model.asObservable();
   }
 
-  addField(field: FormlyFieldConfig): void {
+  addField(field: FormlyFieldConfig, index?: number): void {
     this.fieldsService.mutateField(field, false);
 
-    const fields = cloneDeep(this.fields);
-    fields.push(field);
+    const fields = cloneDeep(this.designerFields);
+    const fieldIndex = (index == null || isNaN(index)) ? this.fields.length :
+      Math.min(this.fields.length, Math.max(0, index));
 
-    this.fields = fields;
-    this.model = cloneDeep(this.model);
+    fields.splice(fieldIndex, 0, field);
+
+    this.updateFields(fields);
+  }
+
+  createField(type: string): FormlyFieldConfig {
+    const field = {} as FormlyFieldConfig;
+    if (type !== 'formly-group') {
+      field.type = type;
+    }
+    const designerType = this.designerConfig.types[type];
+    if (designerType?.fieldArray) {
+      field.fieldArray = { fieldGroup: [] };
+    }
+    if (type === 'formly-group' || designerType?.fieldGroup) {
+      field.fieldGroup = [];
+    }
+    return field;
+  }
+
+  didClickField(value: FormlyFieldConfig): void {
+    this._selectedField.next(value);
   }
 
   removeField(field: FormlyFieldConfig): void {
     this.unsetField(field);
-    if (this.replaceField(this.fields, field, undefined)) {
+    const designerId = field.templateOptions?.$designerId;
+    if (this.replaceField(designerId, null, this.designerFields)) {
       this.removeControl(field.formControl);
     }
-
-    this.fields = cloneDeep(this.fields);
-    this.model = cloneDeep(this.model);
+    this.updateFields();
   }
 
-  updateField(original: FormlyFieldConfig, modified: FormlyFieldConfig): void {
+  updateField(original: FormlyFieldConfig | null, modified: FormlyFieldConfig): void {
     const pruned = this.fieldsService.mutateField(this.createPrunedField(modified), false);
-
-    if (this.replaceField(this.fields, original, pruned)) {
-      if (original.formControl !== pruned.formControl) {
+    const designerId = original?.templateOptions?.$designerId;
+    if (this.replaceField(designerId, pruned, this.designerFields)) {
+      if (original && original.formControl !== pruned.formControl) {
         this.unsetField(original);
         this.removeControl(original.formControl);
       }
-
-      this.fields = cloneDeep(this.fields);
-      this.model = cloneDeep(this.model);
+      this.updateFields();
     }
-  }
-
-  convertField(field: FormlyFieldConfig): FormlyFieldConfig {
-    return this.createPrunedField(field);
-  }
-
-  convertFields(fields: FormlyFieldConfig[]): FormlyFieldConfig[] {
-    return this.createPrunedFields(fields);
-  }
-
-  createDesignerFields(): FormlyFieldConfig[] {
-    return this.createPrunedFields(this.fields);
-  }
-
-  private createPrunedFields(fields: FormlyFieldConfig[]): FormlyFieldConfig[] {
-    const prunedFields: FormlyFieldConfig[] = [];
-    if (isArray(fields)) {
-      fields.forEach(field => {
-        const pruned = this.createPrunedField(field);
-        if (field.fieldArray) {
-          pruned.fieldArray = this.createPrunedField(field.fieldArray);
-        } else if (field.fieldGroup && !pruned.fieldArray) {
-          pruned.fieldGroup = this.createPrunedFields(field.fieldGroup);
-        }
-        if (Object.keys(pruned).length > 0) {
-          prunedFields.push(pruned);
-        }
-      });
-    }
-    return prunedFields;
   }
 
   getWrappers(field: FormlyFieldConfig): string[] {
@@ -128,12 +152,13 @@ export class FormlyDesignerService {
 
     const clonedField = cloneDeep(field);
     let wrappers = clonedField.wrappers = (clonedField.wrappers || []);
-    if (isFunction(this.designerConfig.settings.filterWrapper)) {
-      wrappers = wrappers.filter(w => this.designerConfig.settings.filterWrapper(w, clonedField));
+    const filterWrapper = this.designerConfig.settings.filterWrapper ?? ((wrapper, _) => wrapper !== 'form-field');
+    if (filterWrapper && isFunction(filterWrapper)) {
+      wrappers = wrappers.filter(w => filterWrapper(w, clonedField));
     }
 
     // Determine wrappers part of the formly configuration (static and dynamic) to exclude them from the result
-    const staticWrappers = field.type ? this.formlyConfig.getType(field.type).wrappers || [] : [];
+    const staticWrappers = (field.type && this.formlyConfig.getType(field.type).wrappers) || [];
     const typeWrappers = staticWrappers
       .concat(this.formlyConfig.templateManipulators.preWrapper.map(m => m(clonedField)))
       .concat(this.formlyConfig.templateManipulators.postWrapper.map(m => m(clonedField)))
@@ -154,33 +179,36 @@ export class FormlyDesignerService {
     return wrappers;
   }
 
-  /** Prunes the field of paths not identified in the designer config */
-  private createPrunedField(field: FormlyFieldConfig): FormlyFieldConfig {
-    const type = get(field, 'templateOptions.$fieldArray.type', field.type);
-    const designerType = this.designerConfig.types[type];
+  /** Prunes field of unrecognized properties */
+  createPrunedField(field: FormlyFieldConfig, fieldType = FieldType.Designer): FormlyFieldConfig {
+    const designerType = this.getDesignerType(field);
     const pruned: FormlyFieldConfig = isEmpty(field.key) ? {} : { key: field.key };
 
     if (designerType) {
-      pruned.type = type;
+      pruned.type = designerType.name;
+      if (fieldType === FieldType.Designer && field.templateOptions?.$designerId) {
+        pruned.templateOptions = { $designerId: field.templateOptions.$designerId };
+      }
       this.applyProperties(field, pruned, designerType.fields);
       if (designerType.fieldArray) {
         pruned.fieldArray = {
-          fieldGroup: this.createPrunedFields(field.fieldGroup)
+          fieldGroup: this.createPrunedFields(field.fieldGroup, fieldType)
         };
       }
     }
 
     if (isArray(field.fieldGroup) && !isArray(pruned.fieldArray)) {
-      pruned.fieldGroup = this.createPrunedFields(field.fieldGroup);
+      pruned.fieldGroup = this.createPrunedFields(field.fieldGroup, fieldType);
 
       let fieldGroupClassName: string;
-      if (isString(field.fieldGroupClassName) && (fieldGroupClassName = field.fieldGroupClassName.trim()).length > 0) {
+      if (isString(field.fieldGroupClassName) &&
+        (fieldGroupClassName = (field.fieldGroupClassName as string).trim()).length > 0) {
         pruned.fieldGroupClassName = fieldGroupClassName;
       }
     }
 
     let className: string;
-    if (isString(field.className) && (className = field.className.trim()).length > 0) {
+    if (isString(field.className) && (className = (field.className as string).trim()).length > 0) {
       pruned.className = className;
     }
 
@@ -189,57 +217,108 @@ export class FormlyDesignerService {
       pruned.wrappers = wrappers;
       const designerWrapperFields = wrappers.map(wrapper => this.designerConfig.wrappers[wrapper])
         .filter(designerOption => designerOption && isArray(designerOption.fields))
-        .reduce<FormlyFieldConfig[]>((previous, current) => previous.concat(current.fields), []);
+        .reduce<FormlyFieldConfig[]>((previous, current) => previous.concat(current.fields || []), []);
       this.applyProperties(field, pruned, designerWrapperFields);
     }
     return pruned;
   }
 
-  private applyProperties(field: FormlyFieldConfig, designed: FormlyFieldConfig, designerFields: FormlyFieldConfig[]): void {
+  /** Prunes fields of unrecognized properties */
+  createPrunedFields(fields: FormlyFieldConfig[] | undefined, fieldType = FieldType.Designer): FormlyFieldConfig[] {
+    const prunedFields: FormlyFieldConfig[] = [];
+    if (isArray(fields)) {
+      fields.forEach(field => {
+        const pruned = this.createPrunedField(field, fieldType);
+        if (field.fieldArray) {
+          pruned.fieldArray = this.createPrunedField(field.fieldArray, fieldType);
+        } else if (field.fieldGroup && !pruned.fieldArray) {
+          pruned.fieldGroup = this.createPrunedFields(field.fieldGroup, fieldType);
+        }
+        if (Object.keys(pruned).length > 0) {
+          prunedFields.push(pruned);
+        }
+      });
+    }
+    return prunedFields;
+  }
+
+  getTypeName(type: string | null | undefined): string {
+    if (type === 'formly-group') {
+      return 'fieldGroup';
+    }
+    return type ?? '';
+  }
+
+  private applyProperties(field: FormlyFieldConfig, designed: FormlyFieldConfig, designerFields: FormlyFieldConfig[] | undefined): void {
     if (isArray(designerFields)) {
       designerFields.forEach(designerField => {
-        const value = get(field, designerField.key);
+        const key = designerField.key;
+        if (key == null) {
+          return;
+        }
+        const value = get(field, key);
         if (value != null && (!isString(value) || value.length > 0) && value !== designerField.defaultValue) {
-          set(designed, designerField.key, value);
+          set(designed, key, value);
         }
       });
     }
   }
 
-  private replaceField(fields: FormlyFieldConfig[], original: FormlyFieldConfig, modified: FormlyFieldConfig): boolean {
-    if (isArray(fields)) {
-      const l = fields.length;
-      for (let i = 0; i < l; i++) {
-        const field = fields[i];
-        if (field === original) {
-          if (modified == null) {
-            fields.splice(i, 1);
-          } else {
-            fields[i] = modified;
-          }
-          return true;
+  private getDesignerType(field: FormlyFieldConfig): DesignerTypeOption | undefined {
+    const type = field?.templateOptions?.$fieldArray?.type ?? field.type;
+    const designerType = this.designerConfig.types[type];
+    if (designerType) {
+      return designerType;
+    }
+    if (field.type === 'formly-group' || (!field.type && isArray(field.fieldGroup))) {
+      return { name: field.type as string, fieldGroup: true, fields: [] };
+    }
+    return;
+  }
+
+  private replaceField(id: string, field: FormlyFieldConfig | null, fields: FormlyFieldConfig[]): boolean {
+    if (!id || !isArray(fields)) {
+      return false;
+    }
+    for (let i = 0, l = fields.length; i < l; i++) {
+      const otherField = fields[i];
+      if (otherField.templateOptions?.$designerId === id) {
+        if (field == null) {
+          fields.splice(i, 1);
+        } else {
+          fields[i] = field;
         }
-        if (field.fieldGroup && this.replaceField(field.fieldGroup, original, modified)) {
-          return true;
-        }
-        if (field.fieldArray && this.replaceFieldArray(field, original, modified)) {
-          return true;
-        }
+        return true;
+      }
+      if (otherField.fieldGroup && this.replaceField(id, field, otherField.fieldGroup)) {
+        return true;
+      }
+      if (otherField.fieldArray && this.replaceFieldArray(id, field, otherField)) {
+        return true;
       }
     }
     return false;
   }
 
-  private replaceFieldArray(parent: FormlyFieldConfig, original: FormlyFieldConfig, modified: FormlyFieldConfig): boolean {
+  private replaceFieldArray(id: string | null, field: FormlyFieldConfig | null, parent: FormlyFieldConfig): boolean {
+    if (!id) {
+      return false;
+    }
     const fieldArray = parent.fieldArray;
-    if (fieldArray === original) {
-      parent.fieldArray = modified;
+    if (!fieldArray) {
+      return false;
+    }
+    if (fieldArray.templateOptions?.$designerId === id) {
+      if (field) {
+        parent.fieldArray = field;
+        return true;
+      }
+      return false;
+    }
+    if (fieldArray.fieldGroup && this.replaceField(id, field, fieldArray.fieldGroup)) {
       return true;
     }
-    if (fieldArray.fieldGroup && this.replaceField(fieldArray.fieldGroup, original, modified)) {
-      return true;
-    }
-    return fieldArray.fieldArray && this.replaceFieldArray(fieldArray, original, modified);
+    return fieldArray.fieldArray != null && this.replaceFieldArray(id, field, fieldArray);
   }
 
   private buildPath(key: string, path: string, arrayNext: boolean = false) {
@@ -249,11 +328,8 @@ export class FormlyDesignerService {
   private path(control: AbstractControl, includeSelf: boolean = true): string {
     let path = '';
     let arrayNext = false;
-
-    if (!includeSelf) {
-      control = (control || {} as AbstractControl).parent;
-    }
-    for (let child = control, parent = (control || {} as AbstractControl).parent; !!parent; child = parent, parent = parent.parent) {
+    let root = includeSelf ? control : control?.parent;
+    for (let child = root, parent = root?.parent; !!parent; child = parent, parent = parent.parent) {
       if (parent instanceof FormGroup) {
         for (const key in parent.controls) {
           if (parent.controls[key] === child) {
@@ -276,22 +352,20 @@ export class FormlyDesignerService {
   }
 
   private unsetField(field: FormlyFieldConfig): void {
-    if (field) {
-      if (field.fieldArray) {
-        this.unsetField(field.fieldArray);
-      }
-      if (field.fieldGroup) {
-        field.fieldGroup.forEach(f => this.unsetField(f));
-      }
-      if (field.formControl) {
-        const path = this.path(field.formControl);
-        unset(this.model, path);
-      }
+    if (field.fieldArray) {
+      this.unsetField(field.fieldArray);
+    }
+    if (field.fieldGroup) {
+      field.fieldGroup.forEach(f => this.unsetField(f));
+    }
+    if (field.formControl) {
+      const path = this.path(field.formControl);
+      unset(this.model, path);
     }
   }
 
-  private removeControl(control: AbstractControl): void {
-    const parent = control ? control.parent : undefined;
+  private removeControl(control: AbstractControl | undefined): void {
+    const parent = control?.parent;
     if (parent instanceof FormGroup) {
       for (const key in parent.controls) {
         if (parent.controls[key] === control) {
@@ -307,5 +381,12 @@ export class FormlyDesignerService {
         }
       }
     }
+  }
+
+  private updateFields(fields?: FormlyFieldConfig[], model?: any): void {
+    this.designerFields = fields ?? cloneDeep(this.designerFields);
+    // Update the selected field to use the updated instance, if any
+    this._selectedField.next(this.fieldsService.find(this.selectedDesignerId, this.designerFields) ?? null);
+    this.model = model ?? cloneDeep(this.model);
   }
 }

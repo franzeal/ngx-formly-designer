@@ -11,13 +11,13 @@ import { FieldWrapper } from '@ngx-formly/core';
     `
 })
 export class FormlyWrapperExpanderComponent extends FieldWrapper {
-  @ViewChild('fieldComponent', { read: ViewContainerRef, static: true }) fieldComponent: ViewContainerRef;
+  @ViewChild('fieldComponent', { read: ViewContainerRef, static: true }) fieldComponent!: ViewContainerRef;
 
   get expanded(): boolean {
     return !this.to || this.to['expanded'] === undefined || this.to['expanded'];
   }
 
-  get label(): string {
+  get label(): string | undefined {
     return this.to ? this.to.label : undefined;
   }
 }

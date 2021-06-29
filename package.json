@@ -4,9 +4,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "debug": "concurrently \"ng serve -c development\"  \"ng build ngx-formly-designer --watch\"",
-    "start": "npm run build_lib && ng serve --configuration production",
-    "build": "ng build ngx-formly-designer && ng build",
+    "start": "ng serve",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",

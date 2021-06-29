@@ -43,7 +43,7 @@ import { FieldArrayType } from '@ngx-formly/core';
 })
 export class FormlyFieldRepeatSectionComponent extends FieldArrayType {
   get fieldArrayClassName(): string {
-    return this.field.fieldArray.className;
+    return this.field.fieldArray?.className ?? '';
   }
 
   canAdd(): boolean {

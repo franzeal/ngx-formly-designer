@@ -2,18 +2,20 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
-    "module": "es2020",
     "outDir": "./dist/out-tsc",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
-    "moduleResolution": "node",
+    "downlevelIteration": true,
     "experimentalDecorators": true,
-    "target": "es2015",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
+    "moduleResolution": "node",
+    "target": "es2017",
+    "module": "es2020",
     "lib": [
-      "es2017",
+      "es2018",
       "dom"
     ],
     "paths": {
@@ -23,11 +25,17 @@
       "core-js/es6/*": ["node_modules/core-js/es"],
       "core-js/es7/*": ["node_modules/core-js/es"],
       "ngx-formly-designer": [
-        "dist/ngx-formly-designer"
-      ],
-      "ngx-formly-designer/*": [
-        "dist/ngx-formly-designer/*"
+        "projects/ngx-formly-designer/src/public_api"
       ]
     }
+  },
+  "angularCompilerOptions": {
+    "enableResourceInlining": true,
+    "skipTemplateCodegen": true,
+    "strictMetadataEmit": true,
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
   }
 }

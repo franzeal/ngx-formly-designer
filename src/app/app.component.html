@@ -1,14 +1,20 @@
 <div class="row" style="margin:2em">
-    <div class="col-sm-12 col-md-8 col-lg-6">
-        <formly-designer [model]="model" [fields]="fields" class="container-fluid"
-            (modelChange)="onModelChange($event)" (fieldsChange)="onFieldsChange($event)">
-        </formly-designer>
-        <div>
-            Fields:
-            <pre>{{ designerFields | json }}</pre>
+  <div class="col-sm-12 col-md-2">
+    <formly-designer-types></formly-designer-types>
+  </div>
+  <div class="col-sm-12 col-md-5">
+    <formly-designer class="mt-4 mt-md-0 d-block" [model]="model" [fields]="fields" (modelChange)="onModelChange($event)"
+      (fieldsChange)="onFieldsChange($event)">
+    </formly-designer>
+    <div class="mt-4">
+      Fields:
+      <pre>{{ fieldsResult | json }}</pre>
 
-            Model:
-            <pre>{{ designerModel | json }}</pre>
-        </div>
+      Model:
+      <pre>{{ modelResult | json }}</pre>
     </div>
+  </div>
+  <div class="col-sm-12 col-md-5 mt-sm-4 mt-md-0">
+    <formly-designer-properties></formly-designer-properties>
+  </div>
 </div>

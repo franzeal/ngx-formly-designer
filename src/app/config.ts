@@ -6,32 +6,34 @@ import { FormlyFieldRepeatSectionComponent } from './types/repeat-section';
 import { FormlyWrapperExpanderComponent } from './wrappers/expander';
 
 export const fieldComponents = [
-    FormlyFieldCustomInputComponent,
-    FormlyFieldRepeatSectionComponent,
-    FormlyWrapperExpanderComponent
+  FormlyFieldCustomInputComponent,
+  FormlyFieldRepeatSectionComponent,
+  FormlyWrapperExpanderComponent
 ];
 
 export const config: ConfigOption = {
-    types: [
-        { name: 'extended-input', extends: 'input' },
-        { name: 'customInput', component: FormlyFieldCustomInputComponent },
-        { name: 'repeatSection', component: FormlyFieldRepeatSectionComponent },
-        { name: 'multicheckbox', component: FormlyFieldMultiCheckbox,
-            defaultOptions: {
-                templateOptions: {
-                    options: []
-                }
-            }
-        },
-        { name: 'select', component: FormlyFieldSelect,
-            defaultOptions: {
-                templateOptions: {
-                    options: []
-                }
-            }
+  types: [
+    { name: 'extended-input', extends: 'input' },
+    { name: 'customInput', component: FormlyFieldCustomInputComponent },
+    { name: 'repeatSection', component: FormlyFieldRepeatSectionComponent },
+    {
+      name: 'multicheckbox', component: FormlyFieldMultiCheckbox,
+      defaultOptions: {
+        templateOptions: {
+          options: []
         }
-    ],
-    wrappers: [
-        { name: 'expander', component: FormlyWrapperExpanderComponent }
-    ]
+      }
+    },
+    {
+      name: 'select', component: FormlyFieldSelect,
+      defaultOptions: {
+        templateOptions: {
+          options: []
+        }
+      }
+    }
+  ],
+  wrappers: [
+    { name: 'expander', component: FormlyWrapperExpanderComponent }
+  ]
 };

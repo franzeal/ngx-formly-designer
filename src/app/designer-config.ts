@@ -1,6 +1,6 @@
 import { DesignerConfigOption } from 'ngx-formly-designer';
 
-const reserved = new Set(['label', 'fieldset', 'description', 'validation-message']);
+const reserved = new Set(['label', 'fieldset', 'description', 'validation-message', 'form-field']);
 
 export function formlyBootstrapfilterWrapper(wrapper: string) {
   return reserved.has(wrapper);

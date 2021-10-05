@@ -14,16 +14,16 @@
     "tslib": "^2.0.0"
   },
   "peerDependencies": {
-    "@angular/common": "^6.0.0",
-    "@angular/core": "^6.0.0",
-    "@angular/forms": "^6.0.0",
-    "@ngx-formly/core": "^4.0.0",
-    "@ngx-formly/bootstrap": "^4.0.0",
-    "bootstrap": "^4.0.0",
-    "font-awesome": "^4.7.0",
-    "jquery": "^3.2.1",
-    "lodash-es": "^4.17.0",
-    "popper.js": "^1.12.9",
-    "rxjs": "^6.0.0"
+    "@angular/common": ">=11",
+    "@angular/core": ">=11",
+    "@angular/forms": ">=11",
+    "@ngx-formly/core": ">=4",
+    "@ngx-formly/bootstrap": ">=4",
+    "bootstrap": ">=4",
+    "font-awesome": "^4.0.0",
+    "jquery": "^3.0.0",
+    "lodash-es": "^4.0.0",
+    "popper.js": "^1.0.0",
+    "rxjs": ">=6"
   }
 }

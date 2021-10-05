@@ -81,7 +81,7 @@ export class TypeSelectComponent implements AfterViewInit, ControlValueAccessor,
   }
 
   private updateTypes(): void {
-    timer().subscribe(() => {
+    timer(0).subscribe(() => {
       this.types = this.getTypes();
       const type = this.fieldGroup && (this.type == null || this.type === '') ? 'formly-group' : this.type;
       if (this.types.some(option => option.value === type)) {

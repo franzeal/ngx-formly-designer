@@ -190,7 +190,7 @@ export class FormlyDesignerFieldWrapperComponent extends FieldWrapper implements
     public formlyDesignerService: FormlyDesignerService,
     private zone: NgZone,
     parentService: ParentService,
-    @Inject(DOCUMENT) private document?: Document,
+    @Inject(DOCUMENT) private document?: any,
     @SkipSelf() @Optional() private parentParentService?: ParentService,
   ) {
     super();
@@ -358,12 +358,12 @@ export class FormlyDesignerFieldWrapperComponent extends FieldWrapper implements
     const fieldIndex = (index == null || isNaN(index)) ? updatedField.fieldGroup.length :
       Math.min(updatedField.fieldGroup.length, Math.max(0, index));
     updatedField.fieldGroup.splice(fieldIndex, 0, field);
-    return timer()
+    return timer(0)
       .pipe(
         tap(() => this.formlyDesignerService.updateField(this.field, updatedField)),
         catchError(() => NEVER),
         map(() => undefined)
-      ).toPromise<void>();
+      ).toPromise();
   }
 
   async addChildType(type: string, index?: number): Promise<void> {

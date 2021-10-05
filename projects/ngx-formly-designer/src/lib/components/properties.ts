@@ -64,7 +64,7 @@ export class PropertiesComponent implements OnInit, OnDestroy {
     if (!this.fieldsService.checkField(this.fieldEdit.value, this.formlyDesignerService.designerFields)) {
       return;
     }
-    timer().subscribe(() => {
+    timer(0).subscribe(() => {
       this.formlyDesignerService.updateField(this.field, this.fieldEdit.value);
     });
   }

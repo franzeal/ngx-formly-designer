@@ -14,8 +14,7 @@
     "types": [],
     "lib": [
       "dom",
-      "es2015",
-      "es2017.Object"
+      "es2017"
     ]
   },
   "angularCompilerOptions": {

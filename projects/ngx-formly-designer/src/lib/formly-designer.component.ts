@@ -159,7 +159,7 @@ export class FormlyDesignerComponent implements OnDestroy, OnInit {
   }
 
   onFieldSelected(field: FormlyFieldConfig): void {
-    timer().pipe(
+    timer(0).pipe(
       tap(() => {
         if (this.fieldsService.checkField(field, this.formlyDesignerService.designerFields)) {
           this.formlyDesignerService.addField(field);

@@ -37,7 +37,7 @@ export class WrapperSelectComponent implements AfterViewInit, ControlValueAccess
   protected onTouched = () => { };
 
   ngAfterViewInit(): void {
-    timer().subscribe(() => {
+    timer(0).subscribe(() => {
       this.wrappers = Object.keys(this.formlyDesignerConfig.wrappers);
       if (this.wrappers.length > 0) {
         this.formControl.setValue(this.wrappers[0]);

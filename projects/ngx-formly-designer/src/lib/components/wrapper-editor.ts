@@ -52,7 +52,7 @@ export class WrapperEditorComponent implements ControlValueAccessor, OnChanges, 
 
   ngOnInit(): void {
     this.subscriptions.push(this.fieldForm.statusChanges
-      .pipe(switchMap(() => timer()))
+      .pipe(switchMap(() => timer(0)))
       .subscribe(() => this.invalid = this.fieldForm.invalid));
 
     this.subscribeValueChanges();
